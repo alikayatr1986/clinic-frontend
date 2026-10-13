@@ -102,13 +102,23 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-manrope), var(--font-noto-arabic), system-ui,
+    -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html:lang(ar) {
+    line-height: 1.65;
+  }
+
+  :lang(ar) {
+    font-family: var(--font-noto-arabic), var(--font-manrope), system-ui,
+      -apple-system, "Segoe UI", sans-serif;
   }
 
   body {
