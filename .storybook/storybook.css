@@ -1,0 +1,13 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap");
+
+/*
+ * Storybook-only bridge: production defines these variables via
+ * next/font in src/app/layout.tsx. The preview iframe has no Next
+ * layout, so the same faces are loaded here and the variables are
+ * defined to keep --font-sans resolving to the brand stack.
+ * Never imported by production code.
+ */
+:root {
+  --font-manrope: "Manrope";
+  --font-noto-arabic: "Noto Sans Arabic";
+}
