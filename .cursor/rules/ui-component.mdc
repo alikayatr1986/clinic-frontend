@@ -1,0 +1,11 @@
+---
+description: UI component triple rule (shadcn + Storybook + test)
+globs: ["src/components/ui/**/*"]
+---
+# UI component triple rule
+
+When you CREATE or EDIT any file in `src/components/ui/`:
+1. Update the sibling `*.stories.tsx` (every variant/state, Light/Dark, LTR/RTL).
+2. Update the sibling `*.test.tsx` (render + variant + axe, `pnpm test` green).
+3. Use only `cn()` + CVA + semantic vars (`bg-primary`, never brand hex); React 19 ref-as-prop.
+Reject the change in review if any sibling is missing.
