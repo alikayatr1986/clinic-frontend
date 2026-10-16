@@ -25,12 +25,12 @@ function NavLinks({ rtl }: { rtl?: boolean }) {
     <nav className="flex flex-col gap-1 p-4">
       {rtl
         ? ["الرئيسية", "العلاجات", "الأسئلة", "تواصل"].map((label) => (
-            <Button key={label} variant="ghost" className="justify-start">
+            <Button key={label} variant="ghost">
               {label}
             </Button>
           ))
         : ["Home", "Treatments", "FAQ", "Contact"].map((label) => (
-            <Button key={label} variant="ghost" className="justify-start">
+            <Button key={label} variant="ghost">
               {label}
             </Button>
           ))}

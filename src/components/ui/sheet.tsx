@@ -63,9 +63,15 @@ const sheetVariants = cva(
         right:
           "inset-y-0 right-0 h-full w-3/4 border-s data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
       },
+      /** Surface for sheets that must read as part of a header bar. */
+      tone: {
+        default: "",
+        linen: "bg-linen text-midnight-900",
+      },
     },
     defaultVariants: {
       side: "right",
+      tone: "default",
     },
   }
 );
@@ -74,45 +80,66 @@ function SheetContent({
   className,
   children,
   side = "right",
+  tone = "default",
+  /**
+   * Adds top padding equal to the fixed site header (mobile `h-16`, desktop
+   * `lg:h-20`) so content that slides beneath the header starts below it.
+   */
+  headerClearance = false,
+  /**
+   * Renders the built-in corner close ✕. Sheets that use another close
+   * affordance (e.g. the morphing hamburger above a navigation panel) can
+   * suppress it entirely at the foundation level.
+   */
+  withClose = true,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> &
-  VariantProps<typeof sheetVariants>) {
+  VariantProps<typeof sheetVariants> & {
+    headerClearance?: boolean;
+    withClose?: boolean;
+  }) {
   return (
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content
         data-slot="sheet-content"
-        className={cn(sheetVariants({ side }), className)}
+        className={cn(
+          sheetVariants({ side, tone }),
+          headerClearance && "pt-16 lg:pt-20",
+          className
+        )}
         {...props}
       >
         {children}
-        <SheetPrimitive.Close
-          data-slot="sheet-close-button"
-          aria-label="Close"
-          className={cn(
-            "absolute end-4 top-4 flex size-12 items-center justify-center rounded-md text-muted-foreground transition-colors",
-            "hover:text-foreground",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            "disabled:pointer-events-none disabled:opacity-50"
-          )}
-        >
-          <svg
-            aria-hidden="true"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="size-4 shrink-0"
+        {withClose && (
+          <SheetPrimitive.Close
+            data-slot="sheet-close-button"
+            aria-label="Close"
+            className={cn(
+              "absolute end-4 top-4 flex size-12 items-center justify-center rounded-md text-muted-foreground transition-colors",
+              "hover:text-foreground",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "disabled:pointer-events-none disabled:opacity-50"
+            )}
           >
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
-          <span className="sr-only">Close</span>
-        </SheetPrimitive.Close>
+            <svg
+              aria-hidden="true"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="size-4 shrink-0"
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+            <span className="sr-only">Close</span>
+          </SheetPrimitive.Close>
+        )}
       </SheetPrimitive.Content>
     </SheetPortal>
   );
@@ -132,7 +159,13 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-footer"
-      className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+      className={cn(
+        "mt-auto flex flex-col gap-2 p-4",
+        // Buttons in the footer are full-width CTAs (mobile consultation
+        // panel) — consumers compose variants, not widths.
+        "[&_[data-slot=button]]:w-full",
+        className
+      )}
       {...props}
     />
   );
