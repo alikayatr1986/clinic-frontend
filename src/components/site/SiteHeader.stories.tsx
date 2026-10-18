@@ -15,11 +15,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/**
- * Desktop row is `hidden lg:flex`, so it renders once the Storybook canvas is
- * >=1024px wide (the desktop mock breakpoint); below that only the mobile row
- * shows.
- */
 function Frame({
   theme,
   dir,
@@ -69,7 +64,6 @@ export const DarkRtl: Story = {
   ),
 };
 
-/** Section item active via `activePath` to exercise the crimson underline. */
 export const SectionActive: Story = {
   args: { activePath: "/#treatments" },
   render: ({ activePath }) => (
@@ -77,15 +71,6 @@ export const SectionActive: Story = {
   ),
 };
 
-/**
- * Mobile-row stories. The `lg` breakpoint is evaluated against the Storybook
- * canvas, so the mobile row (like the wordmark in the desktop stories above)
- * renders locally only while the canvas is narrower than 1024px; the
- * `chromatic.viewports` pin prepares the 390px mobile-mock capture for a
- * future Chromatic run (no Chromatic CLI/CI is wired in this repo yet).
- * Menu-open uses the `mobileNavDefaultOpen`
- * story hook so the panel state is deterministic without a play interaction.
- */
 const mobileParameters = {
   chromatic: { viewports: [390] },
 };
@@ -118,7 +103,6 @@ export const MobileDarkRtl: Story = {
   ),
 };
 
-/** Mobile row with the right slide-in menu panel open (7 links + CTA). */
 export const MobileMenuOpen: Story = {
   parameters: mobileParameters,
   args: { activePath: "/" },

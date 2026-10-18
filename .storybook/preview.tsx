@@ -1,7 +1,11 @@
 import type { Preview } from "@storybook/nextjs-vite";
 
+import { NextIntlClientProvider } from "next-intl";
+
 import "../src/app/globals.css";
 import "./storybook.css";
+
+import enMessages from "../messages/en.json";
 
 export const globalTypes = {
   theme: {
@@ -43,9 +47,14 @@ const preview: Preview = {
           lang={dir === "rtl" ? "ar" : "en"}
           className={theme === "dark" ? "dark" : undefined}
         >
-          <div className="min-h-[50vh] bg-background p-6 font-sans text-foreground antialiased">
-            <Story />
-          </div>
+          {/* Story 4 (spec-frontend-i18n-rtl): static EN provider so
+              localized ui surfaces (Close buttons, nav labels) render
+              unlinked — stories' own Arabic/dev-only literals stay. */}
+          <NextIntlClientProvider locale="en" messages={enMessages}>
+            <div className="min-h-[50vh] bg-background p-6 font-sans text-foreground antialiased">
+              <Story />
+            </div>
+          </NextIntlClientProvider>
         </div>
       );
     },

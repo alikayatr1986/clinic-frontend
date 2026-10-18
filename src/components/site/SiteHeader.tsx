@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { ArrowRight } from "lucide-react";
 
 import {
   LOGO_HEIGHT,
@@ -15,25 +17,16 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { LocalePill } from "./LocalePill";
-import { ArrowRightIcon } from "./icons";
 import { MobileNav } from "./MobileNav";
 import { PrimaryNav } from "./PrimaryNav";
 
-/**
- * Fixed site header shell (header-contract §4) with the story-2 desktop row
- * and the story-3 mobile row.
- *
- * At >=1024px (`hidden lg:flex`) the row shows the logo, the 7-item
- * gap-separated `PrimaryNav`, the static EN pill, and the crimson consultation
- * CTA. Below `lg` (`flex lg:hidden`) the compact mobile row shows the derived
- * face mark beside the wordmark, the borderless EN pill, and the
- * `MobileNav` hamburger; the scroll-threshold animation arrives in story 4.
- */
 export function SiteHeader({
   activePath = "/",
   mobileNavDefaultOpen,
   className,
 }: SiteHeaderProps) {
+  const t = useTranslations("header");
+
   return (
     <header
       data-slot="site-header"
@@ -43,7 +36,6 @@ export function SiteHeader({
       )}
     >
       <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 xl:px-8">
-        {/* Story-3 mobile row: mark + wordmark left, EN pill + hamburger right. */}
         <div
           data-slot="site-header-mobile"
           className="flex w-full items-center justify-between gap-2 lg:hidden"
@@ -54,14 +46,10 @@ export function SiteHeader({
           >
             <Image
               src={MOBILE_LOGO_SRC}
-              alt="Dr. Naser Dadaszade"
+              alt={t("logoAlt")}
               width={MOBILE_LOGO_WIDTH}
               height={MOBILE_LOGO_HEIGHT}
-              // Above the fold on the mobile viewport it serves; the desktop
-              // logo keeps the preload because it is the desktop LCP candidate.
               loading="eager"
-              // Rendered at ~20px wide (h-9): the intrinsic 173px source
-              // covers 1x/2x without a custom `sizes` split.
               className="h-9 w-auto"
             />
           </Link>
@@ -75,7 +63,6 @@ export function SiteHeader({
           </div>
         </div>
 
-        {/* Story-2 desktop row. */}
         <div
           data-slot="site-header-desktop"
           className="hidden w-full items-center justify-between gap-2 lg:flex xl:gap-4"
@@ -86,12 +73,10 @@ export function SiteHeader({
           >
             <Image
               src={LOGO_SRC}
-              alt="Dr. Naser Dadaszade"
+              alt={t("logoAlt")}
               width={LOGO_WIDTH}
               height={LOGO_HEIGHT}
               preload
-              // Rendered at ~126px (h-8) / ~142px (xl:h-9): keep the srcset
-              // and preload on the small candidate instead of 1920w (~38 KB).
               sizes="(min-width: 1280px) 142px, 126px"
               className="h-8 w-auto xl:h-9"
             />
@@ -103,8 +88,8 @@ export function SiteHeader({
             <LocalePill />
             <Button asChild size="header">
               <a href="#contact">
-                Book Free Consultation
-                <ArrowRightIcon className="rtl:-scale-x-100" aria-hidden="true" />
+                {t("cta")}
+                <ArrowRight className="rtl:-scale-x-100" aria-hidden="true" />
               </a>
             </Button>
           </div>

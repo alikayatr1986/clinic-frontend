@@ -4,13 +4,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Radius scale (shadcn mapping, derived from --radius) */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* Midnight navy — headings, header, footer, dark canvas */
   --color-midnight-50: #eef1f6;
   --color-midnight-100: #d8dee9;
   --color-midnight-200: #b3bdd1;
@@ -19,7 +17,6 @@
   --color-midnight-900: #0b132b;
   --color-midnight-950: #070d1f;
 
-  /* Crimson — primary CTA only + focus ring + logo mark */
   --color-crimson-50: #fdecef;
   --color-crimson-100: #f9cbd3;
   --color-crimson-500: #d91433;
@@ -27,13 +24,11 @@
   --color-crimson-700: #a50d26;
   --color-crimson-800: #7e0a1e;
 
-  /* Linen — light canvas + cards */
   --color-linen: #f8faf8;
   --color-linen-50: #f8faf8;
   --color-linen-100: #eff3ef;
   --color-linen-200: #dfe7df;
 
-  /* Slate — reuse Tailwind slate, anchor at PRD value */
   --color-slate-custom: #64748b;
 }
 

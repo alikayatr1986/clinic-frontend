@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -65,21 +66,14 @@ function DropdownMenuItem({
   );
 }
 
-function DropdownMenuCheckIcon(props: React.ComponentProps<"svg">) {
+function DropdownMenuCheckIcon(props: React.ComponentProps<typeof Check>) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+    <Check
       strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
       aria-hidden="true"
       className={cn("size-4 shrink-0", props.className)}
       {...props}
-    >
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
+    />
   );
 }
 

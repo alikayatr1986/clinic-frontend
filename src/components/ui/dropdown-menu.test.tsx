@@ -66,7 +66,7 @@ describe('DropdownMenu', () => {
     const menu = await screen.findByRole('menu');
     expect(menu).toHaveClass('rounded-lg');
     expect(menu).toHaveClass('border-border');
-    // Stacks above the fixed header bar (z-60) it can be anchored under.
+
     expect(menu).toHaveClass('z-90');
   });
 
@@ -141,9 +141,7 @@ describe('DropdownMenu', () => {
     themedRender(<Languages />);
     await user.click(screen.getByText('Change language'));
     const menu = await screen.findByRole('menu');
-    // Scoped to the menu: Radix's popper wrapper div sits outside any
-    // landmark by design (the dialog landmark rule covers sheets, but menus
-    // have no landmark role), so document-level scanning flags the wrapper.
+
     await axePass(menu);
   });
 });

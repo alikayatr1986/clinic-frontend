@@ -10,7 +10,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-crimson-700",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
@@ -18,7 +19,6 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-12 px-4 py-2",
-        /** Compact header bar CTA (dense padding, small type that scales up at xl). */
         header: "h-12 px-2 py-2 text-xs xl:px-4 xl:text-sm",
         sm: "h-9 rounded-md px-3",
         lg: "h-12 rounded-md px-8",
@@ -29,11 +29,12 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }

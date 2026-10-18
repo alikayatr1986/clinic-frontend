@@ -1,14 +1,61 @@
 import * as React from 'react';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { LocalePill } from '@/components/site/LocalePill';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { NAV_ITEMS } from '@/constants/nav.constants';
-import { axePass, themedRender } from '@/test/utils';
+import {
+  axePass,
+  enNavLabel,
+  nextRouterSpies,
+  themedRender,
+} from '@/test/utils';
+
+vi.mock('next/navigation', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/navigation')>();
+  const { installRouterSpies } = await import('@/test/utils');
+
+  const spies = installRouterSpies();
+  return {
+    ...actual,
+    useRouter: () => spies,
+  };
+});
+
+const router = nextRouterSpies();
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+function captureCookieWrites(): { written: string[]; restore: () => void } {
+  let proto: object | null = Object.getPrototypeOf(document);
+  while (proto && !Object.prototype.hasOwnProperty.call(proto, 'cookie')) {
+    proto = Object.getPrototypeOf(proto);
+  }
+  const accessor = Object.getOwnPropertyDescriptor(proto!, 'cookie')!;
+  const written: string[] = [];
+  Object.defineProperty(document, 'cookie', {
+    configurable: true,
+    get() {
+      return accessor.get!.call(document);
+    },
+    set(value: string) {
+      written.push(String(value));
+      accessor.set!.call(document, value);
+    },
+  });
+  return {
+    written,
+    restore() {
+      Reflect.deleteProperty(document, 'cookie');
+    },
+  };
+}
 
 describe('SiteHeader (desktop row)', () => {
   it('renders the logo, every nav item, the EN pill, and the CTA', () => {
@@ -17,7 +64,7 @@ describe('SiteHeader (desktop row)', () => {
     expect(screen.getByRole('banner')).toBeInTheDocument();
     const desktopRow = container.querySelector('[data-slot="site-header-desktop"]');
     expect(desktopRow).not.toBeNull();
-    // Both row logos share the alt text, so the query is scoped by row slot.
+
     expect(
       within(desktopRow as HTMLElement).getByRole('img', { name: 'Dr. Naser Dadaszade' }),
     ).toBeInTheDocument();
@@ -26,8 +73,8 @@ describe('SiteHeader (desktop row)', () => {
     expect(nav).toBeInTheDocument();
     expect(nav.querySelectorAll('a')).toHaveLength(NAV_ITEMS.length);
 
-    for (const { label } of NAV_ITEMS) {
-      expect(screen.getByRole('link', { name: label })).toBeInTheDocument();
+    for (const item of NAV_ITEMS) {
+      expect(screen.getByRole('link', { name: enNavLabel(item) })).toBeInTheDocument();
     }
 
     const desktop = within(desktopRow as HTMLElement);
@@ -58,7 +105,7 @@ describe('SiteHeader (desktop row)', () => {
 
     const mobile = container.querySelector('[data-slot="site-header-mobile"]');
     expect(mobile).toHaveClass('flex', 'lg:hidden');
-    // Renegotiation 2026-10-16: the mobile row carries only the face mark.
+
     expect(
       within(mobile as HTMLElement).queryByText('Dr. Naser Dadaszade'),
     ).toBeNull();
@@ -76,14 +123,12 @@ describe('SiteHeader (desktop row)', () => {
     expect(logoLink).toHaveAttribute('href', '/');
     const mark = row.getByRole('img', { name: 'Dr. Naser Dadaszade' });
     expect(mark).toHaveClass('h-9', 'w-auto');
-    // jsdom never fetches img src, so the asset reference and file existence
-    // are asserted directly (src is emitted URL-encoded by next/image).
+
     expect(decodeURIComponent(mark.getAttribute('src') ?? '')).toContain(
       '/icons/mobile_logo.png',
     );
     expect(existsSync(join(process.cwd(), 'public', 'icons', 'mobile_logo.png'))).toBe(true);
 
-    // Mark left, then the EN pill and the hamburger right.
     expect(row.getByRole('button', { name: /change language/i })).toHaveAttribute(
       'data-variant',
       'borderless',
@@ -112,8 +157,6 @@ describe('SiteHeader (desktop row)', () => {
       <SiteHeader activePath="/#treatments" mobileNavDefaultOpen />,
     );
 
-    // With the modal panel open, Radix aria-hides outside content, so the
-    // desktop active state is asserted by attributes rather than by role.
     const desktopTreatments = container.querySelector(
       '[data-slot="primary-nav"] a[href="#treatments"]',
     );
@@ -126,7 +169,6 @@ describe('SiteHeader (desktop row)', () => {
     );
     expect(desktopFaq).not.toHaveClass('text-primary');
 
-    // The mobile panel receives the same activePath via the shared matcher.
     await screen.findByRole('dialog');
     const panelTreatments = within(screen.getByRole('dialog')).getByRole(
       'link',
@@ -175,28 +217,133 @@ describe('SiteHeader (desktop row)', () => {
     await user.click(pill);
 
     const menu = await screen.findByRole('menu');
-    expect(within(menu).getAllByRole('menuitem')).toHaveLength(3);
+    const items = within(menu).getAllByRole('menuitem');
+    expect(items).toHaveLength(2);
     expect(within(menu).getByText('English')).toBeInTheDocument();
     expect(within(menu).getByText('العربية')).toBeInTheDocument();
-    expect(within(menu).getByText('Русский')).toBeInTheDocument();
+    expect(within(menu).queryByText('Русский')).toBeNull();
+    expect(
+      items.map((item) => item.getAttribute('data-lang')),
+    ).toEqual(['en', 'ar']);
 
-    // Default handler is the inert stub; activating an item must not throw.
+    expect(document.cookie).not.toContain('NEXT_LOCALE=');
+    expect(router.refresh).not.toHaveBeenCalled();
+
     await user.keyboard('{Escape}');
   });
 
-  it('exposes the locale-switch hook with the chosen locale', async () => {
+  it('shows ru in the menu automatically once it activates in routing.locales (Q2)', async () => {
+    const user = userEvent.setup();
+
+    vi.resetModules();
+    vi.doMock('@/i18n/routing', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('@/i18n/routing')>();
+      return {
+        routing: {
+          ...actual.routing,
+          locales: ['en', 'ar', 'ru'],
+        } as unknown as typeof actual.routing,
+      };
+    });
+    try {
+      const { LocalePill: RuLocalePill } = await import('@/components/site/LocalePill');
+      themedRender(<RuLocalePill />);
+
+      await user.click(screen.getByRole('button', { name: /change language/i }));
+      const menu = await screen.findByRole('menu');
+      expect(within(menu).getAllByRole('menuitem')).toHaveLength(3);
+      expect(within(menu).getByText('Русский')).toBeInTheDocument();
+      expect(menu.querySelector('[data-lang="ru"]')).toBeInTheDocument();
+    } finally {
+      vi.doUnmock('@/i18n/routing');
+      vi.resetModules();
+    }
+  });
+
+  it('exposes the locale-switch hook with the chosen locale (optional override)', async () => {
     const user = userEvent.setup();
     const onLocaleChange = vi.fn();
-    themedRender(<LocalePill locale="ar" onLocaleChange={onLocaleChange} />);
+    themedRender(<LocalePill locale="en" onLocaleChange={onLocaleChange} />);
 
     await user.click(screen.getByRole('button', { name: /change language/i }));
     const menu = await screen.findByRole('menu');
-    expect(menu.querySelector('[data-lang="ar"]')).toHaveAttribute('data-checked', 'true');
+    expect(menu.querySelector('[data-lang="en"]')).toHaveAttribute('data-checked', 'true');
 
-    await user.click(screen.getByRole('menuitem', { name: 'Русский' }));
+    await user.click(screen.getByRole('menuitem', { name: 'العربية' }));
 
     expect(onLocaleChange).toHaveBeenCalledTimes(1);
-    expect(onLocaleChange).toHaveBeenCalledWith('ru');
+    expect(onLocaleChange).toHaveBeenCalledWith('ar');
+    expect(document.cookie).not.toContain('NEXT_LOCALE=ar');
+    expect(router.refresh).not.toHaveBeenCalled();
+  });
+
+  it('switches locale for real: canonical cookie write + exactly one router.refresh (story 5)', async () => {
+    const user = userEvent.setup();
+    const { written, restore } = captureCookieWrites();
+    try {
+      themedRender(<LocalePill />);
+
+      await user.click(screen.getByRole('button', { name: /change language/i }));
+      await user.click(await screen.findByRole('menuitem', { name: 'العربية' }));
+
+      expect(written).toEqual(['NEXT_LOCALE=ar; path=/; sameSite=lax; max-age=31536000']);
+      expect(document.cookie).toContain('NEXT_LOCALE=ar');
+
+      expect(router.refresh).toHaveBeenCalledTimes(1);
+      expect(router.push).not.toHaveBeenCalled();
+      expect(router.replace).not.toHaveBeenCalled();
+      expect(router.back).not.toHaveBeenCalled();
+      expect(router.forward).not.toHaveBeenCalled();
+      expect(router.prefetch).not.toHaveBeenCalled();
+
+      await waitFor(() => {
+        expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      });
+    } finally {
+      restore();
+
+      document.cookie = 'NEXT_LOCALE=; max-age=0; path=/';
+    }
+  });
+
+  it('re-selecting the active locale is an idempotent no-op (story 5)', async () => {
+    const user = userEvent.setup();
+    const { written, restore } = captureCookieWrites();
+    try {
+      themedRender(<LocalePill locale="ar" />);
+
+      await user.click(screen.getByRole('button', { name: /change language/i }));
+      await user.click(await screen.findByRole('menuitem', { name: 'العربية' }));
+
+      expect(written).toEqual([]);
+      expect(document.cookie).not.toContain('NEXT_LOCALE=ar');
+      expect(router.refresh).not.toHaveBeenCalled();
+      await waitFor(() => {
+        expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      });
+    } finally {
+      restore();
+    }
+  });
+
+  it('keeps both laps of axe green for the pill-open menu', async () => {
+    const user = userEvent.setup();
+
+    const ltr = themedRender(<LocalePill />, { dir: 'ltr', lang: 'en' });
+    await user.click(screen.getByRole('button', { name: /change language/i }));
+    const ltrMenu = await screen.findByRole('menu');
+    expect(ltrMenu.querySelector('[data-lang="en"]')).toHaveAttribute('data-checked', 'true');
+
+    await axePass(ltrMenu);
+    ltr.unmount();
+
+    const rtl = themedRender(<LocalePill />, { dir: 'rtl', lang: 'ar', locale: 'ar' });
+    await user.click(screen.getByRole('button', { name: /تغيير اللغة/ }));
+    const rtlMenu = await screen.findByRole('menu');
+    expect(rtlMenu.querySelector('[data-lang="ar"]')).toHaveAttribute('data-checked', 'true');
+    expect(within(rtlMenu).getAllByRole('menuitem')).toHaveLength(2);
+    await axePass(rtlMenu);
+    rtl.unmount();
   });
 
   it('mirrors the arrow icon in RTL without flipping hues', () => {
@@ -211,12 +358,23 @@ describe('SiteHeader (desktop row)', () => {
     const rtlCta = screen.getByRole('link', { name: /book free consultation/i });
     const rtlArrow = rtlCta.querySelector('svg');
 
-    // Structure/hues are byte-for-byte identical; only the arrow mirrors.
     expect(rtlHeader?.className).toBe(ltrHeader?.className);
     expect(rtlCta).toHaveClass('bg-primary');
     expect(ltrCta).toHaveClass('bg-primary');
     expect(ltrArrow).toHaveClass('rtl:-scale-x-100');
     expect(rtlArrow).toHaveClass('rtl:-scale-x-100');
+  });
+
+  it('serves the Arabic catalog under locale=ar: trigger, pill, nav row, CTA, alt (story 4 matrix)', () => {
+    themedRender(<SiteHeader />, { locale: 'ar' });
+    expect(screen.getByRole('button', { name: 'فتح قائمة التنقل' })).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('button', { name: 'تغيير اللغة، الحالية AR' })
+    ).toHaveLength(2);
+
+    expect(screen.getByRole('link', { name: 'العلاجات' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'احجز استشارتك مجانًا' })).toBeInTheDocument();
+    expect(screen.getAllByRole('img', { name: 'د. ناصر داداس زاده' })).toHaveLength(2);
   });
 
   it('has zero axe violations', async () => {
@@ -254,8 +412,11 @@ describe('SiteHeader (mobile row)', () => {
     const panel = within(dialog);
 
     expect(dialog.querySelector('[data-slot="mobile-nav"]')).not.toBeNull();
-    for (const { label, href } of NAV_ITEMS) {
-      expect(panel.getByRole('link', { name: label })).toHaveAttribute('href', href);
+    for (const item of NAV_ITEMS) {
+      expect(panel.getByRole('link', { name: enNavLabel(item) })).toHaveAttribute(
+        'href',
+        item.href,
+      );
     }
     expect(panel.getByRole('link', { name: /book free consultation/i })).toHaveAttribute(
       'href',

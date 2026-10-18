@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "title": "Dr. Naser Dadaszade Clinic",
+    "description": "Aesthetic and hair transplant care by Dr. Naser Dadaszade — explore treatments, hospitals, and packages, then book a consultation."
+  },
+  "nav": {
+    "treatments": "Treatments",
+    "about": "About Us",
+    "surgeon": "Meet the Surgeon",
+    "packages": "Packages & Pricing",
+    "blog": "Blog",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "header": {
+    "cta": "Book Free Consultation",
+    "logoAlt": "Dr. Naser Dadaszade"
+  },
+  "aria": {
+    "primaryNav": "Primary",
+    "openMenu": "Open navigation menu",
+    "srNavTitle": "Navigation menu",
+    "srNavDescription": "Site navigation links and the consultation entry point",
+    "mobileNav": "Mobile navigation"
+  },
+  "localePill": {
+    "current": "Change language, current {current}"
+  },
+  "ui": {
+    "close": "Close"
+  }
+}

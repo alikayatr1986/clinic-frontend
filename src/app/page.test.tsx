@@ -1,10 +1,20 @@
 import * as React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { screen, within } from '@testing-library/react';
 
 import Home from '@/app/page';
 import { NAV_ITEMS, SECTION_ITEMS } from '@/constants/nav.constants';
-import { axePass, themedRender } from '@/test/utils';
+import { axePass, enNavLabel, themedRender } from '@/test/utils';
+
+vi.mock('next/navigation', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/navigation')>();
+  const { installRouterSpies } = await import('@/test/utils');
+  const spies = installRouterSpies();
+  return {
+    ...actual,
+    useRouter: () => spies,
+  };
+});
 
 describe('Home (/)', () => {
   it('renders the site header and the main landmark', () => {
@@ -12,8 +22,7 @@ describe('Home (/)', () => {
 
     expect(screen.getByRole('banner')).toBeInTheDocument();
     expect(screen.getByRole('main')).toBeInTheDocument();
-    // Renegotiation 2026-10-16: no visible wordmark text remains in the
-    // header; the row logos (both carry the site name as alt) are the identity.
+
     expect(
       screen.getAllByRole('img', { name: 'Dr. Naser Dadaszade' }).length,
     ).toBeGreaterThan(0);
@@ -24,9 +33,9 @@ describe('Home (/)', () => {
 
     expect(SECTION_ITEMS).toHaveLength(NAV_ITEMS.length);
 
-    for (const { anchor, label } of SECTION_ITEMS) {
-      const region = screen.getByRole('region', { name: label });
-      expect(region).toHaveAttribute('id', anchor);
+    for (const item of SECTION_ITEMS) {
+      const region = screen.getByRole('region', { name: enNavLabel(item) });
+      expect(region).toHaveAttribute('id', item.anchor);
       expect(region).toHaveClass('scroll-mt-16', 'lg:scroll-mt-20');
     }
   });
@@ -54,6 +63,15 @@ describe('Home (/)', () => {
     expect(screen.getByRole('main')).toHaveClass('pt-16', 'lg:pt-20');
   });
 
+  it('serves the Arabic section labels under locale=ar: region name from ar.json', () => {
+    themedRender(<Home />, { locale: 'ar' });
+
+    expect(screen.getByRole('region', { name: 'العلاجات' })).toHaveAttribute(
+      'id',
+      'treatments',
+    );
+  });
+
   it('shows the desktop row with no active item on `/`', () => {
     const { container } = themedRender(<Home />);
 
@@ -65,8 +83,8 @@ describe('Home (/)', () => {
     );
     expect(current).toHaveLength(0);
 
-    for (const { label } of NAV_ITEMS) {
-      expect(screen.getByRole('link', { name: label })).toBeInTheDocument();
+    for (const item of NAV_ITEMS) {
+      expect(screen.getByRole('link', { name: enNavLabel(item) })).toBeInTheDocument();
     }
 
     expect(screen.getByRole('link', { name: /book free consultation/i })).toHaveAttribute(
@@ -83,7 +101,7 @@ describe('Home (/)', () => {
     const mobile = within(mobileRow as HTMLElement);
 
     expect(mobileRow).toHaveClass('flex', 'lg:hidden');
-    // Renegotiation 2026-10-16: the mobile row carries only the face mark.
+
     expect(mobile.queryByText('Dr. Naser Dadaszade')).toBeNull();
     expect(mobile.getByRole('img', { name: 'Dr. Naser Dadaszade' })).toHaveClass('h-9');
 
@@ -96,8 +114,6 @@ describe('Home (/)', () => {
   it('carries no Next.js starter copy or assets', () => {
     const { container } = themedRender(<Home />);
 
-    // Case-insensitive regexes (not literals) so the source grep for removed
-    // starter copy stays clean while still proving every phrase is gone.
     expect(screen.queryByText(/to get started/i)).toBeNull();
     expect(screen.queryByRole('link', { name: /deploy/i })).toBeNull();
     expect(screen.queryByRole('link', { name: /documentation/i })).toBeNull();
@@ -113,8 +129,6 @@ describe('Home (/)', () => {
     const ltrHeader = ltr.container.querySelector('[data-slot="site-header"]');
     const rtlHeader = rtl.container.querySelector('[data-slot="site-header"]');
 
-    // Direction mirrors layout only: the shell's own structure and hue classes
-    // are byte-for-byte identical in both directions, colours never flip.
     expect(ltrHeader).not.toBeNull();
     expect(rtlHeader?.className).toBe(ltrHeader?.className);
     expect(ltrHeader).toHaveClass('bg-linen', 'text-midnight-900');

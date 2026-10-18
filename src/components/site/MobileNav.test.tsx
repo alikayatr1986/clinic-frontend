@@ -5,27 +5,25 @@ import userEvent from '@testing-library/user-event';
 
 import { MobileNav } from '@/components/site/MobileNav';
 import { NAV_ITEMS } from '@/constants/nav.constants';
-import { axePass, themedRender } from '@/test/utils';
+import { axePass, enNavLabel, themedRender } from '@/test/utils';
 
 function openPanel(user: ReturnType<typeof userEvent.setup>) {
   return user.click(screen.getByRole('button', { name: 'Open navigation menu' }));
 }
 
 describe('MobileNav (trigger + sheet panel)', () => {
-  it('renders only the 48px hamburger while closed', () => {
+  it('renders only the 48px trigger with the menu.svg icon while closed', () => {
     const { container } = themedRender(<MobileNav />);
 
     const trigger = screen.getByRole('button', { name: 'Open navigation menu' });
     expect(trigger).toHaveClass('size-12');
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    // Three midnight-stroke bars: separator-stroke SVG inheriting the header ink.
-    expect(trigger.querySelector('svg')).toBeInTheDocument();
-    // Closed bars carry no cross transforms.
-    const bars = trigger.querySelectorAll('line');
-    expect(bars).toHaveLength(3);
-    for (const bar of bars) {
-      expect(bar.style.transform).not.toContain('rotate');
-    }
+    // The trigger is the lucide `Menu` icon (three parallel lines) morphing
+    // into a cross on open — asserted via `data-open`, not SVG geometry.
+    const menuIcon = trigger.querySelector('svg');
+    expect(menuIcon).toBeInTheDocument();
+    expect(menuIcon).toHaveClass('lucide-menu');
+    expect(menuIcon).toHaveAttribute('data-open', 'false');
     expect(container.querySelector('[data-slot="sheet-content"]')).toBeNull();
   });
 
@@ -38,15 +36,18 @@ describe('MobileNav (trigger + sheet panel)', () => {
 
     const dialog = await screen.findByRole('dialog');
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    // Frozen right slide-in (header-contract §3): the panel hugs the right edge.
-    expect(dialog).toHaveClass('right-0');
+
+    expect(dialog).toHaveClass('end-0');
     await waitFor(() => {
       expect(dialog).toContainElement(document.activeElement as HTMLElement);
     });
 
     const panel = within(dialog);
-    for (const { label, href } of NAV_ITEMS) {
-      expect(panel.getByRole('link', { name: label })).toHaveAttribute('href', href);
+    for (const item of NAV_ITEMS) {
+      expect(panel.getByRole('link', { name: enNavLabel(item) })).toHaveAttribute(
+        'href',
+        item.href,
+      );
     }
     expect(panel.getByRole('link', { name: /book free consultation/i })).toBeInTheDocument();
   });
@@ -89,19 +90,16 @@ describe('MobileNav (trigger + sheet panel)', () => {
     });
   });
 
-  it('morphs the mounted hamburger into the cross above the panel instead of any in-panel close', async () => {
+  it('morphs the mounted lucide Menu icon into the cross above the panel instead of any in-panel close', async () => {
     const user = userEvent.setup();
     const { container } = themedRender(<MobileNav />);
     await openPanel(user);
     const dialog = await screen.findByRole('dialog');
 
-    // The built-in UI close ✕ is not rendered at all (foundation-owned
-    // `withClose={false}`), and no close control lives inside the panel.
     expect(dialog.querySelector('[data-slot="sheet-close-button"]')).toBeNull();
-    // Panel surface and header clearance are foundation-owned Sheet props.
+
     expect(dialog).toHaveClass('bg-linen', 'text-midnight-900', 'pt-16', 'lg:pt-20');
 
-    // No close control lives inside the panel — the hamburger is the ✕.
     expect(within(dialog).queryByRole('button', { name: /close navigation menu/i })).toBeNull();
     expect(within(dialog).getAllByRole('link')).toHaveLength(NAV_ITEMS.length + 1);
 
@@ -110,21 +108,18 @@ describe('MobileNav (trigger + sheet panel)', () => {
     ) as HTMLElement;
     expect(trigger).toHaveClass('pointer-events-auto');
 
-    // The mounted trigger's bars morph into the cross while the panel is open.
-    const bars = trigger.querySelectorAll('line');
-    expect(bars).toHaveLength(3);
-    await waitFor(() => {
-      expect(bars[0]).toHaveStyle({ transform: 'translateY(6px) rotate(45deg)' });
-    });
-    expect(bars[1]).toHaveClass('opacity-0');
-    await waitFor(() => {
-      expect(bars[2]).toHaveStyle({ transform: 'translateY(-6px) rotate(-45deg)' });
-    });
+    // The mounted lucide `Menu` icon carries the open flag: the CSS morph
+    // (lines → cross) keys off `data-open`; jsdom has no Tailwind stylesheet,
+    // so the transforms themselves live in the class strings, not inline
+    // styles.
+    const menuIcon = trigger.querySelector('svg');
+    expect(menuIcon).toHaveClass('lucide-menu');
+    expect(menuIcon).toHaveAttribute('data-open', 'true');
+    expect(menuIcon).toHaveClass(
+      'data-[open=true]:[&>path:nth-child(1)]:translate-y-[7px]',
+      'data-[open=true]:[&>path:nth-child(3)]:-rotate-45',
+    );
 
-    // jsdom has no Tailwind stylesheet, so the trigger's real
-    // `pointer-events-auto` class never resolves for userEvent's style check
-    // (Radix inlines pointer-events: none outside the modal). Assert the class
-    // above and fire the click directly; real browsers resolve the class.
     fireEvent.click(trigger);
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -161,7 +156,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
     const cta = within(dialog).getByRole('link', { name: /book free consultation/i });
     expect(cta).toHaveAttribute('href', '#contact');
     expect(cta).toHaveClass('bg-primary');
-    // Full width comes from the foundation `SheetFooter` button rule now.
+
     expect(dialog.querySelector('[data-slot="sheet-footer"]')).toHaveClass(
       '[&_[data-slot=button]]:w-full',
     );
@@ -217,8 +212,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
   it('renders the panel on the linen surface with midnight ink identical in both directions', () => {
     const ltr = themedRender(<MobileNav defaultOpen />, { dir: 'ltr', lang: 'en' });
     const ltrDialog = screen.getByRole('dialog');
-    // While the modal panel is open Radix aria-hides outside content, so the
-    // trigger is grabbed by slot instead of by role.
+
     const ltrTrigger = ltr.container.querySelector('[data-slot="mobile-nav-trigger"]');
     ltr.unmount();
 
@@ -226,13 +220,19 @@ describe('MobileNav (trigger + sheet panel)', () => {
     const rtlDialog = screen.getByRole('dialog');
     const rtlTrigger = rtl.container.querySelector('[data-slot="mobile-nav-trigger"]');
 
-    // Direction mirrors layout only: the panel surface and trigger hues are
-    // byte-for-byte identical in both directions, colors never flip.
     expect(rtlDialog.className).toBe(ltrDialog.className);
     expect(rtlTrigger?.className).toBe(ltrTrigger?.className);
-    expect(ltrDialog).toHaveClass('bg-linen', 'text-midnight-900');
-    expect(rtlDialog).toHaveClass('bg-linen', 'text-midnight-900');
+    expect(ltrDialog).toHaveClass('bg-linen', 'text-midnight-900', 'end-0');
+    expect(rtlDialog).toHaveClass('bg-linen', 'text-midnight-900', 'end-0');
     expect(ltrTrigger).toHaveClass('text-midnight-900');
+  });
+
+  it('serves the Arabic catalog under locale=ar: row names inside the open sheet', () => {
+    themedRender(<MobileNav defaultOpen />, { locale: 'ar' });
+
+    const dialog = screen.getByRole('dialog');
+
+    expect(within(dialog).getByRole('link', { name: 'العلاجات' })).toBeInTheDocument();
   });
 
   it('has zero axe violations with the panel open', async () => {

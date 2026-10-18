@@ -1,16 +1,13 @@
 "use client";
-
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 function Accordion({
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Root>) {
   return <AccordionPrimitive.Root data-slot="accordion" {...props} />;
 }
-
 function AccordionItem({
   className,
   ...props
@@ -23,7 +20,6 @@ function AccordionItem({
     />
   );
 }
-
 function AccordionTrigger({
   className,
   children,
@@ -38,30 +34,19 @@ function AccordionTrigger({
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           "disabled:pointer-events-none disabled:opacity-50",
           "[&[data-state=open]>svg]:rotate-180",
-          className
+          className,
         )}
         {...props}
       >
         {children}
-        <svg
+        <ChevronDown
           aria-hidden="true"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
           className="size-4 shrink-0 text-muted-foreground transition-transform duration-200"
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+        />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   );
 }
-
 function AccordionContent({
   className,
   children,
@@ -72,7 +57,7 @@ function AccordionContent({
       data-slot="accordion-content"
       className={cn(
         "data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm",
-        className
+        className,
       )}
       {...props}
     >
@@ -80,5 +65,4 @@ function AccordionContent({
     </AccordionPrimitive.Content>
   );
 }
-
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };

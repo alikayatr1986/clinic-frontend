@@ -60,24 +60,28 @@ export const Default: Story = {
 export const AllSides: Story = {
   render: () => (
     <div dir="ltr" lang="en" className="flex flex-wrap gap-3">
-      {(["top", "right", "bottom", "left"] as const).map((side) => (
-        <Sheet key={side}>
-          <SheetTrigger asChild>
-            <Button variant="secondary">{side}</Button>
-          </SheetTrigger>
-          <SheetContent side={side}>
-            <SheetHeader>
-              <SheetTitle>{side} sheet</SheetTitle>
-              <SheetDescription>Slides from the {side} edge.</SheetDescription>
-            </SheetHeader>
-            <SheetFooter>
-              <SheetClose asChild>
-                <Button>Close</Button>
-              </SheetClose>
-            </SheetFooter>
-          </SheetContent>
-        </Sheet>
-      ))}
+      {(["top", "right", "bottom", "left", "start", "end"] as const).map(
+        (side) => (
+          <Sheet key={side}>
+            <SheetTrigger asChild>
+              <Button variant="secondary">{side}</Button>
+            </SheetTrigger>
+            <SheetContent side={side}>
+              <SheetHeader>
+                <SheetTitle>{side} sheet</SheetTitle>
+                <SheetDescription>
+                  Slides from the {side} edge.
+                </SheetDescription>
+              </SheetHeader>
+              <SheetFooter>
+                <SheetClose asChild>
+                  <Button>Close</Button>
+                </SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+        )
+      )}
     </div>
   ),
 };
@@ -108,7 +112,8 @@ export const RightToLeft: Story = {
         <SheetTrigger asChild>
           <Button>افتح القائمة</Button>
         </SheetTrigger>
-        <SheetContent>
+
+        <SheetContent side="end">
           <SheetHeader>
             <SheetTitle>القائمة</SheetTitle>
             <SheetDescription>درج التنقل للجوال.</SheetDescription>

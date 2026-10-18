@@ -38,3 +38,29 @@ Components then import them via absolute paths (`@/constants/...`,
 `@/types/...`, ...). Never inline a new `const` value, interface, or type in a
 component file — add it to the matching category file instead (create one if
 it doesn't exist yet).
+
+## Icon rule (lucide-react only — stop and ask before placing any icon)
+All UI icons come from [`lucide-react`](https://lucide.dev). Never write
+inline `<svg>` markup, hand-rolled icon components, or icon fonts, and never
+delete/replace a lucide icon with a custom one without approval.
+
+1. **Stop and ask before adding any icon.** Whenever an icon is needed for
+   any UI, STOP and ask the human first. Propose 1–3 candidate `lucide-react`
+   icons by exact export name (e.g. `ArrowRight`, `Globe`, `ChevronDown`,
+   `Menu`) and wait for confirmation before importing.
+2. **If the icon is unique and does not exist in lucide-react** (custom
+   brand marks, shapes lucide doesn't have), tell the human, and ask them to
+   download/provide the SVG themselves. The human will place the file in
+   `public/icons/` or `public/images/`. Do not create, trace, reconstruct,
+   or "approximate" the SVG yourself. Render via `next/image` (`.svg` srcs
+   skip optimization automatically); reference the path through a constant
+   in `src/constants/<owning-component>.constants.ts`.
+3. **Special micro-behaviors (morph, draw-on, pulse) on a lucide icon** are
+   allowed only with explicit human approval in the conversation. Implement
+   them as CSS/Tailwind targeting the lucide component (`data-*` flags +
+   arbitrary variants, `transform-box: fill-box`), record the approval in
+   the active story's Spec Change Log, and never fork/re-render the icon
+   markup manually.
+4. **Tests.** Tests must assert the rendered asset (`img[src="..."]`), lucide
+   class names/props (`lucide-menu`), or approved morph flags (`data-open`)
+   — never depend on internal lucide paths or hand-written SVG geometry.

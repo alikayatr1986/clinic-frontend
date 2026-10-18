@@ -3,6 +3,8 @@
 import * as React from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
+import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
@@ -62,8 +64,12 @@ const sheetVariants = cva(
         left: "inset-y-0 left-0 h-full w-3/4 border-e data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
         right:
           "inset-y-0 right-0 h-full w-3/4 border-s data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+        start:
+          "inset-y-0 start-0 h-full w-3/4 border-e data-[state=closed]:slide-out-to-start data-[state=open]:slide-in-from-start sm:max-w-sm",
+        end:
+          "inset-y-0 end-0 h-full w-3/4 border-s data-[state=closed]:slide-out-to-end data-[state=open]:slide-in-from-end sm:max-w-sm",
       },
-      /** Surface for sheets that must read as part of a header bar. */
+
       tone: {
         default: "",
         linen: "bg-linen text-midnight-900",
@@ -81,16 +87,9 @@ function SheetContent({
   children,
   side = "right",
   tone = "default",
-  /**
-   * Adds top padding equal to the fixed site header (mobile `h-16`, desktop
-   * `lg:h-20`) so content that slides beneath the header starts below it.
-   */
+
   headerClearance = false,
-  /**
-   * Renders the built-in corner close ✕. Sheets that use another close
-   * affordance (e.g. the morphing hamburger above a navigation panel) can
-   * suppress it entirely at the foundation level.
-   */
+
   withClose = true,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> &
@@ -98,6 +97,9 @@ function SheetContent({
     headerClearance?: boolean;
     withClose?: boolean;
   }) {
+
+  const t = useTranslations();
+
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -114,7 +116,7 @@ function SheetContent({
         {withClose && (
           <SheetPrimitive.Close
             data-slot="sheet-close-button"
-            aria-label="Close"
+            aria-label={t("ui.close")}
             className={cn(
               "absolute end-4 top-4 flex size-12 items-center justify-center rounded-md text-muted-foreground transition-colors",
               "hover:text-foreground",
@@ -122,22 +124,11 @@ function SheetContent({
               "disabled:pointer-events-none disabled:opacity-50"
             )}
           >
-            <svg
+            <X
               aria-hidden="true"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
               className="size-4 shrink-0"
-            >
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
-            <span className="sr-only">Close</span>
+            />
+            <span className="sr-only">{t("ui.close")}</span>
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Content>
@@ -161,8 +152,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sheet-footer"
       className={cn(
         "mt-auto flex flex-col gap-2 p-4",
-        // Buttons in the footer are full-width CTAs (mobile consultation
-        // panel) — consumers compose variants, not widths.
+
         "[&_[data-slot=button]]:w-full",
         className
       )}

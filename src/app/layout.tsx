@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Manrope, Noto_Sans_Arabic } from "next/font/google";
+import { getLocale, getTranslations } from "next-intl/server";
+
+import { NextIntlClientProvider } from "next-intl";
+
 import "./globals.css";
 
 const manrope = Manrope({
@@ -21,20 +25,36 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Dr. Naser Dadaszade Clinic",
-  description:
-    "Aesthetic and hair transplant care by Dr. Naser Dadaszade — explore treatments, hospitals, and packages, then book a consultation.",
-};
+export async function generateMetadata(): Promise<Metadata> {
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+  const t = await getTranslations("metadata");
+
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
+
+export const instant = false;
+
+function localeDirection(locale: string): "rtl" | "ltr" {
+  return locale === "ar" ? "rtl" : "ltr";
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const locale = await getLocale();
+  const dir = localeDirection(locale);
+
   return (
     <html
-      lang="en"
-      dir="ltr"
+      lang={locale}
+      dir={dir}
       className={`${manrope.variable} ${notoArabic.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }
