@@ -4,6 +4,7 @@ import arMessages from '../../messages/ar.json';
 import enMessages from '../../messages/en.json';
 import RootLayout, { generateMetadata } from '@/app/layout';
 vi.mock("next/font/google", () => ({
+  Libre_Caslon_Display: () => ({ variable: "font-mock-libre-caslon-display" }),
   Manrope: () => ({ variable: "font-mock-manrope" }),
   Noto_Sans_Arabic: () => ({ variable: "font-mock-noto-arabic" }),
   Geist_Mono: () => ({ variable: "font-mock-geist-mono" }),
@@ -43,6 +44,13 @@ describe('RootLayout (localization seam)', () => {
   const html = await RootLayout(layoutProps(<p data-slot="page">Page</p>));
   expect(html.type).toBe("html");
   expect(html.props).toMatchObject({ lang: "en", dir: "ltr" });
+  });
+  it('adds the scoped hero font variable alongside the body fonts', async () => {
+    serveLocale("en");
+    const html = await RootLayout(layoutProps(<p>Page</p>));
+    expect(html.props.className).toContain("font-mock-libre-caslon-display");
+    expect(html.props.className).toContain("font-mock-manrope");
+    expect(html.props.className).toContain("font-mock-noto-arabic");
   });
   it('generateMetadata resolves the metadata namespace per locale (en byte-identical to messages/en.json)', async () => {
   serveLocale("en");

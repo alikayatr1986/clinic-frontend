@@ -28,5 +28,16 @@
   },
   "ui": {
     "close": "Close"
+  },
+  "hero": {
+    "eyebrow": "ENT & FACIAL PLASTIC SURGERY",
+    "heading": "Natural, Functional Rhinoplasty and ENT Care",
+    "description": "Personalized surgical care with a focus on natural results, advanced techniques and international standards.",
+    "primaryAction": "Book Free Video Consultation",
+    "secondaryAction": "Explore Treatments",
+    "trustHospitals": "Internationally Accredited Hospitals",
+    "trustSpecialist": "Experienced ENT Specialist",
+    "trustSupport": "International Patient Support",
+    "trustScrollLabel": "Clinic trust information. Scroll horizontally with the arrow keys to read all items."
   }
 }

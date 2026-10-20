@@ -6,9 +6,9 @@ const meta = {
   argTypes: {
   variant: {
   control: "select",
-  options: ["default", "secondary", "ghost", "destructive", "link"],
+  options: ["default", "secondary", "outline", "ghost", "destructive", "link"],
   },
-  size: { control: "select", options: ["default", "sm", "lg", "icon"] },
+  size: { control: "select", options: ["default", "header", "hero", "sm", "lg", "icon"] },
   disabled: { control: "boolean" },
   asChild: { table: { disable: true } },
   },
@@ -18,7 +18,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const AllVariants: Story = {
   render: () => (<div className="flex flex-col gap-6">
-  {(["default", "secondary", "ghost", "destructive", "link"] as const).map((variant) => (<div key={variant} className="flex flex-wrap items-center gap-3">
+  {(["default", "secondary", "outline", "ghost", "destructive", "link"] as const).map((variant) => (<div key={variant} className="flex flex-wrap items-center gap-3">
   <span className="w-24 text-sm text-muted-foreground">{variant}</span>
   <Button variant={variant}>Default</Button>
   <Button variant={variant} size="sm">
@@ -52,4 +52,10 @@ export const RightToLeft: Story = {
   <Button variant="ghost">اعرف المزيد</Button>
   <Button disabled>معطل</Button>
   </div>),
+};
+
+export const HeroThemeDirectionMatrix: Story = {
+  render: () => <div className="grid gap-6">{["light", "dark"].map(theme => ["ltr", "rtl"].map(direction => <div key={`${theme}-${direction}`} className={theme === "dark" ? "dark bg-background p-6" : "bg-background p-6"} dir={direction}>
+    <div className="grid max-w-lg gap-4">{(["default", "secondary", "outline", "ghost", "destructive", "link"] as const).map(variant => <Button key={variant} variant={variant}>{variant}</Button>)}<Button size="hero">Book Free Video Consultation with a longer wrapping label</Button><Button variant="outline" size="hero">Explore Treatments</Button></div>
+  </div>))}</div>,
 };

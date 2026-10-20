@@ -11,7 +11,7 @@ type Story = StoryObj<typeof meta>;
 function TreatmentCard({ rtl }: {
   rtl?: boolean;
 }) {
-  return (<Card className="max-w-md">
+  return (<div className="max-w-md"><Card>
   <CardHeader>
   <CardTitle>{rtl ? "زراعة الشعر" : "Hair transplant"}</CardTitle>
   <CardDescription>
@@ -31,7 +31,7 @@ function TreatmentCard({ rtl }: {
   <CardFooter>
   <Button>{rtl ? "احجز الاستشارة" : "Book consultation"}</Button>
   </CardFooter>
-  </Card>);
+  </Card></div>);
 }
 export const Treatment: Story = {
   render: () => (<div dir="ltr" lang="en">
@@ -42,4 +42,10 @@ export const RightToLeft: Story = {
   render: () => (<div dir="rtl" lang="ar">
   <TreatmentCard rtl/>
   </div>),
+};
+
+export const TrustThemeDirectionMatrix: Story = {
+  render: () => <div className="grid gap-6">{["light", "dark"].map(theme => ["ltr", "rtl"].map(direction => <div key={`${theme}-${direction}`} className={theme === "dark" ? "dark bg-background p-6" : "bg-background p-6"} dir={direction}>
+    <div className="grid gap-4"><Card><CardContent>Default card</CardContent></Card><Card variant="trust"><span>Internationally Accredited Hospitals</span></Card></div>
+  </div>))}</div>,
 };

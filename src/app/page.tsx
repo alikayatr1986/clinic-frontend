@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 
 import { SECTION_ITEMS } from "@/constants/nav.constants";
+import { HeroSection } from "@/components/site/HeroSection";
 import { SiteHeader } from "@/components/site/SiteHeader";
 
 export default function Home() {
@@ -10,7 +11,8 @@ export default function Home() {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 pt-16 lg:pt-20">
+      <main className="flex-1">
+        <HeroSection />
         {SECTION_ITEMS.map(({ anchor, labelKey }) => (
           <section
             key={anchor}

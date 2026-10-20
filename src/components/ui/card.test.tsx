@@ -66,7 +66,12 @@ describe('Card', () => {
   expect(rtl.container.querySelector('[data-slot="card"]')).toHaveClass('bg-card');
   expect(ltrCard).toHaveClass('bg-card');
   });
-  it('has zero axe violations', async () => {
+  it.each([['light', 'ltr'], ['light', 'rtl'], ['dark', 'ltr'], ['dark', 'rtl']] as const)('renders trust variant in %s %s', async (theme, dir) => {
+    const { container } = themedRender(<Card variant="trust">International Patient Support</Card>, { theme, dir });
+    expect(container.querySelector('[data-slot="card"]')).toHaveClass('bg-muted', 'lg:bg-transparent', 'lg:shadow-none');
+    await axePass(container);
+  });
+  it('has zero axe violations' , async () => {
   const { container } = themedRender(<FullCard />);
   await axePass(container);
   });

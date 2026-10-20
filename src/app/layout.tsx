@@ -4,6 +4,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { NextIntlClientProvider } from "next-intl";
 
+import { heroDisplayFont } from "@/utils/hero-font.utils";
+
 import "./globals.css";
 
 const manrope = Manrope({
@@ -49,7 +51,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang={locale}
       dir={dir}
-      className={`${manrope.variable} ${notoArabic.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${manrope.variable} ${notoArabic.variable} ${geistMono.variable} ${heroDisplayFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
 

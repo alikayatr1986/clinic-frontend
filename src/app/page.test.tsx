@@ -5,6 +5,7 @@ import { screen, within } from '@testing-library/react';
 import Home from '@/app/page';
 import { NAV_ITEMS, SECTION_ITEMS } from '@/constants/nav.constants';
 import { axePass, enNavLabel, themedRender } from '@/test/utils';
+import arMessages from '../../messages/ar.json';
 
 vi.mock('next/navigation', async (importOriginal) => {
   const actual = await importOriginal<typeof import('next/navigation')>();
@@ -40,6 +41,14 @@ describe('Home (/)', () => {
     }
   });
 
+  it('places the single hero heading before the anchored sections', () => {
+    const { container } = themedRender(<Home />);
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(container.querySelector('main')?.firstElementChild).toHaveAttribute('data-slot', 'hero');
+    expect(screen.getByRole('link', { name: 'Book Free Video Consultation' })).toHaveAttribute('href', '#contact');
+    expect(screen.getByRole('link', { name: 'Explore Treatments' })).toHaveAttribute('href', '#treatments');
+  });
+
   it('points every anchored nav item at its own section id', () => {
     const anchored = NAV_ITEMS.filter((item) => item.anchor !== undefined);
     expect(anchored.length).toBeGreaterThan(0);
@@ -49,7 +58,7 @@ describe('Home (/)', () => {
     }
   });
 
-  it('reserves space for the fixed header via matching top padding', () => {
+  it('overlays the hero with a fixed transparent header', () => {
     themedRender(<Home />);
 
     expect(screen.getByRole('banner')).toHaveClass(
@@ -60,7 +69,9 @@ describe('Home (/)', () => {
       'h-16',
       'lg:h-20',
     );
-    expect(screen.getByRole('main')).toHaveClass('pt-16', 'lg:pt-20');
+    expect(screen.getByRole('main')).not.toHaveClass('pt-16', 'lg:pt-20');
+    expect(screen.getByRole('banner')).toHaveAttribute('data-scrolled', 'false');
+    expect(screen.getByRole('banner')).toHaveClass('bg-transparent');
   });
 
   it('serves the Arabic section labels under locale=ar: region name from ar.json', () => {
@@ -70,6 +81,8 @@ describe('Home (/)', () => {
       'id',
       'treatments',
     );
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(arMessages.hero.heading);
+    expect(screen.getByRole('region', { name: arMessages.hero.heading })).toHaveAttribute('dir', 'rtl');
   });
 
   it('shows the desktop row with no active item on `/`', () => {
@@ -131,11 +144,11 @@ describe('Home (/)', () => {
 
     expect(ltrHeader).not.toBeNull();
     expect(rtlHeader?.className).toBe(ltrHeader?.className);
-    expect(ltrHeader).toHaveClass('bg-linen', 'text-midnight-900');
-    expect(rtlHeader).toHaveClass('bg-linen', 'text-midnight-900');
+    expect(ltrHeader).toHaveClass('bg-transparent', 'text-midnight-900');
+    expect(rtlHeader).toHaveClass('bg-transparent', 'text-midnight-900');
 
-    const ltrSections = ltr.container.querySelectorAll('main section');
-    const rtlSections = rtl.container.querySelectorAll('main section');
+    const ltrSections = ltr.container.querySelectorAll('main section[id]');
+    const rtlSections = rtl.container.querySelectorAll('main section[id]');
     expect(rtlSections).toHaveLength(ltrSections.length);
     expect(rtlSections).toHaveLength(SECTION_ITEMS.length);
   });

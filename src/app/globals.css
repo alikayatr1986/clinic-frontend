@@ -33,6 +33,10 @@
 }
 
 :root {
+  --hero-background: var(--color-linen);
+  --hero-foreground: var(--color-midnight-900);
+  --hero-muted-foreground: var(--color-slate-600);
+  --hero-accent: var(--color-crimson-600);
   --background: #f8faf8;
   --foreground: #0b132b;
   --card: #ffffff;
@@ -40,6 +44,7 @@
   --popover: #ffffff;
   --popover-foreground: #0b132b;
   --primary: #c8102e;
+  --primary-hover: var(--color-crimson-700);
   --primary-foreground: #ffffff;
   --secondary: #eef1f6;
   --secondary-foreground: #0b132b;
@@ -85,6 +90,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -100,6 +106,7 @@
   --font-sans: var(--font-manrope), var(--font-noto-arabic), system-ui,
     -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono);
+  --font-hero-display: var(--font-libre-caslon-display), Georgia, serif;
 }
 
 @layer base {

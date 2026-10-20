@@ -11,9 +11,11 @@ describe('Button', () => {
   });
   it('applies one semantic class per variant', () => {
   const { rerender, container } = themedRender(<Button variant="default">CTA</Button>);
-  expect(container.querySelector('button')).toHaveClass('bg-primary');
+  expect(container.querySelector('button')).toHaveClass('bg-primary', 'hover:bg-primary-hover');
   rerender(<Button variant="secondary">CTA</Button>);
   expect(container.querySelector('button')).toHaveClass('bg-secondary');
+  rerender(<Button variant="outline">CTA</Button>);
+  expect(container.querySelector('button')).toHaveClass('border-border', 'text-foreground');
   rerender(<Button variant="ghost">CTA</Button>);
   expect(container.querySelector('button')).toHaveClass('hover:bg-accent');
   rerender(<Button variant="destructive">CTA</Button>);
@@ -73,7 +75,16 @@ describe('Button', () => {
   expect(rtl.container.textContent).toContain('احجز استشارة');
   expect(ltrClasses).toContain('bg-primary');
   });
-  it('has zero axe violations', async () => {
+  it.each([['light', 'ltr'], ['light', 'rtl'], ['dark', 'ltr'], ['dark', 'rtl']] as const)('supports wrapping hero links in %s %s', async (theme, dir) => {
+    const user = userEvent.setup();
+    const { container } = themedRender(<Button asChild variant="outline" size="hero"><a href="#treatments">Explore Treatments</a></Button>, { theme, dir });
+    const link = screen.getByRole('link', { name: 'Explore Treatments' });
+    expect(link).toHaveClass('h-auto', 'min-h-12', 'whitespace-normal', 'focus-visible:ring-2');
+    await user.tab();
+    expect(link).toHaveFocus();
+    await axePass(container);
+  });
+  it('has zero axe violations' , async () => {
   const { container } = themedRender(<Button>Book consultation</Button>);
   await axePass(container);
   });

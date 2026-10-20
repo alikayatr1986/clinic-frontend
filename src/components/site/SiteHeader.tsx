@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -15,6 +17,7 @@ import type { SiteHeaderProps } from "@/types/header.types";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useHeaderScrolled } from "@/hooks/site-header.hooks";
 
 import { LocalePill } from "./LocalePill";
 import { MobileNav } from "./MobileNav";
@@ -26,12 +29,15 @@ export function SiteHeader({
   className,
 }: SiteHeaderProps) {
   const t = useTranslations("header");
+  const isScrolled = useHeaderScrolled();
 
   return (
     <header
       data-slot="site-header"
+      data-scrolled={isScrolled}
       className={cn(
-        "fixed inset-x-0 top-0 z-60 h-16 border-b border-border bg-linen text-midnight-900 lg:h-20",
+        "fixed inset-x-0 top-0 z-60 h-16 border-b border-transparent bg-transparent text-midnight-900 transition-colors duration-200 lg:h-20 motion-reduce:transition-none",
+        isScrolled && "border-border bg-linen/95 shadow-sm backdrop-blur-sm",
         className,
       )}
     >

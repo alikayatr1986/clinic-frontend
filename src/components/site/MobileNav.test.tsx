@@ -12,7 +12,7 @@ function openPanel(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('MobileNav (trigger + sheet panel)', () => {
-  it('renders only the 48px trigger with the menu.svg icon while closed', () => {
+  it('renders only the 48px trigger with the lucide Menu icon while closed', () => {
     const { container } = themedRender(<MobileNav />);
 
     const trigger = screen.getByRole('button', { name: 'Open navigation menu' });

@@ -1,18 +1,12 @@
 import * as React from "react";
 
+import { cardVariants } from "@/constants/card.constants";
+import type { CardProps } from "@/types/card.types";
+
 import { cn } from "@/lib/utils";
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card"
-      className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border border-border py-6 shadow-sm",
-        className
-      )}
-      {...props}
-    />
-  );
+function Card({ className, variant, ...props }: CardProps) {
+  return <div data-slot="card" data-variant={variant ?? "default"} className={cn(cardVariants({ variant, className }))} {...props} />;
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {

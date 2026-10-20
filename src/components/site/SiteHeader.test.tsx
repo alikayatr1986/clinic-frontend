@@ -86,6 +86,22 @@ describe('SiteHeader (desktop row)', () => {
     ).toBeInTheDocument();
   });
 
+  it('starts transparent and adds a linen background after scrolling', async () => {
+    const { container } = themedRender(<SiteHeader />);
+    const header = container.querySelector('[data-slot="site-header"]');
+    expect(header).toHaveAttribute('data-scrolled', 'false');
+    expect(header).toHaveClass('bg-transparent');
+
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 24 });
+    window.dispatchEvent(new Event('scroll'));
+    await waitFor(() => expect(header).toHaveAttribute('data-scrolled', 'true'));
+    expect(header).toHaveClass('bg-linen/95', 'backdrop-blur-sm');
+
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 });
+    window.dispatchEvent(new Event('scroll'));
+    await waitFor(() => expect(header).toHaveAttribute('data-scrolled', 'false'));
+  });
+
   it('points every rendered nav link at its catalog href', () => {
     const { container } = themedRender(<SiteHeader />);
 
