@@ -5,9 +5,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { LocalePill } from '@/components/site/LocalePill';
-import { SiteHeader } from '@/components/site/SiteHeader';
-import { NAV_ITEMS } from '@/constants/nav.constants';
+import { LocalePill } from '@/components/layout/LocalePill';
+import { SiteHeader } from '@/components/layout/SiteHeader';
+import { HEADER_NAV_ITEMS as NAV_ITEMS, HEADER_CTA_HREF } from '@/test/header.fixtures';
 import {
   axePass,
   enNavLabel,
@@ -58,8 +58,37 @@ function captureCookieWrites(): { written: string[]; restore: () => void } {
 }
 
 describe('SiteHeader (desktop row)', () => {
+  it('uses only caller-supplied links and forwards the same CTA to desktop and mobile', async () => {
+    const user = userEvent.setup();
+    const items = [
+      { labelKey: 'blog', href: '/articles' },
+      { labelKey: 'faq', href: '#help', anchor: 'help' },
+    ] as const;
+    const { container } = themedRender(
+      <SiteHeader items={items} ctaHref="/consultation" activePath="/articles" />,
+    );
+    const desktopNav = container.querySelector('[data-slot="primary-nav"]') as HTMLElement;
+    expect(within(desktopNav).getAllByRole('link').map(link => link.getAttribute('href'))).toEqual(
+      ['/articles', '#help'],
+    );
+    expect(within(desktopNav).getByRole('link', { name: 'Blog' })).toHaveAttribute('aria-current', 'page');
+    const desktop = container.querySelector('[data-slot="site-header-desktop"]') as HTMLElement;
+    expect(within(desktop).getByRole('link', { name: /book free consultation/i })).toHaveAttribute('href', '/consultation');
+
+    expect(within(desktopNav).queryByRole('link', { name: 'Treatments' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+    const dialog = await screen.findByRole('dialog');
+    const mobileNav = dialog.querySelector('[data-slot="mobile-nav"]') as HTMLElement;
+    expect(within(mobileNav).getAllByRole('link').map(link => link.getAttribute('href'))).toEqual(
+      ['/articles', '#help'],
+    );
+    expect(within(mobileNav).getByRole('link', { name: 'Blog' })).toHaveAttribute('aria-current');
+    expect(within(dialog).getByRole('link', { name: /book free consultation/i })).toHaveAttribute('href', '/consultation');
+    expect(within(mobileNav).queryByRole('link', { name: 'Treatments' })).toBeNull();
+  });
+
   it('renders the logo, every nav item, the EN pill, and the CTA', () => {
-    const { container } = themedRender(<SiteHeader />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     expect(screen.getByRole('banner')).toBeInTheDocument();
     const desktopRow = container.querySelector('[data-slot="site-header-desktop"]');
@@ -87,7 +116,7 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('starts transparent and adds a linen background after scrolling', async () => {
-    const { container } = themedRender(<SiteHeader />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
     const header = container.querySelector('[data-slot="site-header"]');
     expect(header).toHaveAttribute('data-scrolled', 'false');
     expect(header).toHaveClass('bg-transparent');
@@ -103,7 +132,7 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('points every rendered nav link at its catalog href', () => {
-    const { container } = themedRender(<SiteHeader />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const links = Array.from(
       container.querySelectorAll('[data-slot="primary-nav"] a'),
@@ -114,7 +143,7 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('keeps the desktop row hidden below `lg` while the mobile row owns <1024px', () => {
-    const { container } = themedRender(<SiteHeader />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const desktop = container.querySelector('[data-slot="site-header-desktop"]');
     expect(desktop).toHaveClass('hidden', 'lg:flex');
@@ -129,7 +158,7 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('shows the derived mark in the mobile row, scoped by slot', () => {
-    const { container } = themedRender(<SiteHeader />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const mobile = container.querySelector('[data-slot="site-header-mobile"]');
     expect(mobile).not.toBeNull();
@@ -153,7 +182,7 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('renders no active nav item on `/` — the logo is the home link', () => {
-    const { container } = themedRender(<SiteHeader activePath="/" />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} activePath="/" />);
 
     const navLinks = Array.from(
       container.querySelectorAll('[data-slot="primary-nav"] a'),
@@ -170,7 +199,7 @@ describe('SiteHeader (desktop row)', () => {
 
   it('marks an anchored section active when activePath targets it, desktop and panel', async () => {
     const { container } = themedRender(
-      <SiteHeader activePath="/#treatments" mobileNavDefaultOpen />,
+      <SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} activePath="/#treatments" mobileNavDefaultOpen />,
     );
 
     const desktopTreatments = container.querySelector(
@@ -195,7 +224,7 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('routes the CTA to the consultation anchor', () => {
-    themedRender(<SiteHeader />);
+    themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const cta = screen.getByRole('link', { name: /book free consultation/i });
     expect(cta).toHaveAttribute('href', '#contact');
@@ -203,7 +232,7 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('gives nav links, the EN pill, and the CTA >=48px targets and a focus ring', () => {
-    const { container } = themedRender(<SiteHeader />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const desktopRow = container.querySelector('[data-slot="site-header-desktop"]');
     expect(desktopRow).not.toBeNull();
@@ -222,7 +251,7 @@ describe('SiteHeader (desktop row)', () => {
 
   it('opens the supported-languages menu from the desktop pill without crashing', async () => {
     const user = userEvent.setup();
-    const { container } = themedRender(<SiteHeader />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const desktopRow = container.querySelector('[data-slot="site-header-desktop"]');
     expect(desktopRow).not.toBeNull();
@@ -262,7 +291,7 @@ describe('SiteHeader (desktop row)', () => {
       };
     });
     try {
-      const { LocalePill: RuLocalePill } = await import('@/components/site/LocalePill');
+      const { LocalePill: RuLocalePill } = await import('@/components/layout/LocalePill');
       themedRender(<RuLocalePill />);
 
       await user.click(screen.getByRole('button', { name: /change language/i }));
@@ -363,13 +392,13 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('mirrors the arrow icon in RTL without flipping hues', () => {
-    const ltr = themedRender(<SiteHeader />, { dir: 'ltr', lang: 'en' });
+    const ltr = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />, { dir: 'ltr', lang: 'en' });
     const ltrHeader = ltr.container.querySelector('[data-slot="site-header"]');
     const ltrCta = screen.getByRole('link', { name: /book free consultation/i });
     const ltrArrow = ltrCta.querySelector('svg');
     ltr.unmount();
 
-    const rtl = themedRender(<SiteHeader />, { dir: 'rtl', lang: 'ar' });
+    const rtl = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />, { dir: 'rtl', lang: 'ar' });
     const rtlHeader = rtl.container.querySelector('[data-slot="site-header"]');
     const rtlCta = screen.getByRole('link', { name: /book free consultation/i });
     const rtlArrow = rtlCta.querySelector('svg');
@@ -382,7 +411,7 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('serves the Arabic catalog under locale=ar: trigger, pill, nav row, CTA, alt (story 4 matrix)', () => {
-    themedRender(<SiteHeader />, { locale: 'ar' });
+    themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />, { locale: 'ar' });
     expect(screen.getByRole('button', { name: 'فتح قائمة التنقل' })).toBeInTheDocument();
     expect(
       screen.getAllByRole('button', { name: 'تغيير اللغة، الحالية AR' })
@@ -394,14 +423,14 @@ describe('SiteHeader (desktop row)', () => {
   });
 
   it('has zero axe violations', async () => {
-    const { container } = themedRender(<SiteHeader />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
     await axePass(container);
   });
 });
 
 describe('SiteHeader (mobile row)', () => {
   it('keeps the desktop pill bordered and the mobile pill borderless', () => {
-    const { container } = themedRender(<SiteHeader />);
+    const { container } = themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const desktopRow = container.querySelector('[data-slot="site-header-desktop"]');
     expect(desktopRow).not.toBeNull();
@@ -421,7 +450,7 @@ describe('SiteHeader (mobile row)', () => {
 
   it('opens the menu panel with the 7 nav links plus the consultation CTA from the hamburger', async () => {
     const user = userEvent.setup();
-    themedRender(<SiteHeader />);
+    themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     await user.click(screen.getByRole('button', { name: 'Open navigation menu' }));
     const dialog = await screen.findByRole('dialog');
@@ -451,7 +480,7 @@ describe('SiteHeader (mobile row)', () => {
   });
 
   it('has zero axe violations with the menu panel open', async () => {
-    themedRender(<SiteHeader mobileNavDefaultOpen />);
+    themedRender(<SiteHeader items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} mobileNavDefaultOpen />);
     await screen.findByRole('dialog');
     await axePass(document.body);
   });

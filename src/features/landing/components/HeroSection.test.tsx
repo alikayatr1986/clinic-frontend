@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
 
 import { HeroSection } from "./HeroSection";
-import { HERO_ARTWORK, HERO_DESKTOP_MEDIA } from "@/constants/hero.constants";
+import { HERO_ARTWORK, HERO_DESKTOP_MEDIA } from "@/features/landing/constants/hero.constants";
 import { axePass, themedRender } from "@/test/utils";
-import arMessages from "../../../messages/ar.json";
+import arMessages from "../../../../messages/ar.json";
 
 describe("HeroSection", () => {
   it("renders the exact live copy with one h1, actions and all trust statements", () => {

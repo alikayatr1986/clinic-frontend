@@ -23,21 +23,30 @@ story's Spec Change Log before editing. Composing existing public props
 (`variant`, `size`, `asChild`, layout-only wrappers around the component) is
 allowed without asking.
 
-## Shared-code placement rule (no constants/types/hooks/styles in component folders)
-Never keep constants, types/interfaces, hooks, or styles inside
-`src/components/**`. Move them to the category folder under `src/` and name
-the file after the owning component, e.g.:
+## Feature-first architecture — required reading
 
-- Data/constants -> `src/constants/<component>.constants.ts`
-- Types/interfaces -> `src/types/<component>.types.ts`
-- Hooks -> `src/hooks/<component>.hooks.ts`
-- Styles -> `src/styles/` (approvals per the UI style ownership rule)
-- Pure helpers/functions -> `src/utils/<component>.utils.ts`
+Read [ARCHITECTURE.md](ARCHITECTURE.md) before planning, implementing, fixing,
+refactoring, or reviewing frontend code. It governs file placement and dependency
+direction, including BMAD work. Follow the repository root's
+[AGENTS.md](../AGENTS.md) for BMAD context/handoff requirements and human-owned
+commits.
 
-Components then import them via absolute paths (`@/constants/...`,
-`@/types/...`, ...). Never inline a new `const` value, interface, or type in a
-component file — add it to the matching category file instead (create one if
-it doesn't exist yet).
+- Keep routes in `src/app/` focused on framework concerns and composition.
+- Put domain implementation and its constants, types, hooks, services, schemas,
+  helpers, and styles in `src/features/<feature>/`, creating only needed folders.
+- Keep components flat by default. Colocate private supporting files with a
+  complex component when useful; simple local values and types may stay inline.
+- Keep generic UI in `src/components/ui/` and application-wide layout in
+  `src/components/layout/`. Shared modules must not import feature code.
+- Promote code to global category folders only when ownership and dependencies
+  justify cross-feature reuse. Prefer `@/` imports and existing naming patterns.
+- Inspect existing code first. Migrate legacy `components/site/` and global
+  domain files only within a justified task; update affected imports and tests.
+
+This replaces the former blanket ban on constants/types/hooks/styles inside
+component folders. The UI triple rule, style ownership approvals, and icon
+approvals remain in force. Editing a shared primitive's extracted styling or
+types also requires checking/updating its stories and tests as affected.
 
 ## Icon rule (lucide-react only — stop and ask before placing any icon)
 All UI icons come from [`lucide-react`](https://lucide.dev). Never write
@@ -54,7 +63,8 @@ delete/replace a lucide icon with a custom one without approval.
    `public/icons/` or `public/images/`. Do not create, trace, reconstruct,
    or "approximate" the SVG yourself. Render via `next/image` (`.svg` srcs
    skip optimization automatically); reference the path through a constant
-   in `src/constants/<owning-component>.constants.ts`.
+   in its owning feature's `constants/<component>.constants.ts`, or
+   `src/constants/<component>.constants.ts` for genuinely shared assets.
 3. **Special micro-behaviors (morph, draw-on, pulse) on a lucide icon** are
    allowed only with explicit human approval in the conversation. Implement
    them as CSS/Tailwind targeting the lucide component (`data-*` flags +

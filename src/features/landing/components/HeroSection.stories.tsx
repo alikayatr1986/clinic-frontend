@@ -3,8 +3,8 @@ import { NextIntlClientProvider } from "next-intl";
 
 import { HeroSection } from "./HeroSection";
 import { withFallback } from "@/i18n/request";
-import enMessages from "../../../messages/en.json";
-import arMessages from "../../../messages/ar.json";
+import enMessages from "../../../../messages/en.json";
+import arMessages from "../../../../messages/ar.json";
 
 const meta = {
   title: "Site/HeroSection",

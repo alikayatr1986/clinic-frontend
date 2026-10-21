@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { screen, within } from '@testing-library/react';
 
 import Home from '@/app/page';
-import { NAV_ITEMS, SECTION_ITEMS } from '@/constants/nav.constants';
+import { NAV_ITEMS, SECTION_ITEMS } from '@/features/landing/constants/nav.constants';
 import { axePass, enNavLabel, themedRender } from '@/test/utils';
 import arMessages from '../../messages/ar.json';
 

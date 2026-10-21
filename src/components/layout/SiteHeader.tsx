@@ -24,6 +24,8 @@ import { MobileNav } from "./MobileNav";
 import { PrimaryNav } from "./PrimaryNav";
 
 export function SiteHeader({
+  items,
+  ctaHref,
   activePath = "/",
   mobileNavDefaultOpen,
   className,
@@ -63,6 +65,8 @@ export function SiteHeader({
           <div className="flex shrink-0 items-center gap-1">
             <LocalePill variant="borderless" />
             <MobileNav
+              items={items}
+              ctaHref={ctaHref}
               activePath={activePath}
               defaultOpen={mobileNavDefaultOpen}
             />
@@ -88,12 +92,12 @@ export function SiteHeader({
             />
           </Link>
 
-          <PrimaryNav activePath={activePath} />
+          <PrimaryNav items={items} activePath={activePath} />
 
           <div className="flex shrink-0 items-center gap-2">
             <LocalePill />
             <Button asChild size="header">
-              <a href="#contact">
+              <a href={ctaHref}>
                 {t("cta")}
                 <ArrowRight className="rtl:-scale-x-100" aria-hidden="true" />
               </a>

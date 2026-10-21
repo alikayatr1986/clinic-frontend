@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { MobileNav } from '@/components/site/MobileNav';
-import { NAV_ITEMS } from '@/constants/nav.constants';
+import { MobileNav } from '@/components/layout/MobileNav';
+import { HEADER_NAV_ITEMS as NAV_ITEMS, HEADER_CTA_HREF } from '@/test/header.fixtures';
 import { axePass, enNavLabel, themedRender } from '@/test/utils';
 
 function openPanel(user: ReturnType<typeof userEvent.setup>) {
@@ -12,8 +12,32 @@ function openPanel(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('MobileNav (trigger + sheet panel)', () => {
+  it('renders supplied navigation, marks its active anchor, and closes on the supplied CTA', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    themedRender(
+      <MobileNav
+        items={[{ labelKey: 'faq', href: '#help', anchor: 'help' }]}
+        ctaHref="#book"
+        activePath="/#help"
+        onOpenChange={onOpenChange}
+      />,
+    );
+    await openPanel(user);
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getAllByRole('link')).toHaveLength(2);
+    expect(within(dialog).getByRole('link', { name: 'FAQ' })).toHaveAttribute('href', '#help');
+    expect(within(dialog).getByRole('link', { name: 'FAQ' })).toHaveAttribute('aria-current', 'location');
+    expect(within(dialog).queryByRole('link', { name: 'Treatments' })).toBeNull();
+    const cta = within(dialog).getByRole('link', { name: /book free consultation/i });
+    expect(cta).toHaveAttribute('href', '#book');
+    await user.click(cta);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(onOpenChange.mock.calls.filter(([open]) => !open)).toHaveLength(1);
+  });
+
   it('renders only the 48px trigger with the lucide Menu icon while closed', () => {
-    const { container } = themedRender(<MobileNav />);
+    const { container } = themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const trigger = screen.getByRole('button', { name: 'Open navigation menu' });
     expect(trigger).toHaveClass('size-12');
@@ -29,7 +53,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
 
   it('opens the panel with all 7 links plus the consultation CTA, aria-expanded true, and focus inside', async () => {
     const user = userEvent.setup();
-    themedRender(<MobileNav />);
+    themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const trigger = screen.getByRole('button', { name: 'Open navigation menu' });
     await openPanel(user);
@@ -54,7 +78,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
 
   it('orders the panel rows by the catalog and closes on Escape with focus returned', async () => {
     const user = userEvent.setup();
-    const { container } = themedRender(<MobileNav />);
+    const { container } = themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
     const trigger = screen.getByRole('button', { name: 'Open navigation menu' });
 
     await openPanel(user);
@@ -78,7 +102,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
 
   it('closes on overlay activation', async () => {
     const user = userEvent.setup();
-    themedRender(<MobileNav />);
+    themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
     await openPanel(user);
     await screen.findByRole('dialog');
 
@@ -92,7 +116,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
 
   it('morphs the mounted lucide Menu icon into the cross above the panel instead of any in-panel close', async () => {
     const user = userEvent.setup();
-    const { container } = themedRender(<MobileNav />);
+    const { container } = themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
     await openPanel(user);
     const dialog = await screen.findByRole('dialog');
 
@@ -133,7 +157,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
   it('closes the panel before navigating when a row is activated, firing exactly one close', async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();
-    themedRender(<MobileNav onOpenChange={onOpenChange} />);
+    themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} onOpenChange={onOpenChange} />);
     await openPanel(user);
     await screen.findByRole('dialog');
 
@@ -149,7 +173,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
   it('routes the CTA to the consultation anchor, closes first, and holds it in the sheet footer', async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();
-    themedRender(<MobileNav onOpenChange={onOpenChange} />);
+    themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} onOpenChange={onOpenChange} />);
     await openPanel(user);
     const dialog = await screen.findByRole('dialog');
 
@@ -170,7 +194,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
   });
 
   it('mirrors the desktop behavior: nothing active on `/` — the logo is the home link', () => {
-    themedRender(<MobileNav defaultOpen />);
+    themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} defaultOpen />);
 
     const dialog = screen.getByRole('dialog');
     const panelRows = Array.from(dialog.querySelectorAll('[data-slot="mobile-nav"] a'));
@@ -182,7 +206,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
   });
 
   it('marks the active section row crimson via the shared matcher', () => {
-    themedRender(<MobileNav activePath="/#treatments" defaultOpen />);
+    themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} activePath="/#treatments" defaultOpen />);
 
     const treatments = screen.getByRole('link', { name: 'Treatments' });
     expect(treatments).toHaveAttribute('aria-current', 'location');
@@ -193,7 +217,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
   });
 
   it('gives every row and the CTA >=48px targets with a focus ring', () => {
-    themedRender(<MobileNav defaultOpen />);
+    themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} defaultOpen />);
 
     const dialog = screen.getByRole('dialog');
     const rows = Array.from(dialog.querySelectorAll('[data-slot="mobile-nav"] a'));
@@ -210,13 +234,13 @@ describe('MobileNav (trigger + sheet panel)', () => {
   });
 
   it('renders the panel on the linen surface with midnight ink identical in both directions', () => {
-    const ltr = themedRender(<MobileNav defaultOpen />, { dir: 'ltr', lang: 'en' });
+    const ltr = themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} defaultOpen />, { dir: 'ltr', lang: 'en' });
     const ltrDialog = screen.getByRole('dialog');
 
     const ltrTrigger = ltr.container.querySelector('[data-slot="mobile-nav-trigger"]');
     ltr.unmount();
 
-    const rtl = themedRender(<MobileNav defaultOpen />, { dir: 'rtl', lang: 'ar' });
+    const rtl = themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} defaultOpen />, { dir: 'rtl', lang: 'ar' });
     const rtlDialog = screen.getByRole('dialog');
     const rtlTrigger = rtl.container.querySelector('[data-slot="mobile-nav-trigger"]');
 
@@ -228,7 +252,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
   });
 
   it('serves the Arabic catalog under locale=ar: row names inside the open sheet', () => {
-    themedRender(<MobileNav defaultOpen />, { locale: 'ar' });
+    themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} defaultOpen />, { locale: 'ar' });
 
     const dialog = screen.getByRole('dialog');
 
@@ -236,7 +260,7 @@ describe('MobileNav (trigger + sheet panel)', () => {
   });
 
   it('has zero axe violations with the panel open', async () => {
-    themedRender(<MobileNav defaultOpen />);
+    themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} defaultOpen />);
     await screen.findByRole('dialog');
     await axePass(document.body);
   });

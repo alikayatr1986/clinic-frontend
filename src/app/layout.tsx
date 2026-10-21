@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { NextIntlClientProvider } from "next-intl";
 
-import { heroDisplayFont } from "@/utils/hero-font.utils";
+import { heroDisplayFont } from "@/features/landing/utils/hero-font.utils";
 
 import "./globals.css";
 

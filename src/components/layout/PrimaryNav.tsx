@@ -1,11 +1,10 @@
 import { useTranslations } from "next-intl";
 
-import { NAV_ITEMS } from "@/constants/nav.constants";
 import type { PrimaryNavProps } from "@/types/header.types";
 import { cn } from "@/lib/utils";
 import { isActive } from "@/utils/nav.utils";
 
-export function PrimaryNav({ activePath = "/", className }: PrimaryNavProps) {
+export function PrimaryNav({ items, activePath = "/", className }: PrimaryNavProps) {
   const t = useTranslations();
   const tNav = useTranslations("nav");
 
@@ -16,7 +15,7 @@ export function PrimaryNav({ activePath = "/", className }: PrimaryNavProps) {
       className={cn("shrink-0", className)}
     >
       <ul className="flex items-center gap-x-5 xl:gap-x-8">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const active = isActive(item, activePath);
           const isAnchor = item.href.startsWith("#");
 

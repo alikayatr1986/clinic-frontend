@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLocale, useTranslations } from "next-intl";
 
-import "@/styles/hero.styles.css";
+import "@/features/landing/styles/hero.styles.css";
 
 import {
   HERO_ARTWORK,
@@ -13,7 +13,7 @@ import {
   HERO_DESKTOP_IMAGE,
   HERO_DESKTOP_MEDIA,
   HERO_MOBILE_IMAGE,
-} from "@/constants/hero.constants";
+} from "@/features/landing/constants/hero.constants";
 
 export function HeroSection() {
   const t = useTranslations("hero");

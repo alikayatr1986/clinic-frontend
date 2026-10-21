@@ -18,10 +18,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS } from "@/constants/nav.constants";
 import { isActive } from "@/utils/nav.utils";
 
 export function MobileNav({
+  items,
+  ctaHref,
   activePath = "/",
   defaultOpen,
   onOpenChange,
@@ -74,7 +75,7 @@ export function MobileNav({
 
         <nav aria-label={t("aria.mobileNav")} data-slot="mobile-nav">
           <ul className="flex flex-col">
-            {NAV_ITEMS.map((item) => {
+            {items.map((item) => {
               const active = isActive(item, activePath);
 
               return (
@@ -101,7 +102,7 @@ export function MobileNav({
         <SheetFooter>
           <SheetClose asChild>
             <Button asChild>
-              <a href="#contact">
+              <a href={ctaHref}>
                 {t("header.cta")}
                 <ArrowRight className="rtl:-scale-x-100" aria-hidden="true" />
               </a>
