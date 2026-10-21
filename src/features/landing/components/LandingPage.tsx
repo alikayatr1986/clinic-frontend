@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { NAV_ITEMS, SECTION_ITEMS } from "@/features/landing/constants/nav.constants";
 import { HERO_ACTIONS } from "@/features/landing/constants/hero.constants";
 import { HeroSection } from "@/features/landing/components/HeroSection";
+import { WhyTurkeySection } from "@/features/landing/components/WhyTurkeySection";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export function LandingPage() {
@@ -14,6 +15,7 @@ export function LandingPage() {
       <SiteHeader items={NAV_ITEMS} ctaHref={HERO_ACTIONS.primary} />
       <main className="flex-1">
         <HeroSection />
+        <WhyTurkeySection />
         {SECTION_ITEMS.map(({ anchor, labelKey }) => (
           <section
             key={anchor}
