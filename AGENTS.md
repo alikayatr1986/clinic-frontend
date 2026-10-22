@@ -43,6 +43,17 @@ commits.
 - Inspect existing code first. Migrate legacy `components/site/` and global
   domain files only within a justified task; update affected imports and tests.
 
+## Tailwind-first styling
+
+Use Tailwind CSS utility classes in component `className` values for frontend
+layout and visual styling whenever practical. Prefer existing design tokens and
+Tailwind responsive, dark, RTL, state, and arbitrary-value utilities before
+adding a stylesheet. Keep `src/app/globals.css` for Tailwind imports, shared
+tokens, and genuinely global base rules. Add feature CSS only when utilities
+would make the behavior unclear or cannot express it; explain that exception
+in the change report. Remove obsolete feature stylesheets and imports after
+migrating their rules. This does not override the UI style ownership rule above.
+
 This replaces the former blanket ban on constants/types/hooks/styles inside
 component folders. The UI triple rule, style ownership approvals, and icon
 approvals remain in force. Editing a shared primitive's extracted styling or

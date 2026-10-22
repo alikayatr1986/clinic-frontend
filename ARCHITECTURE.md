@@ -191,8 +191,10 @@ Follow nearby repository conventions first:
 
 Use descriptive ownership names. Preserve semantic tokens in `app/globals.css`,
 the existing style approval rules, and translation catalogs for user-facing copy.
-Feature styles belong to their feature; only global styles belong in global
-style locations. Do not invent a stylesheet per component by default.
+Prefer Tailwind utilities in component `className` values; keep feature CSS only
+for rules that are unclear or impractical as utilities. Feature styles belong to
+their feature; only global styles belong in global style locations. Do not invent
+a stylesheet per component by default.
 
 Generic UI changes still require the sibling Storybook and test coverage
 described in `AGENTS.md`, including affected changes to extracted primitive
