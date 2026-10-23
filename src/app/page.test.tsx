@@ -6,6 +6,7 @@ import Home from '@/app/page';
 import { NAV_ITEMS, SECTION_ITEMS } from '@/features/landing/constants/nav.constants';
 import { axePass, enNavLabel, themedRender } from '@/test/utils';
 import arMessages from '../../messages/ar.json';
+import enMessages from '../../messages/en.json';
 
 vi.mock('next/navigation', async (importOriginal) => {
   const actual = await importOriginal<typeof import('next/navigation')>();
@@ -35,7 +36,9 @@ describe('Home (/)', () => {
     expect(SECTION_ITEMS).toHaveLength(NAV_ITEMS.length);
 
     for (const item of SECTION_ITEMS) {
-      const region = screen.getByRole('region', { name: enNavLabel(item) });
+      const region = screen.getByRole('region', {
+        name: item.anchor === 'treatments' ? enMessages.treatmentServices.heading : enNavLabel(item),
+      });
       expect(region).toHaveAttribute('id', item.anchor);
       expect(region).toHaveClass('scroll-mt-16', 'lg:scroll-mt-20');
     }
@@ -46,7 +49,15 @@ describe('Home (/)', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(container.querySelector('main')?.firstElementChild).toHaveAttribute('data-slot', 'hero');
     expect(screen.getByRole('link', { name: 'Book Free Video Consultation' })).toHaveAttribute('href', '#contact');
-    expect(screen.getByRole('link', { name: 'Explore Treatments' })).toHaveAttribute('href', '#treatments');
+    expect(within(container.querySelector('[data-slot="hero"]') as HTMLElement).getByRole('link', { name: 'Explore Treatments' })).toHaveAttribute('href', '#treatments');
+  });
+
+  it('places one treatments region directly after Why Turkey with a live section heading', () => {
+    const { container } = themedRender(<Home />);
+    const treatments = screen.getByRole('region', { name: enMessages.treatmentServices.heading });
+    expect(container.querySelectorAll('#treatments')).toHaveLength(1);
+    expect(treatments.previousElementSibling).toHaveAttribute('id', 'why-turkey');
+    expect(within(treatments).getByRole('heading', { level: 2 })).toHaveTextContent(enMessages.treatmentServices.heading);
   });
 
   it('points every anchored nav item at its own section id', () => {
@@ -77,7 +88,7 @@ describe('Home (/)', () => {
   it('serves the Arabic section labels under locale=ar: region name from ar.json', () => {
     themedRender(<Home />, { locale: 'ar' });
 
-    expect(screen.getByRole('region', { name: 'العلاجات' })).toHaveAttribute(
+    expect(screen.getByRole('region', { name: arMessages.treatmentServices.heading })).toHaveAttribute(
       'id',
       'treatments',
     );
@@ -150,7 +161,7 @@ describe('Home (/)', () => {
     const ltrSections = ltr.container.querySelectorAll('main section[id]');
     const rtlSections = rtl.container.querySelectorAll('main section[id]');
     expect(rtlSections).toHaveLength(ltrSections.length);
-    expect(rtlSections).toHaveLength(SECTION_ITEMS.length);
+    expect(rtlSections).toHaveLength(SECTION_ITEMS.length + 1);
   });
 
   it('has zero axe violations', async () => {

@@ -69,5 +69,49 @@
     "cardHospitalsBody": "Advanced facilities, modern technology and international standards.",
     "cardLicenseTitle": "Medical Tourism License",
     "cardLicenseBody": "Official authorization with registration number and QR verification."
+  },
+  "treatmentServices": {
+    "eyebrow": "TREATMENTS & SERVICES",
+    "heading": "Comprehensive ENT & Facial Plastic Surgery",
+    "introduction": "From functional breathing to aesthetic harmony, we offer personalized treatments designed for natural results and long-term well-being.",
+    "profileEyebrow": "MEET THE SURGEON",
+    "profileName": "Dr. Naser Dadaszade",
+    "profileSpecialty": "ENT & Facial Plastic Surgeon",
+    "services": {
+      "rhinoplasty": {
+        "title": "Rhinoplasty",
+        "description": "Natural beauty, better breathing"
+      },
+      "ent": {
+        "title": "ENT Treatments",
+        "description": "Advanced care for nose, ear and throat"
+      },
+      "rejuvenation": {
+        "title": "Facial Rejuvenation",
+        "description": "Restore. Refine. Rebalance."
+      },
+      "reconstructive": {
+        "title": "Functional & Reconstructive Surgery",
+        "description": "Health, function, confidence"
+      }
+    },
+    "primaryAction": "Book Consultation",
+    "secondaryAction": "Explore Treatments",
+    "servicesLabel": "Featured treatments",
+    "trustLabel": "Our care commitments",
+    "trust": {
+      "hospitals": {
+        "title": "Accredited Partner Hospitals",
+        "description": "World-class facilities, highest safety standards"
+      },
+      "specialist": {
+        "title": "Board-Certified Specialist",
+        "description": "International training & expertise"
+      },
+      "concierge": {
+        "title": "International Concierge",
+        "description": "Seamless care, from consultation to recovery"
+      }
+    }
   }
 }
