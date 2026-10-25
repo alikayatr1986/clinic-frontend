@@ -161,7 +161,7 @@ describe('Home (/)', () => {
     const ltrSections = ltr.container.querySelectorAll('main section[id]');
     const rtlSections = rtl.container.querySelectorAll('main section[id]');
     expect(rtlSections).toHaveLength(ltrSections.length);
-    expect(rtlSections).toHaveLength(SECTION_ITEMS.length + 1);
+    expect(rtlSections).toHaveLength(SECTION_ITEMS.length + 2);
   });
 
   it('has zero axe violations', async () => {
