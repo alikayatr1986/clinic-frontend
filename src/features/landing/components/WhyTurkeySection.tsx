@@ -3,7 +3,8 @@ import Image, { getImageProps } from "next/image";
 import { ArrowRight, BedDouble, Coins, Plane, ShieldPlus, Trophy } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-import mobileArtwork from "../../../../public/images/landing/why-turkey-mobile-image.png";
+import desktopArtwork from "../assets/images/why-turkey-desktop-image.png";
+import mobileArtwork from "../assets/images/why-turkey-mobile-image.png";
 import {
   WHY_TURKEY_CERTIFICATE_MARKS,
   WHY_TURKEY_HOSPITAL_IMAGE,
@@ -11,8 +12,8 @@ import {
 } from "@/features/landing/constants/why-turkey.constants";
 
 const artwork = {
-  desktop: { src: "/images/landing/why-turkey-desktop-image.png", width: 1983, height: 793 },
-  mobile: { src: mobileArtwork, width: 1391, height: 1024 },
+  desktop: desktopArtwork,
+  mobile: mobileArtwork,
 } as const;
 
 const benefits = [
@@ -76,7 +77,7 @@ export function WhyTurkeySection() {
               <span className="absolute top-4 end-4 grid size-[1.9rem] place-items-center rounded-full bg-[#f7f5f3] dark:bg-[#263650]" aria-hidden="true"><ArrowRight className="size-4 rtl:-scale-x-100" /></span>
               <ul className="mt-[.8rem] grid grid-cols-3 border-t border-[#e3e7e9] pt-[.8rem] dark:border-[#34445c] max-lg:col-span-2 max-lg:mt-0 max-lg:border-t-0 max-lg:pt-[.35rem]" aria-label={t("marksLabel")}>
                 {WHY_TURKEY_CERTIFICATE_MARKS.map(({ src, width, height, labelKey }, index) => (
-                  <li key={src} className={`flex min-w-0 items-center justify-center gap-[.35rem] px-[.2rem] text-[.6rem] leading-[1.35] min-[481px]:px-[.35rem] min-[481px]:max-lg:text-[.55rem] lg:text-[.68rem] ${index > 0 ? "border-s border-[#e3e7e9] dark:border-[#34445c]" : ""}`}>
+                  <li key={labelKey} className={`flex min-w-0 items-center justify-center gap-[.35rem] px-[.2rem] text-[.6rem] leading-[1.35] min-[481px]:px-[.35rem] min-[481px]:max-lg:text-[.55rem] lg:text-[.68rem] ${index > 0 ? "border-s border-[#e3e7e9] dark:border-[#34445c]" : ""}`}>
                     <Image className={`h-11 w-[min(100%,3rem)] flex-[0_1_auto] object-contain min-[481px]:h-12 ${labelKey === "markMinistry" ? "w-[min(45%,3rem)]" : ""}`} src={src} width={width} height={height} alt={labelKey === "markMinistry" ? "" : t(labelKey)} />
                     {labelKey === "markMinistry" && <span className="min-w-0">{t(labelKey)}</span>}
                   </li>

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
 
@@ -6,6 +6,22 @@ import { HeroSection } from "./HeroSection";
 import { HERO_ARTWORK, HERO_DESKTOP_MEDIA } from "@/features/landing/constants/hero.constants";
 import { axePass, themedRender } from "@/test/utils";
 import arMessages from "../../../../messages/ar.json";
+
+vi.mock("../assets/images/hero-section-mobile-image.png", () => ({
+  default: {
+    src: "/_next/static/media/hero-section-mobile-image.test.png",
+    width: 937,
+    height: 1678,
+  },
+}));
+
+vi.mock("../assets/images/hero-section-desktop-image.png", () => ({
+  default: {
+    src: "/_next/static/media/hero-section-desktop-image.test.png",
+    width: 1672,
+    height: 941,
+  },
+}));
 
 describe("HeroSection", () => {
   it("renders the exact live copy with one h1, actions and all trust statements", () => {

@@ -1,6 +1,5 @@
-export const LOGO_SRC = "/icons/logo.png";
-export const LOGO_WIDTH = 1280;
-export const LOGO_HEIGHT = 326;
-export const MOBILE_LOGO_SRC = "/icons/mobile_logo.png";
-export const MOBILE_LOGO_WIDTH = 173;
-export const MOBILE_LOGO_HEIGHT = 322;
+import logoImage from "@/components/layout/assets/images/logo.png";
+import mobileLogoImage from "@/components/layout/assets/images/mobile-logo.png";
+
+export const LOGO_IMAGE = { src: logoImage, width: 1280, height: 326 } as const;
+export const MOBILE_LOGO_IMAGE = { src: mobileLogoImage, width: 173, height: 322 } as const;

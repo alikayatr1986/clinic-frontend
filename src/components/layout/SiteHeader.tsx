@@ -6,12 +6,8 @@ import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
 
 import {
-  LOGO_HEIGHT,
-  LOGO_SRC,
-  LOGO_WIDTH,
-  MOBILE_LOGO_HEIGHT,
-  MOBILE_LOGO_SRC,
-  MOBILE_LOGO_WIDTH,
+  LOGO_IMAGE,
+  MOBILE_LOGO_IMAGE,
 } from "@/constants/header.constants";
 import type { SiteHeaderProps } from "@/types/header.types";
 
@@ -53,10 +49,8 @@ export function SiteHeader({
             className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Image
-              src={MOBILE_LOGO_SRC}
+              {...MOBILE_LOGO_IMAGE}
               alt={t("logoAlt")}
-              width={MOBILE_LOGO_WIDTH}
-              height={MOBILE_LOGO_HEIGHT}
               loading="eager"
               className="h-9 w-auto"
             />
@@ -82,10 +76,8 @@ export function SiteHeader({
             className="inline-flex min-h-12 shrink-0 items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Image
-              src={LOGO_SRC}
+              {...LOGO_IMAGE}
               alt={t("logoAlt")}
-              width={LOGO_WIDTH}
-              height={LOGO_HEIGHT}
               preload
               sizes="(min-width: 1280px) 142px, 126px"
               className="h-8 w-auto xl:h-9"

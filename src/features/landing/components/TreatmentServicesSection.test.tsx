@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { screen, within } from "@testing-library/react";
 
@@ -7,6 +7,22 @@ import { TREATMENT_SERVICES, TREATMENT_SERVICES_ARTWORK, TREATMENT_SERVICES_DOCT
 import { axePass, themedRender } from "@/test/utils";
 import enMessages from "../../../../messages/en.json";
 import arMessages from "../../../../messages/ar.json";
+
+vi.mock("../assets/images/treatment-services-desktop-image.png", () => ({
+  default: {
+    src: "/_next/static/media/treatment-services-desktop-image.test.png",
+    width: 1774,
+    height: 887,
+  },
+}));
+
+vi.mock("../assets/images/treatment-services-mobile-image.png", () => ({
+  default: {
+    src: "/_next/static/media/treatment-services-mobile-image.test.png",
+    width: 940,
+    height: 1673,
+  },
+}));
 
 describe("TreatmentServicesSection", () => {
   it.each([
@@ -27,7 +43,10 @@ describe("TreatmentServicesSection", () => {
     expect(within(profile).getByText(copy.profileEyebrow)).toBeInTheDocument();
     expect(within(profile).getByText(copy.profileSpecialty)).toBeInTheDocument();
     const mark = profile.querySelector("img")!;
-    expect(mark.getAttribute("src")).toContain(encodeURIComponent(TREATMENT_SERVICES_DOCTOR_MARK.src));
+    const doctorMarkSrc = typeof TREATMENT_SERVICES_DOCTOR_MARK.src === "string"
+      ? TREATMENT_SERVICES_DOCTOR_MARK.src
+      : TREATMENT_SERVICES_DOCTOR_MARK.src.src;
+    expect(mark.getAttribute("src")).toContain(encodeURIComponent(doctorMarkSrc));
     expect(mark).toHaveAttribute("alt", "");
     expect(mark).toHaveAttribute("aria-hidden", "true");
     expect(within(profile).queryByRole("link")).not.toBeInTheDocument();
@@ -37,7 +56,8 @@ describe("TreatmentServicesSection", () => {
       expect(within(services[index]).getByRole("heading", { level: 3 })).toHaveTextContent(copy.services[key].title);
       expect(within(services[index]).getByText(copy.services[key].description)).toBeInTheDocument();
       const icon = services[index].querySelector("img")!;
-      expect(icon.getAttribute("src")).toContain(encodeURIComponent(image.src));
+      const imageSrc = typeof image.src === "string" ? image.src : image.src.src;
+      expect(icon.getAttribute("src")).toContain(encodeURIComponent(imageSrc));
       expect(icon).toHaveAttribute("alt", "");
       expect(icon).toHaveAttribute("aria-hidden", "true");
       expect(icon).not.toHaveClass("rtl:-scale-x-100");

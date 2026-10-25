@@ -22,11 +22,11 @@ export function HeroSection() {
     <section
       lang={locale}
       dir={isArabic ? "rtl" : "ltr"}
-      className="relative isolate min-h-[139vw] overflow-hidden bg-[var(--hero-background)] text-[var(--hero-foreground)] [--foreground:var(--hero-foreground)] lg:min-h-[clamp(42rem,calc(100svh-5rem),60rem)]"
+      className="relative isolate min-h-[139vw] overflow-hidden bg-[var(--hero-background)] text-[var(--hero-foreground)] [--foreground:var(--hero-foreground)] lg:grid lg:grid-cols-1 lg:grid-rows-1 lg:min-h-[clamp(42rem,calc(100svh-5rem),60rem)]"
       data-slot="hero"
       aria-labelledby="hero-heading"
     >
-      <picture className="absolute inset-x-0 top-[-20vw] -z-10 block aspect-[937/1678] [mask-image:linear-gradient(to_bottom,black_80vw,transparent_96vw,transparent_118vw,black_135vw)] lg:top-0 lg:h-[clamp(42rem,calc(100svh-5rem),60rem)] lg:aspect-auto lg:[mask-image:none]">
+      <picture className="block max-lg:absolute max-lg:inset-x-0 max-lg:-z-10 max-lg:aspect-[937/1678] lg:col-start-1 lg:row-start-1 lg:h-full lg:w-full lg:min-h-0 lg:min-w-0">
         <source
           media={HERO_DESKTOP_MEDIA}
           srcSet={HERO_DESKTOP_IMAGE.srcSet}
@@ -35,10 +35,14 @@ export function HeroSection() {
           height={HERO_ARTWORK.desktop.height}
         />
         {/* Art direction requires one img fallback, as documented by Next. */}
-        <img {...HERO_MOBILE_IMAGE} className="block h-auto w-full rtl:-scale-x-100 lg:h-full lg:object-cover lg:object-center" alt="" aria-hidden="true" />
+        <img {...HERO_MOBILE_IMAGE} className="block h-auto w-full rtl:-scale-x-100 lg:h-full lg:w-full lg:object-cover lg:object-right" alt="" aria-hidden="true" />
       </picture>
       <div
-        className={`relative px-[6%] pt-[77vw] pb-12 [overflow-wrap:anywhere] lg:mx-auto lg:w-full lg:max-w-7xl lg:px-6 lg:pt-[clamp(7rem,15vh,11rem)] lg:pb-16 xl:px-8 ${isArabic ? "[font-family:var(--font-noto-arabic),system-ui,sans-serif]" : "[font-family:var(--font-manrope),var(--font-noto-arabic),system-ui,sans-serif]"}`}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-[45vw] z-[-5] h-full [background:linear-gradient(to_bottom,transparent_0%,var(--hero-background)_58%,var(--hero-background)_100%)] lg:hidden"
+      />
+      <div
+        className={`relative px-[6%] pt-[88vw] pb-12 [overflow-wrap:anywhere] lg:col-start-1 lg:row-start-1 lg:z-10 lg:mx-auto lg:w-full lg:max-w-7xl lg:px-6 lg:pt-[clamp(7rem,15vh,11rem)] lg:pb-16 xl:px-8 ${isArabic ? "[font-family:var(--font-noto-arabic),system-ui,sans-serif]" : "[font-family:var(--font-manrope),var(--font-noto-arabic),system-ui,sans-serif]"}`}
         lang={locale}
         dir={isArabic ? "rtl" : "ltr"}
       >

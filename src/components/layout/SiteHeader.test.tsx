@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,6 +12,22 @@ import {
   nextRouterSpies,
   themedRender,
 } from '@/test/utils';
+
+vi.mock('@/components/layout/assets/images/logo.png', () => ({
+  default: {
+    src: '/_next/static/media/logo.test.png',
+    width: 1280,
+    height: 326,
+  },
+}));
+
+vi.mock('@/components/layout/assets/images/mobile-logo.png', () => ({
+  default: {
+    src: '/_next/static/media/mobile-logo.test.png',
+    width: 173,
+    height: 322,
+  },
+}));
 
 vi.mock('next/navigation', async (importOriginal) => {
   const actual = await importOriginal<typeof import('next/navigation')>();
@@ -170,9 +184,8 @@ describe('SiteHeader (desktop row)', () => {
     expect(mark).toHaveClass('h-9', 'w-auto');
 
     expect(decodeURIComponent(mark.getAttribute('src') ?? '')).toContain(
-      '/icons/mobile_logo.png',
+      'mobile-logo.test.png',
     );
-    expect(existsSync(join(process.cwd(), 'public', 'icons', 'mobile_logo.png'))).toBe(true);
 
     expect(row.getByRole('button', { name: /change language/i })).toHaveAttribute(
       'data-variant',

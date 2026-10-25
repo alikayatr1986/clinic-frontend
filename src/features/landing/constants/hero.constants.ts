@@ -1,17 +1,11 @@
 import { ShieldPlus, UserRound, UsersRound } from "lucide-react";
 import { getImageProps } from "next/image";
+import desktopHeroImage from "../assets/images/hero-section-desktop-image.png";
+import mobileHeroImage from "../assets/images/hero-section-mobile-image.png";
 
 export const HERO_ARTWORK = {
-  desktop: {
-    src: "/images/landing/hero-section-desktop-image3.png",
-    width: 1672,
-    height: 941,
-  },
-  mobile: {
-    src: "/images/landing/hero-section-mobile-image.png",
-    width: 937,
-    height: 1678,
-  },
+  desktop: desktopHeroImage,
+  mobile: mobileHeroImage,
 } as const;
 
 export const HERO_DESKTOP_MEDIA = "(min-width: 1024px)";
