@@ -132,7 +132,7 @@ describe('Home (/)', () => {
     const pill = mobile.getByRole('button', { name: /change language/i });
     expect(pill).toHaveAttribute('data-variant', 'borderless');
 
-    expect(mobile.getByRole('button', { name: 'Open navigation menu' })).toHaveClass('size-12');
+    expect(mobile.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
   });
 
   it('carries no Next.js starter copy or assets', () => {

@@ -191,7 +191,7 @@ describe('SiteHeader (desktop row)', () => {
       'data-variant',
       'borderless',
     );
-    expect(row.getByRole('button', { name: 'Open navigation menu' })).toHaveClass('size-12');
+    expect(row.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
   });
 
   it('renders no active nav item on `/` — the logo is the home link', () => {

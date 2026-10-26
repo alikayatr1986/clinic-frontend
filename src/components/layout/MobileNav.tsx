@@ -47,7 +47,7 @@ export function MobileNav({
           data-slot="mobile-nav-trigger"
           aria-label={t("aria.openMenu")}
           className={cn(
-            "pointer-events-auto inline-flex size-12 shrink-0 items-center justify-center rounded-sm text-midnight-900 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-crimson-600",
+            "pointer-events-auto inline-flex shrink-0 items-center justify-center rounded-sm text-midnight-900 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-crimson-600",
             className,
           )}
         >

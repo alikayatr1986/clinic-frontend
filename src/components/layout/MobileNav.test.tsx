@@ -36,11 +36,10 @@ describe('MobileNav (trigger + sheet panel)', () => {
     expect(onOpenChange.mock.calls.filter(([open]) => !open)).toHaveLength(1);
   });
 
-  it('renders only the 48px trigger with the lucide Menu icon while closed', () => {
+  it('renders only the trigger with the lucide Menu icon while closed', () => {
     const { container } = themedRender(<MobileNav items={NAV_ITEMS} ctaHref={HEADER_CTA_HREF} />);
 
     const trigger = screen.getByRole('button', { name: 'Open navigation menu' });
-    expect(trigger).toHaveClass('size-12');
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     // The trigger is the lucide `Menu` icon (three parallel lines) morphing
     // into a cross on open — asserted via `data-open`, not SVG geometry.
