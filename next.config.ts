@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
         destination: `${apiOrigin}/api/v1/gallery/:path*`,
       },
       {
+        source: "/api/v1/blogs/:path*",
+        destination: `${apiOrigin}/api/v1/blogs/:path*`,
+      },
+      {
         source: "/api/v1/gallery-content",
         destination: `${apiOrigin}/api/v1/gallery-content`,
       },

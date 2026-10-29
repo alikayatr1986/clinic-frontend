@@ -37,7 +37,12 @@ describe('Home (/)', () => {
 
     for (const item of SECTION_ITEMS) {
       const region = screen.getByRole('region', {
-        name: item.anchor === 'treatments' ? enMessages.treatmentServices.heading : enNavLabel(item),
+        name:
+                  item.anchor === 'treatments'
+                    ? enMessages.treatmentServices.heading
+                    : item.anchor === 'blog'
+                      ? enMessages.blogs.heading
+                      : enNavLabel(item),
       });
       expect(region).toHaveAttribute('id', item.anchor);
       expect(region).toHaveClass('scroll-mt-16', 'lg:scroll-mt-20');

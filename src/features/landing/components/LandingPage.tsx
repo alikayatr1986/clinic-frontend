@@ -6,6 +6,7 @@ import { HeroSection } from "@/features/landing/components/HeroSection";
 import { TreatmentServicesSection } from "@/features/landing/components/TreatmentServicesSection";
 import { WhyTurkeySection } from "@/features/landing/components/WhyTurkeySection";
 import { GallerySection } from "@/features/landing/components/GallerySection";
+import { BlogsSection } from "@/features/landing/components/BlogsSection";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export function LandingPage() {
@@ -20,7 +21,8 @@ export function LandingPage() {
         <WhyTurkeySection />
         <TreatmentServicesSection />
         <GallerySection />
-        {SECTION_ITEMS.filter(({ anchor }) => anchor !== "treatments").map(({ anchor, labelKey }) => (
+        <BlogsSection />
+        {SECTION_ITEMS.filter(({ anchor }) => anchor !== "treatments" && anchor !== "blog").map(({ anchor, labelKey }) => (
           <section
             key={anchor}
             id={anchor}
