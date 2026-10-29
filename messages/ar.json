@@ -115,7 +115,7 @@
     }
   },
   "blogs": {
-    "eyebrow": "07. المدونة",
+    "eyebrow": "المدونة",
     "heading": "رؤى لرحلتك",
     "introduction": "إرشادات موثوقة حول الإجراءات والتعافي والسفر للعلاج.",
     "viewAllArticles": "عرض جميع المقالات",
@@ -218,5 +218,21 @@
     "dialogDescription": "عرض مكبر لتحول الحالة قبل وبعد",
     "procedureLabel": "الإجراء",
     "timeframeLabel": "الفترة الزمنية"
+  },
+  "colorSmoke": {
+    "previewLabel": "معاينة القسم الرئيسي بالعربية",
+    "heroHeading": "احجز استشارتك المجانية",
+    "heroDescription": "استشارة فيديو مجانية مع جراح متخصص.",
+    "consultation": "احجز الاستشارة",
+    "club": "نادي الخصومات",
+    "trust": "شريط الثقة: شهادات حقيقية",
+    "heading": "اختبار نظام الألوان",
+    "description": "يتحقق من bg-background وbg-primary وbg-card وborder-border في الوضع الفاتح و.dark، ومن تطابق الألوان بين الإنجليزية والعربية. دون قيم ألوان سداسية ثابتة في TSX.",
+    "lightLabel": "رموز الوضع الفاتح",
+    "lightHeading": "فاتح — :root",
+    "darkLabel": "رموز الوضع الداكن",
+    "darkHeading": "داكن — تبديل .dark",
+    "darkDescription": "داخل .dark تصبح --background و--card و--primary خلفية كحلية مع زر دعوة لاتخاذ إجراء بالقرمزي المشرق.",
+    "swatchesLabel": "عينات ألوان العلامة التجارية"
   }
 }

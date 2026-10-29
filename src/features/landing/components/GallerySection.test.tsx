@@ -1,8 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { screen, within } from "@testing-library/react";
 
 import { GallerySection } from "./GallerySection";
+import { fetchGalleryContent, fetchLandingGalleryCases } from "@/features/gallery/services/gallery.service";
+
+vi.mock("@/features/gallery/services/gallery.service", () => ({
+  fetchGalleryContent: vi.fn(),
+  fetchLandingGalleryCases: vi.fn(),
+}));
 import { axePass, themedRender } from "@/test/utils";
 import type {
   GalleryCaptionContent,
@@ -95,6 +101,26 @@ const mockCaptions: Record<string, GalleryCaptionContent> = {
 };
 
 describe("GallerySection", () => {
+  it("recovers gallery content after retrying an initial fetch failure", async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchLandingGalleryCases)
+      .mockRejectedValueOnce(new Error("Unavailable"))
+      .mockResolvedValueOnce(mockCases);
+    vi.mocked(fetchGalleryContent).mockResolvedValueOnce({
+      section: mockContentEn,
+      captions: mockCaptions,
+    });
+
+    themedRender(<GallerySection />, { locale: "en", dir: "ltr" });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(enMessages.gallery.errorTitle);
+    await user.click(screen.getByRole("button", { name: enMessages.gallery.retry }));
+
+    expect(await screen.findByRole("region", { name: mockContentEn.heading })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: mockCaptions["case-1"].alt_text })).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("renders 5 cases with featured case 1, 5 dots, 4 supporting thumbnails, and approved statistics", () => {
     themedRender(
       <GallerySection

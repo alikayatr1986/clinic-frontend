@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
@@ -130,13 +131,14 @@ export function BlogArticle({ post }: { post: BlogDetail }) {
             className="mx-auto mt-12 max-w-[70ch] rounded-xl border border-border bg-muted/50 p-5 text-sm text-muted-foreground"
           >
             <p>{t("notice")}</p>
-            <a
-              href={BLOG_CTA_HREF}
-              className={`mt-3 inline-flex min-h-12 items-center gap-2 font-semibold text-primary ${focusRing}`}
-            >
-              {t("consultation")}
-              <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
-            </a>
+            <div className="mt-3">
+              <Button asChild variant="link">
+                <a href={BLOG_CTA_HREF}>
+                  {t("consultation")}
+                  <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+                </a>
+              </Button>
+            </div>
           </aside>
         </div>
 
@@ -165,13 +167,14 @@ export function BlogArticle({ post }: { post: BlogDetail }) {
         </section>
       )}
 
-      <Link
-        href="/blog"
-        className={`mt-12 inline-flex min-h-12 items-center gap-2 font-semibold text-primary ${focusRing}`}
-      >
-        <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden="true" />
-        {t("backToArticles")}
-      </Link>
+      <div className="mt-12">
+        <Button asChild variant="link">
+          <Link href="/blog">
+            <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden="true" />
+            {t("backToArticles")}
+          </Link>
+        </Button>
+      </div>
     </article>
   );
 }

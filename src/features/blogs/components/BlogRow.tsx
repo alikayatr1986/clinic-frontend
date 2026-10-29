@@ -13,7 +13,7 @@ interface BlogRowProps {
 export function BlogRow({ post, locale }: BlogRowProps) {
   const isArabic = locale === "ar";
   return (
-    <article className="relative flex min-w-0 gap-4 py-4 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary">
+    <article className="relative flex min-w-0 gap-4 rounded-2xl border border-border/60 bg-card p-4 text-card-foreground shadow-sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary">
       <BlogCover
         cover={post.cover}
         className="aspect-square w-24 shrink-0 rounded-xl sm:w-32"

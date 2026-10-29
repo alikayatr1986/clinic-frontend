@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import Image, { getImageProps } from "next/image";
 import { ArrowRight, BedDouble, Coins, Plane, ShieldPlus, Trophy } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -109,7 +110,9 @@ export function WhyTurkeySection() {
           <li className="flex min-w-0 items-center gap-[.55rem] text-[.8rem] leading-[1.5] font-semibold text-[#34445c] [overflow-wrap:anywhere] dark:text-[#e2e8f0] max-lg:gap-[.35rem] max-lg:text-[.7rem] max-lg:leading-[1.35] max-[360px]:flex-col max-[360px]:items-start"><Image className="size-6 shrink-0 object-contain max-lg:size-5" src={WHY_TURKEY_TRUST_MARKS.specialist.src} width={28} height={28} alt="" aria-hidden="true" />{t("trustSpecialist")}</li>
           <li className="flex min-w-0 items-center gap-[.55rem] text-[.8rem] leading-[1.5] font-semibold text-[#34445c] [overflow-wrap:anywhere] dark:text-[#e2e8f0] max-lg:gap-[.35rem] max-lg:text-[.7rem] max-lg:leading-[1.35] max-[360px]:flex-col max-[360px]:items-start"><Image className="size-6 shrink-0 object-contain max-lg:size-5" src={WHY_TURKEY_TRUST_MARKS.support.src} width={28} height={28} alt="" aria-hidden="true" />{t("trustSupport")}</li>
         </ul>
-        <Link className="inline-flex min-h-12 items-center justify-center justify-self-start rounded-full bg-crimson-600 px-5 py-3 text-[.8rem] font-bold tracking-[.08em] text-white no-underline hover:bg-crimson-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-midnight-900 motion-safe:transition-colors motion-safe:duration-[160ms] lg:col-start-1 lg:row-start-6" href="#about-us">{t("cta")}</Link>
+        <div className="justify-self-start lg:col-start-1 lg:row-start-6">
+          <Button asChild><Link href="#about-us">{t("cta")}</Link></Button>
+        </div>
       </div>
     </section>
   );

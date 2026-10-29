@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
@@ -31,9 +32,6 @@ function useIsDesktop(): boolean {
     () => false,
   );
 }
-
-const ctaClass =
-  "inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
 const navButtonClass =
   "inline-flex size-12 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-40";
@@ -91,7 +89,7 @@ export function BlogsSection({ initialHome }: BlogsSectionProps) {
       aria-labelledby="blog-heading"
       lang={locale}
       dir={isArabic ? "rtl" : "ltr"}
-      className="relative isolate scroll-mt-16 overflow-x-clip bg-background py-16 text-foreground lg:scroll-mt-20 lg:py-24"
+      className="relative isolate scroll-mt-16 overflow-x-clip border-y border-border/60 bg-secondary py-16 text-foreground lg:scroll-mt-20 lg:py-24"
     >
       <div className="mx-auto grid max-w-7xl min-w-0 gap-10 px-4 sm:px-6 lg:grid-cols-4 lg:gap-12 lg:px-8">
         <div className="min-w-0 lg:col-span-1">
@@ -111,10 +109,14 @@ export function BlogsSection({ initialHome }: BlogsSectionProps) {
           <p className="mt-5 text-base leading-relaxed text-muted-foreground">
             {t("introduction")}
           </p>
-          <Link href="/blog" className={`${ctaClass} mt-8 w-full sm:w-auto`}>
-            <span>{t("viewAllArticles")}</span>
-            <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
-          </Link>
+          <div className="mt-8 grid sm:block">
+            <Button asChild>
+              <Link href="/blog">
+                <span>{t("viewAllArticles")}</span>
+                <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="min-w-0 lg:col-span-3">
@@ -125,9 +127,11 @@ export function BlogsSection({ initialHome }: BlogsSectionProps) {
             >
               <h3 className="text-xl font-bold">{t("errorTitle")}</h3>
               <p className="mt-3 text-muted-foreground">{t("errorDescription")}</p>
-              <button type="button" onClick={loadData} className={`${ctaClass} mt-6`}>
-                {t("retry")}
-              </button>
+              <div className="mt-6">
+                <Button type="button" onClick={loadData}>
+                  {t("retry")}
+                </Button>
+              </div>
             </div>
           ) : home === null ? (
             <div
@@ -225,14 +229,11 @@ export function BlogsSection({ initialHome }: BlogsSectionProps) {
                     >
                       {t("latest")}
                     </h3>
-                    <Link
-                      href="/blog"
-                      className="inline-flex min-h-[48px] items-center text-sm font-semibold text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                    >
-                      {t("viewAll")}
-                    </Link>
+                    <Button asChild variant="link">
+                      <Link href="/blog">{t("viewAll")}</Link>
+                    </Button>
                   </div>
-                  <div className="mt-2 divide-y divide-border/70">
+                  <div className="mt-4 grid gap-4">
                     {latest.map((post) => (
                       <BlogRow key={post.id} post={post} locale={locale} />
                     ))}

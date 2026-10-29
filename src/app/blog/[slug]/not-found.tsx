@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -16,12 +17,9 @@ export default function BlogNotFound() {
         <div className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-8 text-center">
           <h1 className="text-2xl font-bold">{t("notFoundTitle")}</h1>
           <p className="mt-3 text-muted-foreground">{t("notFoundDescription")}</p>
-          <Link
-            href="/blog"
-            className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            {t("backToArticles")}
-          </Link>
+          <div className="mt-6">
+            <Button asChild><Link href="/blog">{t("backToArticles")}</Link></Button>
+          </div>
         </div>
       </main>
     </>

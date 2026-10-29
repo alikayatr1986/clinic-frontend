@@ -23,6 +23,20 @@ story's Spec Change Log before editing. Composing existing public props
 (`variant`, `size`, `asChild`, layout-only wrappers around the component) is
 allowed without asking.
 
+## Navigation presented as buttons
+
+Use the shared `Button` with `asChild` for navigation presented as a button,
+including CTAs, category filters, and pagination. Choose public `variant` and
+`size` props; put layout spacing on wrappers and do not add styling classes to
+Button consumers or their slotted anchors.
+
+```tsx
+<Button asChild variant="outline"><Link href="/blog">Articles</Link></Button>
+```
+
+Keep ordinary text links, breadcrumbs, article titles, linked content cards,
+and table-of-contents entries as anchors.
+
 ## Feature-first architecture — required reading
 
 Read [ARCHITECTURE.md](ARCHITECTURE.md) before planning, implementing, fixing,

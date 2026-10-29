@@ -115,7 +115,7 @@
     }
   },
   "blogs": {
-    "eyebrow": "07. BLOG",
+    "eyebrow": "BLOG",
     "heading": "Insights for Your Journey",
     "introduction": "Trusted guidance on procedures, recovery and travelling for care.",
     "viewAllArticles": "View All Articles",
@@ -218,5 +218,21 @@
     "dialogDescription": "Enlarged view of before and after transformation",
     "procedureLabel": "Procedure",
     "timeframeLabel": "Timeframe"
+  },
+  "colorSmoke": {
+    "previewLabel": "EN hero spot check",
+    "heroHeading": "Book your free consultation",
+    "heroDescription": "A free video assessment with a specialist surgeon.",
+    "consultation": "Book consultation",
+    "club": "Discount Club",
+    "trust": "Trust bar: real credentials",
+    "heading": "Color system smoke test",
+    "description": "Proves bg-background, bg-primary, bg-card + border-border in light and .dark, plus EN/AR hue parity. No hardcoded hex in TSX.",
+    "lightLabel": "Light mode tokens",
+    "lightHeading": "Light — :root",
+    "darkLabel": "Dark mode tokens",
+    "darkHeading": "Dark — .dark flip",
+    "darkDescription": "Wrapped in .dark so --background, --card, --primary resolve to navy canvas with brightened crimson CTA.",
+    "swatchesLabel": "Brand scale swatches"
   }
 }

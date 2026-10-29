@@ -109,6 +109,23 @@ describe("BlogList", () => {
     expect(screen.getByRole("link", { name: /Next page/ })).toHaveAttribute("href", "/blog?page=3");
   });
 
+  it("retains active filters and pagination metadata on shared button anchors", async () => {
+    vi.mocked(fetchBlogList).mockResolvedValue({ data: [post(1)], total: 30 });
+    const { container } = await renderList({ page: "2", category: "rhinoplasty", q: "nose" });
+    const category = screen.getByRole("link", { name: "Rhinoplasty" });
+    expect(category).toHaveAttribute("href", "/blog?q=nose&category=rhinoplasty");
+    expect(category).toHaveAttribute("aria-current", "true");
+    expect(category).toHaveAttribute("data-slot", "button");
+    const previous = screen.getByRole("link", { name: /Previous page/ });
+    const next = screen.getByRole("link", { name: /Next page/ });
+    expect(previous).toHaveAttribute("href", "/blog?q=nose&category=rhinoplasty");
+    expect(previous).toHaveAttribute("rel", "prev");
+    expect(next).toHaveAttribute("href", "/blog?q=nose&category=rhinoplasty&page=3");
+    expect(next).toHaveAttribute("rel", "next");
+    expect(next).toHaveAttribute("data-slot", "button");
+    expect(container.querySelector("a button, button a")).toBeNull();
+  });
+
   it("propagates API failure instead of rendering empty", async () => {
     vi.mocked(fetchBlogList).mockRejectedValue(new Error("503"));
     await expect(BlogList({ searchParams: Promise.resolve({}) })).rejects.toThrow("503");

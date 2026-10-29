@@ -22,11 +22,11 @@ export function HeroSection() {
     <section
       lang={locale}
       dir={isArabic ? "rtl" : "ltr"}
-      className="relative isolate min-h-[139vw] overflow-hidden bg-[var(--hero-background)] text-[var(--hero-foreground)] [--foreground:var(--hero-foreground)] lg:grid lg:grid-cols-1 lg:grid-rows-1 lg:min-h-[clamp(42rem,calc(100svh-5rem),60rem)]"
+      className="relative isolate min-h-[139vw] overflow-hidden bg-[var(--hero-background)] text-[var(--hero-foreground)] [--foreground:var(--hero-foreground)] lg:grid lg:grid-cols-1 lg:grid-rows-1 lg:min-h-[clamp(42rem,calc(100svh-5rem),60rem)] lg:min-h-auto lg:max-xl:max-h-[700px]"
       data-slot="hero"
       aria-labelledby="hero-heading"
     >
-      <picture className="block max-lg:absolute max-lg:inset-x-0 max-lg:-z-10 max-lg:aspect-[937/1678] lg:col-start-1 lg:row-start-1 lg:h-full lg:w-full lg:min-h-0 lg:min-w-0">
+      <picture className="block max-lg:absolute max-lg:inset-x-0 max-lg:-z-10 max-lg:aspect-[937/1678] lg:col-start-1 lg:max-h-[700px] lg:row-start-1 lg:h-full lg:w-full lg:min-h-0 lg:min-w-0 lg:max-xl:absolute lg:max-xl:inset-0">
         <source
           media={HERO_DESKTOP_MEDIA}
           srcSet={HERO_DESKTOP_IMAGE.srcSet}
@@ -35,7 +35,12 @@ export function HeroSection() {
           height={HERO_ARTWORK.desktop.height}
         />
         {/* Art direction requires one img fallback, as documented by Next. */}
-        <img {...HERO_MOBILE_IMAGE} className="block h-auto w-full rtl:-scale-x-100 lg:h-full lg:w-full lg:object-cover lg:object-right" alt="" aria-hidden="true" />
+        <img
+          {...HERO_MOBILE_IMAGE}
+          className="block h-auto w-full rtl:-scale-x-100 lg:h-full lg:w-full lg:object-cover lg:object-right"
+          alt=""
+          aria-hidden="true"
+        />
       </picture>
       <div
         aria-hidden="true"
@@ -46,22 +51,59 @@ export function HeroSection() {
         lang={locale}
         dir={isArabic ? "rtl" : "ltr"}
       >
-        <p className={`flex items-center gap-3 px-[6%] text-[var(--hero-muted-foreground)] text-[clamp(.625rem,2.3vw,.875rem)] leading-normal before:h-px before:basis-[2.4em] before:shrink-0 before:bg-[var(--hero-accent)] before:content-[''] lg:me-auto lg:max-w-[58%] lg:gap-[1.125rem] lg:px-0 lg:text-[clamp(.6875rem,.88vw,1.125rem)] lg:before:basis-[3.1em] ${isArabic ? "tracking-normal" : "tracking-[.12em] lg:tracking-[.24em]"}`}>{t("eyebrow")}</p>
-        <h1 id="hero-heading" className={`mt-3 max-w-[7.5em] px-[6%] font-normal text-[clamp(2.25rem,9.9vw,4.75rem)] leading-[1.02] lg:me-auto lg:mt-6 lg:max-w-[58%] lg:px-0 lg:text-[clamp(2.5rem,4.2vw,4.5rem)] lg:leading-[1.06] ${isArabic ? "max-w-[11em] leading-[1.45] tracking-normal lg:leading-[1.5]" : "font-hero-display tracking-[-.025em]"}`}>{t("heading")}</h1>
-        <p className="mt-3 max-w-[42em] px-[6%] text-[var(--hero-muted-foreground)] text-[clamp(1rem,3.2vw,1.375rem)] leading-[1.5] lg:me-auto lg:mt-6 lg:max-w-[58%] lg:px-0 lg:text-[clamp(1rem,1.35vw,1.75rem)]">{t("description")}</p>
+        <p
+          className={`flex items-center gap-3 px-[6%] text-[var(--hero-muted-foreground)] text-[clamp(.625rem,2.3vw,.875rem)] leading-normal before:h-px before:basis-[2.4em] before:shrink-0 before:bg-[var(--hero-accent)] before:content-[''] lg:me-auto lg:max-w-[58%] lg:gap-[1.125rem] lg:px-0 lg:text-[clamp(.6875rem,.88vw,1.125rem)] lg:before:basis-[3.1em] ${isArabic ? "tracking-normal" : "tracking-[.12em] lg:tracking-[.24em]"}`}
+        >
+          {t("eyebrow")}
+        </p>
+        <h1
+          id="hero-heading"
+          className={`mt-3 max-w-[7.5em] px-[6%] font-normal text-[clamp(2.25rem,9.9vw,4.75rem)] leading-[1.02] lg:me-auto lg:mt-6 lg:max-w-[58%] lg:px-0 lg:text-[clamp(2.5rem,4.2vw,4.5rem)] lg:leading-[1.06] ${isArabic ? "max-w-[11em] leading-[1.45] tracking-normal lg:leading-[1.5]" : "font-hero-display tracking-[-.025em]"}`}
+        >
+          {t("heading")}
+        </h1>
+        <p className="mt-3 max-w-[42em] px-[6%] text-[var(--hero-muted-foreground)] text-[clamp(1rem,3.2vw,1.375rem)] leading-[1.5] lg:me-auto lg:mt-6 lg:max-w-[58%] lg:px-0 lg:text-[clamp(1rem,1.35vw,1.75rem)]">
+          {t("description")}
+        </p>
         <div className="mt-7 flex flex-col gap-4 px-[6%] lg:me-auto lg:max-w-[58%] lg:flex-row lg:flex-wrap lg:px-0">
           <Button asChild size="hero">
-            <Link href={HERO_ACTIONS.primary}><Video aria-hidden="true" /><span className="min-w-0">{t("primaryAction")}</span><ArrowRight aria-hidden="true" className="shrink-0 rtl:-scale-x-100" data-hero-arrow="" /></Link>
+            <Link href={HERO_ACTIONS.primary}>
+              <Video aria-hidden="true" />
+              <span className="min-w-0">{t("primaryAction")}</span>
+              <ArrowRight
+                aria-hidden="true"
+                className="shrink-0 rtl:-scale-x-100"
+                data-hero-arrow=""
+              />
+            </Link>
           </Button>
           <Button asChild variant="outline" size="hero">
-            <Link href={HERO_ACTIONS.secondary}><span className="min-w-0">{t("secondaryAction")}</span><ArrowRight aria-hidden="true" className="shrink-0 rtl:-scale-x-100" data-hero-arrow="" /></Link>
+            <Link href={HERO_ACTIONS.secondary}>
+              <span className="min-w-0">{t("secondaryAction")}</span>
+              <ArrowRight
+                aria-hidden="true"
+                className="shrink-0 rtl:-scale-x-100"
+                data-hero-arrow=""
+              />
+            </Link>
           </Button>
         </div>
-        <div className="mt-8 overflow-x-auto overscroll-x-contain rounded-xl px-[6%] py-1 snap-x snap-proximity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] lg:me-auto lg:mt-10 lg:max-w-[58%] lg:overflow-visible lg:p-1 lg:px-0" role="group" tabIndex={0} aria-label={t("trustScrollLabel")}>
+        <div
+          className="mt-8 overflow-x-auto overscroll-x-contain rounded-xl px-[6%] py-1 snap-x snap-proximity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] lg:me-auto lg:mt-10 lg:max-w-[58%] lg:overflow-visible lg:p-1 lg:px-0"
+          role="group"
+          tabIndex={0}
+          aria-label={t("trustScrollLabel")}
+        >
           <ul className="flex gap-4 pb-2 lg:pb-0">
             {HERO_TRUST_ITEMS.map(({ key, icon: Icon }, index) => (
-              <li key={key} className={`min-w-0 flex-[0_0_70%] snap-start text-base leading-normal lg:flex-[1_1_0] lg:text-[clamp(.75rem,.9vw,1.125rem)] ${index > 0 ? "lg:border-s lg:border-[var(--border)] lg:ps-4" : ""}`}>
-                <Card variant="trust"><Icon aria-hidden="true" /><span>{t(key)}</span></Card>
+              <li
+                key={key}
+                className={`min-w-0 flex-[0_0_70%] snap-start text-base leading-normal lg:flex-[1_1_0] lg:text-[clamp(.75rem,.9vw,1.125rem)] ${index > 0 ? "lg:border-s lg:border-[var(--border)] lg:ps-4" : ""}`}
+              >
+                <Card variant="trust">
+                  <Icon aria-hidden="true" />
+                  <span>{t(key)}</span>
+                </Card>
               </li>
             ))}
           </ul>

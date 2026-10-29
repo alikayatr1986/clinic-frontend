@@ -19,22 +19,18 @@ export const PROCEDURE_OPTIONS: readonly GalleryFilterOption[] = [
   {
     value: "synthetic-procedure",
     labelKey: "procedure_synthetic",
-    fallbackLabel: "Synthetic procedure",
   },
   {
     value: "rhinoplasty",
     labelKey: "procedure_rhinoplasty",
-    fallbackLabel: "Rhinoplasty",
   },
   {
     value: "revision-rhinoplasty",
     labelKey: "procedure_revision_rhinoplasty",
-    fallbackLabel: "Revision Rhinoplasty",
   },
   {
     value: "septoplasty",
     labelKey: "procedure_septoplasty",
-    fallbackLabel: "Septoplasty",
   },
 ];
 
@@ -42,27 +38,22 @@ export const TIMEFRAME_OPTIONS: readonly GalleryFilterOption[] = [
   {
     value: "synthetic-time",
     labelKey: "timeframe_synthetic",
-    fallbackLabel: "Synthetic timeframe",
   },
   {
     value: "1-month",
     labelKey: "timeframe_1_month",
-    fallbackLabel: "1 Month Post-Op",
   },
   {
     value: "3-months",
     labelKey: "timeframe_3_months",
-    fallbackLabel: "3 Months Post-Op",
   },
   {
     value: "6-months",
     labelKey: "timeframe_6_months",
-    fallbackLabel: "6 Months Post-Op",
   },
   {
     value: "1-year",
     labelKey: "timeframe_1_year",
-    fallbackLabel: "1 Year Post-Op",
   },
 ];
 

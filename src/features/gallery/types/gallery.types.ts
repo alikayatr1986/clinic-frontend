@@ -57,7 +57,6 @@ export interface GalleryQueryParams {
 export interface GalleryFilterOption {
   value: string;
   labelKey: string;
-  fallbackLabel?: string;
 }
 
 export interface GalleryFilterOptions {

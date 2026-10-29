@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, ShieldCheck, Star, UserRound } from "lucide-react";
 import { GalleryComparison } from "@/features/gallery/components/GalleryComparison";
@@ -103,13 +104,11 @@ export function GallerySection({
               {t("errorTitle")}
             </h2>
             <p className="mt-3 text-muted-foreground">{t("errorDescription")}</p>
-            <button
-              type="button"
-              onClick={loadData}
-              className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              {t("retry")}
-            </button>
+            <div className="mt-6">
+              <Button type="button" onClick={loadData}>
+                {t("retry")}
+              </Button>
+            </div>
           </div>
         ) : cases === null && isPending ? (
           /* Loading Skeleton State */
@@ -313,14 +312,13 @@ export function GallerySection({
             )}
 
             {/* View Gallery CTA */}
-            <div className="mt-10 flex justify-center lg:mt-14">
-              <Link
-                href="/gallery"
-                className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center gap-2.5 rounded-xl bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors"
-              >
-                <span>{t("cta")}</span>
-                <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
-              </Link>
+            <div className="mt-10 grid sm:flex sm:justify-center lg:mt-14">
+              <Button asChild size="lg">
+                <Link href="/gallery">
+                  <span>{t("cta")}</span>
+                  <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+                </Link>
+              </Button>
             </div>
           </div>
         )}

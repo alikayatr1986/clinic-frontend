@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowLeft, ArrowRight, Search } from "lucide-react";
 
@@ -17,8 +18,6 @@ interface BlogListProps {
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
-const pill =
-  "inline-flex min-h-12 items-center rounded-full border px-5 text-sm font-semibold transition-colors";
 
 /**
  * Server-rendered so crawlers and refreshes get real headings and links.
@@ -89,16 +88,10 @@ export async function BlogList({ searchParams }: BlogListProps) {
             focusRing,
           )}
         />
-        <button
-          type="submit"
-          className={cn(
-            "inline-flex min-h-12 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary/90",
-            focusRing,
-          )}
-        >
+        <Button type="submit">
           <Search className="size-4" aria-hidden="true" />
           {t("searchButton")}
-        </button>
+        </Button>
       </form>
 
       <nav aria-label={t("categoriesLabel")} className="mt-6">
@@ -107,19 +100,14 @@ export async function BlogList({ searchParams }: BlogListProps) {
             const active = c.key === filters.category;
             return (
               <li key={c.key || "all"}>
-                <Link
-                  href={blogListHref({ q: filters.q, category: c.key })}
-                  aria-current={active ? "true" : undefined}
-                  className={cn(
-                    pill,
-                    focusRing,
-                    active
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-card text-foreground hover:bg-muted",
-                  )}
-                >
-                  {c.label}
-                </Link>
+                <Button asChild variant={active ? "default" : "outline"}>
+                  <Link
+                    href={blogListHref({ q: filters.q, category: c.key })}
+                    aria-current={active ? "true" : undefined}
+                  >
+                    {c.label}
+                  </Link>
+                </Button>
               </li>
             );
           })}
@@ -131,12 +119,11 @@ export async function BlogList({ searchParams }: BlogListProps) {
       </p>
 
       {outOfRange ? (
-        <Link
-          href={blogListHref({ ...filters, page: 1 })}
-          className={cn("mt-4 inline-flex min-h-12 items-center font-semibold text-primary", focusRing)}
-        >
-          {t("backToFirstPage")}
-        </Link>
+        <div className="mt-4">
+          <Button asChild variant="link">
+            <Link href={blogListHref({ ...filters, page: 1 })}>{t("backToFirstPage")}</Link>
+          </Button>
+        </div>
       ) : data.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-border/80 bg-card p-8 text-center sm:p-12">
           <h2 className="text-xl font-bold">
@@ -145,15 +132,9 @@ export async function BlogList({ searchParams }: BlogListProps) {
           {hasFilters && (
             <>
               <p className="mt-3 text-muted-foreground">{t("noResultsDescription")}</p>
-              <Link
-                href="/blog"
-                className={cn(
-                  "mt-6 inline-flex min-h-12 items-center rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground",
-                  focusRing,
-                )}
-              >
-                {t("clearFilters")}
-              </Link>
+              <div className="mt-6">
+                <Button asChild><Link href="/blog">{t("clearFilters")}</Link></Button>
+              </div>
             </>
           )}
         </div>
@@ -162,11 +143,11 @@ export async function BlogList({ searchParams }: BlogListProps) {
           {data.map((post) => (
             <li key={post.id} className="min-w-0">
               <BlogCard
-                              post={post}
-                              locale={locale}
-                              readMoreLabel={t("readMore")}
-                              headingLevel="h2"
-                            />
+                post={post}
+                locale={locale}
+                readMoreLabel={t("readMore")}
+                headingLevel="h2"
+              />
             </li>
           ))}
         </ul>
@@ -178,14 +159,15 @@ export async function BlogList({ searchParams }: BlogListProps) {
           className="mt-10 flex items-center justify-between gap-4"
         >
           {filters.page > 1 ? (
-            <Link
-              href={blogListHref({ ...filters, page: filters.page - 1 })}
-              rel="prev"
-              className={cn(pill, focusRing, "gap-2 border-border bg-card")}
-            >
-              <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden="true" />
-              {t("previousPage")}
-            </Link>
+            <Button asChild variant="outline">
+              <Link
+                href={blogListHref({ ...filters, page: filters.page - 1 })}
+                rel="prev"
+              >
+                <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden="true" />
+                {t("previousPage")}
+              </Link>
+            </Button>
           ) : (
             <span />
           )}
@@ -193,14 +175,15 @@ export async function BlogList({ searchParams }: BlogListProps) {
             {t("pageOf", { page: filters.page, total: totalPages })}
           </span>
           {filters.page < totalPages ? (
-            <Link
-              href={blogListHref({ ...filters, page: filters.page + 1 })}
-              rel="next"
-              className={cn(pill, focusRing, "gap-2 border-border bg-card")}
-            >
-              {t("nextPage")}
-              <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
-            </Link>
+            <Button asChild variant="outline">
+              <Link
+                href={blogListHref({ ...filters, page: filters.page + 1 })}
+                rel="next"
+              >
+                {t("nextPage")}
+                <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+              </Link>
+            </Button>
           ) : (
             <span />
           )}
