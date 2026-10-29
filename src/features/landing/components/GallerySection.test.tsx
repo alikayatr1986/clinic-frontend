@@ -121,6 +121,22 @@ describe("GallerySection", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
+  it("renders loading skeleton and resolves gallery content when mounted without initial data", async () => {
+    vi.mocked(fetchLandingGalleryCases).mockResolvedValueOnce(mockCases);
+    vi.mocked(fetchGalleryContent).mockResolvedValueOnce({
+      section: mockContentEn,
+      captions: mockCaptions,
+    });
+
+    themedRender(<GallerySection />, { locale: "en", dir: "ltr" });
+
+    expect(screen.getByTestId("gallery-loading")).toBeInTheDocument();
+
+    expect(await screen.findByRole("region", { name: mockContentEn.heading })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: mockCaptions["case-1"].alt_text })).toBeInTheDocument();
+    expect(screen.queryByTestId("gallery-loading")).not.toBeInTheDocument();
+  });
+
   it("renders 5 cases with featured case 1, 5 dots, 4 supporting thumbnails, and approved statistics", () => {
     themedRender(
       <GallerySection

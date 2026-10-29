@@ -1,16 +1,20 @@
 import { useTranslations } from "next-intl";
 
-import { NAV_ITEMS, SECTION_ITEMS } from "@/features/landing/constants/nav.constants";
+import {
+  NAV_ITEMS,
+  SECTION_ITEMS,
+} from "@/features/landing/constants/nav.constants";
 import { HERO_ACTIONS } from "@/features/landing/constants/hero.constants";
 import { HeroSection } from "@/features/landing/components/HeroSection";
 import { TreatmentServicesSection } from "@/features/landing/components/TreatmentServicesSection";
 import { WhyTurkeySection } from "@/features/landing/components/WhyTurkeySection";
 import { GallerySection } from "@/features/landing/components/GallerySection";
 import { BlogsSection } from "@/features/landing/components/BlogsSection";
+import { ContactSection } from "@/features/contact/components/ContactSection";
+import { getContactConfig } from "@/features/contact/constants/contact.constants";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export function LandingPage() {
-
   const tNav = useTranslations("nav");
 
   return (
@@ -22,7 +26,13 @@ export function LandingPage() {
         <TreatmentServicesSection />
         <GallerySection />
         <BlogsSection />
-        {SECTION_ITEMS.filter(({ anchor }) => anchor !== "treatments" && anchor !== "blog").map(({ anchor, labelKey }) => (
+        <ContactSection config={getContactConfig(process.env)} />
+        {SECTION_ITEMS.filter(
+          ({ anchor }) =>
+            anchor !== "treatments" &&
+            anchor !== "blog" &&
+            anchor !== "contact",
+        ).map(({ anchor, labelKey }) => (
           <section
             key={anchor}
             id={anchor}

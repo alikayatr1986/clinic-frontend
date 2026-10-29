@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -8,10 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useProcedures } from "@/features/procedures/hooks/useProcedures";
 import { Badge } from "@/components/ui/badge";
 import { GalleryComparison } from "./GalleryComparison";
 import {
-  getProcedureLabel,
   getTimeframeLabel,
 } from "../utils/gallery.utils";
 import type {
@@ -33,6 +33,8 @@ export function GalleryLightbox({
   onOpenChange,
 }: GalleryLightboxProps) {
   const t = useTranslations("gallery");
+  const locale = useLocale();
+  const { procedures } = useProcedures();
 
   if (!item) {
     return null;
@@ -42,7 +44,8 @@ export function GalleryLightbox({
     return t(k as never);
   }
 
-  const procedureLabel = getProcedureLabel(item.procedure_tag, getLabel);
+  const procedure = procedures.find((p) => p.code === item.procedure_tag);
+  const procedureLabel = procedure ? (locale === "ar" ? procedure.ar : procedure.en) : item.procedure_tag;
   const timeframeLabel = getTimeframeLabel(item.timeframe_badge, getLabel);
 
   return (

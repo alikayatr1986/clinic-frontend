@@ -3,9 +3,17 @@ import userEvent from "@testing-library/user-event";
 import { screen, waitFor, within } from "@testing-library/react";
 import { GalleryBrowser } from "./GalleryBrowser";
 import { axePass, themedRender } from "@/test/utils";
+import { useProcedures } from "@/features/procedures/hooks/useProcedures";
 import * as galleryService from "../services/gallery.service";
 import type { GalleryPublicCase } from "../types/gallery.types";
 import enMessages from "../../../../messages/en.json";
+
+vi.mock("@/features/procedures/hooks/useProcedures", () => ({
+  useProcedures: vi.fn(() => ({ procedures: [
+    { code: "rhinoplasty", en: "Rhinoplasty", ar: "تجميل الأنف" },
+    { code: "revision_rhinoplasty", en: "Revision rhinoplasty", ar: "إعادة تجميل الأنف" },
+  ], error: false, retry: vi.fn() })),
+}));
 
 const mockPush = vi.fn((url: string) => {
   const query = url.split("?")[1] || "";
@@ -177,18 +185,26 @@ describe("GalleryBrowser", () => {
       expect(screen.getByTestId("gallery-recovery-notice")).toHaveTextContent(
         enMessages.gallery.recoveryNotice,
       );
-      expect(galleryService.fetchGalleryCases).toHaveBeenNthCalledWith(1, {
-        page: 9999,
-        page_size: 12,
-        procedure_tag: "",
-        timeframe_badge: "",
-      });
-      expect(galleryService.fetchGalleryCases).toHaveBeenNthCalledWith(2, {
-        page: 1,
-        page_size: 12,
-        procedure_tag: "",
-        timeframe_badge: "",
-      });
+      expect(galleryService.fetchGalleryCases).toHaveBeenNthCalledWith(
+        1,
+        {
+          page: 9999,
+          page_size: 12,
+          procedure_tag: "",
+          timeframe_badge: "",
+        },
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
+      expect(galleryService.fetchGalleryCases).toHaveBeenNthCalledWith(
+        2,
+        {
+          page: 1,
+          page_size: 12,
+          procedure_tag: "",
+          timeframe_badge: "",
+        },
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
       expect(screen.getAllByTestId("gallery-card").map(card => card.getAttribute("data-case-id")))
         .toEqual(recoveredCases.map(item => item.id));
       expect(screen.getByTestId("gallery-results-count")).toHaveTextContent(
@@ -197,8 +213,11 @@ describe("GalleryBrowser", () => {
     });
   });
 
-  it("recovers gracefully on invalid filter code client-side", async () => {
+  it("recovers gracefully when backend rejects an invalid procedure code", async () => {
     mockSearchParams = new URLSearchParams("procedure_tag=invalid-filter-code");
+    vi.mocked(galleryService.fetchGalleryCases).mockRejectedValueOnce(
+      Object.assign(new Error("Invalid procedure"), { status: 400 }),
+    );
 
     themedRender(<GalleryBrowser />);
 
@@ -207,6 +226,12 @@ describe("GalleryBrowser", () => {
       expect(screen.getByTestId("gallery-recovery-notice")).toHaveTextContent(
         enMessages.gallery.recoveryNotice,
       );
+      expect(galleryService.fetchGalleryCases).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ page: 1 }),
+        expect.anything(),
+      );
+      expect(screen.getAllByTestId("gallery-card")).toHaveLength(12);
     });
   });
 
@@ -230,6 +255,25 @@ describe("GalleryBrowser", () => {
       expect(screen.getByTestId("gallery-recovery-notice")).toHaveTextContent(
         enMessages.gallery.recoveryNotice,
       );
+      expect(galleryService.fetchGalleryCases).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ page: 1 }),
+        expect.anything(),
+      );
+      expect(screen.getAllByTestId("gallery-card")).toHaveLength(12);
+    });
+  });
+
+  it("normalizes invalid client-side parameters (non-positive page and invalid timeframe)", async () => {
+    mockSearchParams = new URLSearchParams("page=0&timeframe_badge=invalid-timeframe");
+    themedRender(<GalleryBrowser />);
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith("/gallery");
+      expect(screen.getByTestId("gallery-recovery-notice")).toHaveTextContent(
+        enMessages.gallery.recoveryNotice,
+      );
+      expect(screen.getAllByTestId("gallery-card")).toHaveLength(12);
     });
   });
 
@@ -329,5 +373,14 @@ describe("GalleryBrowser", () => {
     });
 
     await axePass(container);
+  });
+
+  it("offers an accessible retry when procedure choices are unavailable", async () => {
+    const retry = vi.fn();
+    vi.mocked(useProcedures).mockReturnValue({ procedures: [], error: true, retry });
+    themedRender(<GalleryBrowser initialCases={[]} />);
+    expect(screen.getByRole("alert")).toHaveTextContent(enMessages.gallery.procedureCatalogError);
+    await userEvent.click(screen.getByRole("button", { name: enMessages.gallery.retry }));
+    expect(retry).toHaveBeenCalledOnce();
   });
 });

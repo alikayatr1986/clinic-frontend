@@ -57,6 +57,46 @@ commits.
 - Inspect existing code first. Migrate legacy `components/site/` and global
   domain files only within a justified task; update affected imports and tests.
 
+## Data-access architecture and server state (React Query)
+
+All data access in the frontend must follow the permanent layered architecture:
+- **Client component reads and writes:** `app/component -> feature hook -> feature service -> shared API transport (@/lib/api)`.
+- **Server framework reads:** `app/Server Component -> feature service -> shared API transport (@/lib/api)`.
+
+### 1. Shared transport exclusivity (`@/lib/api`)
+`frontend/src/lib/api.ts` is the single general HTTP transport boundary. Direct `fetch` calls are forbidden outside `src/lib/api.ts` (and narrow documented framework exceptions). Do not introduce Axios, SWR, or secondary API clients.
+
+### 2. Browser server state managed by TanStack Query
+All browser-side remote reads and mutations must use TanStack Query feature hooks:
+- Feature hooks reside in `src/features/<feature>/hooks/` (or colocated beside a complex component when private to it).
+- Exported hook names must begin with `use` (e.g. `useGalleryCases`, `useLandingGallery`, `useBlogHome`, `useConsent`, `useSubmitContact`, `useProcedures`).
+- Mutation hooks (e.g. `useSubmitContact`) must disable automatic retries (`retry: false`) on non-idempotent operations.
+- Forward TanStack Query's `signal` through queries and mutations to `apiRequest` so superseded requests can be aborted.
+- Client presentation components (`"use client"`) must consume feature hooks and must never import data-fetching functions from `*.service.ts`.
+
+### 3. Allowed local UI state vs. server state
+TanStack Query owns remote server state (caching, in-flight state, errors, refetching). Never mirror query state into component `useState` or create manual fetch effects with `useEffect`.
+Local React state (`useState`/`useReducer`) is strictly reserved for ephemeral UI state:
+- Controlled form values, field inputs, and validation feedback
+- Selection indices, active tabs, modal/lightbox disclosure, dialog visibility
+- Local pagination display and viewport/scroll-derived state
+- Client-side focus management and accessible announcements
+
+### 4. Query-key ownership and key factories
+Query keys must be stable, serializable arrays owned by the feature and exposed via a query key factory (e.g. `galleryKeys`, `blogKeys`, `contactKeys`, `proceduresKeys`).
+- Query keys must include all request dimensions that affect the response: `locale`, `page`, `page_size`, filters, and entity identifiers.
+- Never scatter raw string literals across components or hooks.
+
+### 5. Server rendering and initial data
+Preserve server-rendered routes (`/blog`, `/blog/[slug]`, `/gallery`, `/sitemap.xml`, `/robots.txt`) for SEO and resilience.
+- Server Components, metadata generators, and route handlers may call typed feature services directly.
+- When hydrating interactive client components from server data, provide `initialData` with an intentional freshness policy (`staleTime: 60_000` or higher) to prevent duplicate mount refetches.
+
+### 6. Testing and verification
+- Feature hooks must be tested with an isolated test `QueryClient` (`retry: false`).
+- Component tests must mock feature hooks or wrap components with `ThemedRender` / `QueryClientProvider`.
+- Automated structural tests in `src/test/data-access-architecture.test.ts` enforce transport exclusivity, client-hook usage, and query key invariants.
+
 ## Tailwind-first styling
 
 Use Tailwind CSS utility classes in component `className` values for frontend

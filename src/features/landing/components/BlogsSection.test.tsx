@@ -1,11 +1,16 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
 
 import { BlogsSection } from "./BlogsSection";
 import { axePass, themedRender } from "@/test/utils";
 import type { BlogHome, BlogSummary } from "@/features/blogs/types/blogs.types";
+import { fetchBlogHome } from "@/features/blogs/services/blogs.service";
 import enMessages from "../../../../messages/en.json";
+
+vi.mock("@/features/blogs/services/blogs.service", () => ({
+  fetchBlogHome: vi.fn(),
+}));
 
 function post(n: number): BlogSummary {
   return {
@@ -40,9 +45,24 @@ function setDesktop(matches: boolean) {
   );
 }
 
-afterEach(() => vi.unstubAllGlobals());
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("BlogsSection", () => {
+  it("renders loading skeleton while query is in-flight without initialHome", () => {
+    setDesktop(true);
+    vi.mocked(fetchBlogHome).mockReturnValue(new Promise(() => {}));
+    themedRender(<BlogsSection />);
+
+    expect(screen.getByTestId("blogs-loading")).toBeInTheDocument();
+    expect(screen.queryByTestId("blogs-empty")).not.toBeInTheDocument();
+  });
+
   it("desktop: pages three at a time with disabled ends and passive indicators", async () => {
     setDesktop(true);
     const { container } = themedRender(<BlogsSection initialHome={home(12)} />);
@@ -97,11 +117,30 @@ describe("BlogsSection", () => {
     );
   });
 
-  it("failure shows retry, not the empty state", async () => {
+  it("hydrates initialHome without issuing a remote request", () => {
     setDesktop(true);
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 503 }));
+    themedRender(<BlogsSection initialHome={home(3)} />);
+    expect(screen.getByRole("link", { name: "Post 1" })).toBeInTheDocument();
+    expect(fetchBlogHome).not.toHaveBeenCalled();
+  });
+
+  it("failure shows retry, not the empty state, and recovers on retry click", async () => {
+    setDesktop(true);
+    vi.mocked(fetchBlogHome)
+      .mockRejectedValueOnce(new Error("503 Service Unavailable"))
+      .mockResolvedValueOnce(home(3));
+
     themedRender(<BlogsSection />);
+
     expect(await screen.findByRole("alert")).toHaveTextContent(enMessages.blogs.errorTitle);
     expect(screen.queryByTestId("blogs-empty")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("blogs-loading")).not.toBeInTheDocument();
+
+    const retryButton = screen.getByRole("button", { name: enMessages.blogs.retry });
+    await userEvent.click(retryButton);
+
+    expect(await screen.findByRole("link", { name: "Post 1" })).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(fetchBlogHome).toHaveBeenCalledTimes(2);
   });
 });

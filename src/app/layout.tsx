@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 
 import { heroDisplayFont } from "@/features/landing/utils/hero-font.utils";
+import { QueryProvider } from "@/lib/query-client-provider";
 
 import "./globals.css";
 
@@ -55,7 +56,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
 
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

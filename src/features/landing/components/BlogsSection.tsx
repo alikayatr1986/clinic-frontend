@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
@@ -8,7 +8,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { BlogCard } from "@/features/blogs/components/BlogCard";
 import { BlogRow } from "@/features/blogs/components/BlogRow";
-import { fetchBlogHome } from "@/features/blogs/services/blogs.service";
+import { useBlogHome } from "@/features/blogs/hooks/useBlogHome";
 import type { BlogHome } from "@/features/blogs/types/blogs.types";
 
 const PAGE_SIZE = 3;
@@ -46,26 +46,13 @@ export function BlogsSection({ initialHome }: BlogsSectionProps) {
   const isArabic = locale === "ar";
   const isDesktop = useIsDesktop();
 
-  const [home, setHome] = useState<BlogHome | null>(initialHome ?? null);
-  const [hasError, setHasError] = useState(false);
   const [page, setPage] = useState(0);
 
-  const loadData = useCallback(() => {
-    setHasError(false);
-    fetchBlogHome(locale)
-      .then((data) => {
-        setHome(data);
-        setPage(0);
-      })
-      .catch(() => setHasError(true));
-  }, [locale]);
-
-  useEffect(() => {
-    if (initialHome === undefined) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch on mount, mirrors GallerySection
-      loadData();
-    }
-  }, [initialHome, loadData]);
+  const {
+    home,
+    error: hasError,
+    retry,
+  } = useBlogHome(locale, { initialHome });
 
   const articles = (home?.articles ?? []).slice(0, MAX_ARTICLES);
   const featured =
@@ -128,7 +115,13 @@ export function BlogsSection({ initialHome }: BlogsSectionProps) {
               <h3 className="text-xl font-bold">{t("errorTitle")}</h3>
               <p className="mt-3 text-muted-foreground">{t("errorDescription")}</p>
               <div className="mt-6">
-                <Button type="button" onClick={loadData}>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setPage(0);
+                    retry();
+                  }}
+                >
                   {t("retry")}
                 </Button>
               </div>

@@ -5,6 +5,7 @@ import {
   type RenderResult,
 } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { axe } from "jest-axe";
 import { expect, vi } from "vitest";
 
@@ -22,6 +23,7 @@ export interface ThemedRenderOptions extends Omit<RenderOptions, "wrapper"> {
   dir?: Direction;
   lang?: string;
   locale?: TestLocale;
+  queryClient?: QueryClient;
 }
 
 const TEST_MESSAGES: Record<TestLocale, typeof enMessages> = {
@@ -36,9 +38,20 @@ export function themedRender(
     dir = "ltr",
     lang = "en",
     locale = "en",
+    queryClient,
     ...options
   }: ThemedRenderOptions = {},
 ): RenderResult {
+  const testQueryClient =
+    queryClient ??
+    new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+
   function Wrapper({ children }: { children: React.ReactNode }) {
     return (
       <div
@@ -50,7 +63,9 @@ export function themedRender(
           locale={locale}
           messages={withFallback(TEST_MESSAGES.en, TEST_MESSAGES[locale])}
         >
-          {children}
+          <QueryClientProvider client={testQueryClient}>
+            {children}
+          </QueryClientProvider>
         </NextIntlClientProvider>
       </div>
     );

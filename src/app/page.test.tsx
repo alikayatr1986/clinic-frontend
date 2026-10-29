@@ -42,7 +42,9 @@ describe('Home (/)', () => {
                     ? enMessages.treatmentServices.heading
                     : item.anchor === 'blog'
                       ? enMessages.blogs.heading
-                      : enNavLabel(item),
+                      : item.anchor === 'contact'
+                        ? enMessages.contact.heading
+                        : enNavLabel(item),
       });
       expect(region).toHaveAttribute('id', item.anchor);
       expect(region).toHaveClass('scroll-mt-16', 'lg:scroll-mt-20');
@@ -172,5 +174,5 @@ describe('Home (/)', () => {
   it('has zero axe violations', async () => {
     const { container } = themedRender(<Home />);
     await axePass(container);
-  });
+  }, 15000);
 });

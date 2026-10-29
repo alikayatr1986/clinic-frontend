@@ -1,12 +1,12 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Maximize2 } from "lucide-react";
+import { useProcedures } from "@/features/procedures/hooks/useProcedures";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GalleryComparison } from "./GalleryComparison";
 import {
-  getProcedureLabel,
   getTimeframeLabel,
 } from "../utils/gallery.utils";
 import type {
@@ -28,12 +28,15 @@ export function GalleryCard({
   priority = false,
 }: GalleryCardProps) {
   const t = useTranslations("gallery");
+  const locale = useLocale();
+  const { procedures } = useProcedures();
 
   function getLabel(k: string) {
     return t(k as never);
   }
 
-  const procedureLabel = getProcedureLabel(item.procedure_tag, getLabel);
+  const procedure = procedures.find((p) => p.code === item.procedure_tag);
+  const procedureLabel = procedure ? (locale === "ar" ? procedure.ar : procedure.en) : item.procedure_tag;
   const timeframeLabel = getTimeframeLabel(item.timeframe_badge, getLabel);
 
   return (

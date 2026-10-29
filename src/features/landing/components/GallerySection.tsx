@@ -1,16 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, ShieldCheck, Star, UserRound } from "lucide-react";
 import { GalleryComparison } from "@/features/gallery/components/GalleryComparison";
-import {
-  fetchGalleryContent,
-  fetchLandingGalleryCases,
-  type GalleryContentData,
-} from "@/features/gallery/services/gallery.service";
+import { useLandingGallery } from "@/features/gallery/hooks/useLandingGallery";
 import type {
   GalleryCaptionContent,
   GalleryPublicCase,
@@ -34,45 +30,23 @@ export function GallerySection({
   const locale = useLocale();
   const isArabic = locale === "ar";
 
-  const [cases, setCases] = useState<GalleryPublicCase[] | null>(
-    initialCases !== undefined ? initialCases : null,
-  );
-  const [content, setContent] = useState<GallerySectionContent | null>(
-    initialContent !== undefined ? initialContent : null,
-  );
-  const [captions, setCaptions] = useState<Record<string, GalleryCaptionContent>>(
-    initialCaptions || {},
-  );
+  const {
+    cases,
+    content,
+    captions,
+    isLoading,
+    isError: hasError,
+    retry,
+  } = useLandingGallery(locale, {
+    initialCases,
+    initialContent,
+    initialCaptions,
+  });
+
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const [hasError, setHasError] = useState<boolean>(false);
-  const [isPending, startTransition] = useTransition();
 
-  const loadData = useCallback(() => {
-    startTransition(async () => {
-      setHasError(false);
-      try {
-        const fetchedCases = await fetchLandingGalleryCases(5);
-        const caseIds = fetchedCases.map((c) => c.id);
-        const contentData: GalleryContentData = await fetchGalleryContent(
-          locale,
-          caseIds,
-        );
-
-        setCases(fetchedCases);
-        setContent(contentData.section);
-        setCaptions(contentData.captions);
-        setSelectedIndex(0);
-      } catch {
-        setHasError(true);
-      }
-    });
-  }, [locale]);
-
-  useEffect(() => {
-    if (initialCases === undefined) {
-      loadData();
-    }
-  }, [initialCases, loadData]);
+  const activeIndex = cases && selectedIndex < cases.length ? selectedIndex : 0;
+  const activeCase = cases ? cases[activeIndex] ?? null : null;
 
   const eyebrow = formatGalleryEyebrow(content?.eyebrow || t("eyebrow"));
   const heading = content?.heading || t("heading");
@@ -105,12 +79,12 @@ export function GallerySection({
             </h2>
             <p className="mt-3 text-muted-foreground">{t("errorDescription")}</p>
             <div className="mt-6">
-              <Button type="button" onClick={loadData}>
+              <Button type="button" onClick={retry}>
                 {t("retry")}
               </Button>
             </div>
           </div>
-        ) : cases === null && isPending ? (
+        ) : isLoading ? (
           /* Loading Skeleton State */
           <div
             data-testid="gallery-loading"
@@ -237,11 +211,11 @@ export function GallerySection({
 
               {/* Large Featured Comparison Column */}
               <div className="min-w-0">
-                {cases[selectedIndex] && (
+                {activeCase && (
                   <div className="space-y-4">
                     <GalleryComparison
-                      item={cases[selectedIndex]}
-                      caption={captions[cases[selectedIndex].id]}
+                      item={activeCase}
+                      caption={captions[activeCase.id]}
                       priority={true}
                       className="lg:mx-auto lg:max-w-[420px] lg:[&_img]:h-[320px] lg:[&_img]:max-h-[320px] lg:[&_img]:object-cover"
                     />
@@ -254,7 +228,7 @@ export function GallerySection({
                         className="flex items-center justify-center gap-2 pt-2"
                       >
                         {cases.map((c, idx) => {
-                          const isSelected = idx === selectedIndex;
+                          const isSelected = idx === activeIndex;
                           return (
                             <button
                               key={c.id}
@@ -282,7 +256,7 @@ export function GallerySection({
             </div>
 
             {/* Supporting Cases Grid (Cases excluding selected case, up to 4) */}
-            {cases.length > 1 && (
+            {cases && cases.length > 1 && (
               <div className="mt-6 lg:mt-12">
                 <div
                   aria-label={t("supportingCases")}
@@ -290,7 +264,7 @@ export function GallerySection({
                 >
                   {cases
                     .map((item, originalIndex) => ({ item, originalIndex }))
-                    .filter(({ originalIndex }) => originalIndex !== selectedIndex)
+                    .filter(({ originalIndex }) => originalIndex !== activeIndex)
                     .slice(0, 4)
                     .map(({ item, originalIndex }) => (
                       <button

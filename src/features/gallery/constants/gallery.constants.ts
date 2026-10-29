@@ -15,25 +15,6 @@ export const GALLERY_NAV_ITEMS: readonly NavItem[] = [
 
 export const GALLERY_CTA_HREF = "/#contact";
 
-export const PROCEDURE_OPTIONS: readonly GalleryFilterOption[] = [
-  {
-    value: "synthetic-procedure",
-    labelKey: "procedure_synthetic",
-  },
-  {
-    value: "rhinoplasty",
-    labelKey: "procedure_rhinoplasty",
-  },
-  {
-    value: "revision-rhinoplasty",
-    labelKey: "procedure_revision_rhinoplasty",
-  },
-  {
-    value: "septoplasty",
-    labelKey: "procedure_septoplasty",
-  },
-];
-
 export const TIMEFRAME_OPTIONS: readonly GalleryFilterOption[] = [
   {
     value: "synthetic-time",

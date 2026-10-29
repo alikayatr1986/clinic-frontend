@@ -7,6 +7,13 @@ import type { GalleryCaptionContent, GalleryPublicCase } from "../types/gallery.
 import enMessages from "../../../../messages/en.json";
 import arMessages from "../../../../messages/ar.json";
 
+vi.mock("@/features/procedures/hooks/useProcedures", () => ({
+  useProcedures: () => ({ procedures: [
+    { code: "rhinoplasty", en: "Rhinoplasty", ar: "تجميل الأنف" },
+    { code: "revision_rhinoplasty", en: "Revision rhinoplasty", ar: "إعادة تجميل الأنف" },
+  ], error: false, retry: vi.fn() }),
+}));
+
 const mockCase: GalleryPublicCase = {
   id: "case-card-uuid",
   url: "/api/v1/gallery/case-card-uuid/media/display",

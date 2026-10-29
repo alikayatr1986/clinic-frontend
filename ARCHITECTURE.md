@@ -158,6 +158,46 @@ A hook shared by several components in one feature belongs in the feature's
 belongs in global `src/hooks/` only if genuinely domain-independent. Avoid
 duplicating hooks and creating circular imports.
 
+## Data-access architecture and server state
+
+All data fetching and mutations in the frontend adhere to a strict layered architecture:
+
+- **Client component interaction:** `app/component -> feature hook -> feature service -> shared API transport (@/lib/api)`.
+- **Server framework reads:** `app/Server Component -> feature service -> shared API transport (@/lib/api)`.
+
+### 1. Transport boundary exclusivity (`src/lib/api.ts`)
+`frontend/src/lib/api.ts` is the sole general HTTP transport. It centralizes base URL resolution (browser-relative same-origin vs. server-side `API_BASE_URL`), header merging, JSON serialization/parsing, typed error translation (`ApiError`), timeout management, and `AbortSignal` composition. Direct `fetch` calls are forbidden outside `src/lib/api.ts` (with narrow, documented framework exceptions). No second API client or alternative transport library (Axios, SWR) is permitted.
+
+### 2. Feature-owned services and hooks
+- **Feature services (`src/features/<feature>/services/<feature>.service.ts`):** Own endpoint paths, request/response contracts, payload normalization, and domain error mapping. Services call `apiRequest`; they never maintain React component state.
+- **Feature query hooks (`src/features/<feature>/hooks/use<Name>.ts`):** Own React Query options, caching policies, query key factories, invalidation, and UI return contracts. Exported hook names start with `use`.
+- **Client presentation components (`"use client"`):** Must consume feature query/mutation hooks. Client components must never import data-fetching functions directly from `*.service.ts`.
+
+### 3. Browser server state vs. local UI state
+TanStack Query manages browser-side server state (caching, deduplication, loading/fetching flags, errors, refetching, and pagination results).
+- Do not mirror query state or create manual fetch effects with `useState` and `useEffect`.
+- Local state (`useState`/`useReducer`) is strictly reserved for ephemeral, non-server UI state:
+  - Controlled form inputs and validation feedback
+  - Active tab, selection index, modal/lightbox/dialog disclosure
+  - Local pagination display and viewport/scroll-derived state
+  - Focus management and screen-reader announcements
+
+### 4. Query-key ownership and key factories
+Every query hook must use a stable, serializable query key factory defined in the feature (e.g. `galleryKeys`, `blogKeys`, `contactKeys`, `proceduresKeys`).
+- Query keys must start with the feature namespace as an array (e.g. `['gallery']`, `['blogs']`).
+- Query keys must incorporate every request parameter that modifies the result (`locale`, `page`, `page_size`, filters, tags, identifiers).
+- Never scatter raw string literals across components or hooks.
+
+### 5. Server rendering, SEO, and initial data
+Preserve server-rendered routes (`/blog`, `/blog/[slug]`, `/gallery`, `/sitemap.xml`, `/robots.txt`) for SEO and no-JS fallback.
+- Server Components, metadata generators, and route handlers call typed feature services directly; React hooks are never invoked in Server Components.
+- When hydrating interactive client components from server data (e.g. `useBlogHome`, `useGalleryCases`, `useLandingGallery`), pass `initialData` alongside an explicit freshness policy (`staleTime: 60_000` or higher) so initial data hydrates cleanly without an immediate redundant mount refetch.
+
+### 6. Testing and structural enforcement
+- Feature hooks are tested using an isolated test `QueryClient` with retries disabled (`retry: false`).
+- Presentation components are tested by mocking feature hooks or providing a test `QueryClientProvider` via `ThemedRender`.
+- Automated structural tests in `src/test/data-access-architecture.test.ts` verify transport exclusivity, client-hook usage, and query key invariants across all production source files.
+
 ## Imports and dependency boundaries
 
 Dependency direction is `app → features → shared UI/infrastructure`. Routes

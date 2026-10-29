@@ -1,3 +1,4 @@
+import { apiRequest, ApiError } from "@/lib/api";
 import type {
   BlogCategory,
   BlogDetail,
@@ -6,62 +7,59 @@ import type {
   BlogListQuery,
 } from "../types/blogs.types";
 
-function getBaseUrl(): string {
-  if (typeof window !== "undefined") {
-    return "";
-  }
-  return (
-    process.env.API_BASE_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    "http://127.0.0.1:8080"
+export interface FetchBlogOptions {
+  signal?: AbortSignal;
+}
+
+export async function fetchBlogCategories(
+  lang: string,
+  options: FetchBlogOptions = {},
+): Promise<BlogCategory[]> {
+  const json = await apiRequest<{ data?: BlogCategory[] }>(
+    "/api/v1/blogs/categories",
+    {
+      query: { lang },
+      signal: options.signal,
+    },
   );
+  return json?.data ?? [];
 }
 
-async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${getBaseUrl()}${path}`, {
-    cache: "no-store",
-    headers: { Accept: "application/json" },
+export async function fetchBlogList(
+  q: BlogListQuery,
+  options: FetchBlogOptions = {},
+): Promise<BlogList> {
+  const json = await apiRequest<Partial<BlogList>>("/api/v1/blogs", {
+    query: {
+      lang: q.lang,
+      page: q.page,
+      page_size: q.pageSize,
+      category: q.category || undefined,
+      q: q.q || undefined,
+    },
+    signal: options.signal,
   });
-  if (!res.ok) {
-    throw new Error(`Blog API returned status ${res.status}`);
-  }
-  return res.json();
-}
-
-export async function fetchBlogCategories(lang: string): Promise<BlogCategory[]> {
-  const json = await getJson<{ data?: BlogCategory[] }>(
-    `/api/v1/blogs/categories?lang=${encodeURIComponent(lang)}`,
-  );
-  return json.data ?? [];
-}
-
-export async function fetchBlogList(q: BlogListQuery): Promise<BlogList> {
-  const params = new URLSearchParams({
-    lang: q.lang,
-    page: String(q.page),
-    page_size: String(q.pageSize),
-  });
-  if (q.category) params.set("category", q.category);
-  if (q.q) params.set("q", q.q);
-  const json = await getJson<Partial<BlogList>>(`/api/v1/blogs?${params}`);
-  return { data: json.data ?? [], total: json.total ?? 0 };
+  return { data: json?.data ?? [], total: json?.total ?? 0 };
 }
 
 const SITEMAP_PAGE_SIZE = 500;
 
 /** Every live slug; throws rather than emitting a partial sitemap. */
-export async function fetchBlogSitemap(): Promise<
-  { slug: string; last_published_at: string }[]
-> {
+export async function fetchBlogSitemap(
+  options: FetchBlogOptions = {},
+): Promise<{ slug: string; last_published_at: string }[]> {
   const all: { slug: string; last_published_at: string }[] = [];
   for (let page = 1; ; page++) {
-    const json = await getJson<{
+    const json = await apiRequest<{
       data?: { slug: string; last_published_at: string }[];
       total?: number;
-    }>(`/api/v1/blogs/sitemap?page=${page}&page_size=${SITEMAP_PAGE_SIZE}`);
-    const data = json.data ?? [];
+    }>("/api/v1/blogs/sitemap", {
+      query: { page, page_size: SITEMAP_PAGE_SIZE },
+      signal: options.signal,
+    });
+    const data = json?.data ?? [];
     all.push(...data);
-    if (data.length === 0 || all.length >= (json.total ?? 0)) return all;
+    if (data.length === 0 || all.length >= (json?.total ?? 0)) return all;
   }
 }
 
@@ -69,31 +67,39 @@ export async function fetchBlogSitemap(): Promise<
 export async function fetchBlogDetail(
   slug: string,
   lang: string,
+  options: FetchBlogOptions = {},
 ): Promise<BlogDetail | null> {
-  const res = await fetch(
-    `${getBaseUrl()}/api/v1/blogs/${encodeURIComponent(slug)}?lang=${encodeURIComponent(lang)}`,
-    { cache: "no-store", headers: { Accept: "application/json" } },
-  );
-  if (res.status === 404) return null;
-  if (!res.ok) {
-    throw new Error(`Blog API returned status ${res.status}`);
+  try {
+    const json = await apiRequest<{ data: BlogDetail }>(
+      `/api/v1/blogs/${encodeURIComponent(slug)}`,
+      {
+        query: { lang },
+        signal: options.signal,
+      },
+    );
+    return json.data;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+    throw error;
   }
-  const json: { data: BlogDetail } = await res.json();
-  return json.data;
 }
 
 /** Throws on any failure so callers can tell "unavailable" from "empty". */
-export async function fetchBlogHome(lang: string): Promise<BlogHome> {
-  const res = await fetch(
-    `${getBaseUrl()}/api/v1/blogs/home?lang=${encodeURIComponent(lang)}`,
-    { cache: "no-store", headers: { Accept: "application/json" } },
+export async function fetchBlogHome(
+  lang: string,
+  options: FetchBlogOptions = {},
+): Promise<BlogHome> {
+  const json = await apiRequest<{ data?: Partial<BlogHome> }>(
+    "/api/v1/blogs/home",
+    {
+      query: { lang },
+      signal: options.signal,
+    },
   );
-  if (!res.ok) {
-    throw new Error(`Blog API returned status ${res.status}`);
-  }
-  const json: { data?: Partial<BlogHome> } = await res.json();
   return {
-    featured: json.data?.featured ?? null,
-    articles: json.data?.articles ?? [],
+    featured: json?.data?.featured ?? null,
+    articles: json?.data?.articles ?? [],
   };
 }

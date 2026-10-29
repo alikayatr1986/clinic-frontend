@@ -5,18 +5,14 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useProcedures } from "@/features/procedures/hooks/useProcedures";
 import { GalleryCard } from "./GalleryCard";
 import { GalleryLightbox } from "./GalleryLightbox";
 import {
   DEFAULT_PAGE_SIZE,
-  PROCEDURE_OPTIONS,
   TIMEFRAME_OPTIONS,
 } from "../constants/gallery.constants";
-import {
-  fetchGalleryCases,
-  fetchGalleryContent,
-  type GalleryContentData,
-} from "../services/gallery.service";
+import { useGalleryCases } from "../hooks/useGalleryCases";
 import type {
   GalleryCaptionContent,
   GalleryPublicCase,
@@ -41,43 +37,129 @@ export function GalleryBrowser({
 }: GalleryBrowserProps) {
   const t = useTranslations("gallery");
   const locale = useLocale();
+  const { procedures, error: catalogError, retry: retryCatalog } = useProcedures();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const lastFetchedKey = useRef<string>("");
   const procedureSelectId = useId();
   const timeframeSelectId = useId();
+  const hasRecovered400 = useRef<boolean>(false);
 
   // Active query parameters parsed from URL
   const rawPage = searchParams.get("page");
   const rawProcedure = searchParams.get("procedure_tag") || "";
   const rawTimeframe = searchParams.get("timeframe_badge") || "";
 
-  const currentPage = rawPage ? parseInt(rawPage, 10) : initialPage;
+  const parsedPage = rawPage ? parseInt(rawPage, 10) : initialPage;
+  const isPageInvalid = isNaN(parsedPage) || parsedPage < 1;
+  const isTimeInvalid =
+    rawTimeframe !== "" &&
+    !TIMEFRAME_OPTIONS.some((opt) => opt.value === rawTimeframe);
+
+  const pageToQuery = isPageInvalid ? 1 : parsedPage;
   const currentProcedure = rawProcedure;
-  const currentTimeframe = rawTimeframe;
+  const currentTimeframe = isTimeInvalid ? "" : rawTimeframe;
 
-  const [cases, setCases] = useState<GalleryPublicCase[] | null>(
-    initialCases !== undefined ? initialCases : null,
+  const {
+    cases,
+    total,
+    sectionContent,
+    captions,
+    isLoading,
+    isError,
+    error,
+    retry,
+    refetch,
+  } = useGalleryCases(
+    locale,
+    {
+      page: pageToQuery,
+      page_size: DEFAULT_PAGE_SIZE,
+      procedure_tag: currentProcedure,
+      timeframe_badge: currentTimeframe,
+    },
+    {
+      initialCases,
+      initialTotal,
+      initialPage,
+      initialCaptions,
+      initialSectionContent,
+    },
   );
-  const [total, setTotal] = useState<number>(initialTotal ?? 0);
-  const [captions, setCaptions] = useState<Record<string, GalleryCaptionContent>>(
-    initialCaptions || {},
-  );
-  const [sectionContent, setSectionContent] =
-    useState<GallerySectionContent | null>(initialSectionContent ?? null);
 
-  const [isLoading, setIsLoading] = useState<boolean>(initialCases === undefined);
-  const [hasError, setHasError] = useState<boolean>(false);
   const [recoveryNotice, setRecoveryNotice] = useState<boolean>(false);
 
   // Lightbox modal state
-  const [lightboxCase, setLightboxCase] = useState<GalleryPublicCase | null>(
-    null,
-  );
+  const [lightboxCase, setLightboxCase] = useState<GalleryPublicCase | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
+
+  const totalPages = Math.max(1, Math.ceil(total / DEFAULT_PAGE_SIZE));
+
+  // Handle URL normalization and recovery
+  useEffect(() => {
+    // 1. Recover from backend 400 rejection (e.g. invalid procedure code)
+    const errorStatus = (error as { status?: number })?.status;
+    if (errorStatus === 400) {
+      if (!hasRecovered400.current) {
+        hasRecovered400.current = true;
+        setTimeout(() => {
+          setRecoveryNotice(true);
+        }, 0);
+        router.replace(pathname);
+        if (!rawProcedure && !rawTimeframe && (!rawPage || rawPage === "1")) {
+          refetch();
+        }
+      }
+      return;
+    }
+
+    if (!isError) {
+      hasRecovered400.current = false;
+    }
+
+    // 2. Client-side invalid params (e.g. page < 1 or invalid timeframe)
+    if (isPageInvalid || isTimeInvalid) {
+      setTimeout(() => {
+        setRecoveryNotice(true);
+      }, 0);
+      const cleanParams = new URLSearchParams();
+      if (currentProcedure) cleanParams.set("procedure_tag", currentProcedure);
+      if (currentTimeframe) cleanParams.set("timeframe_badge", currentTimeframe);
+      const qs = cleanParams.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname);
+      return;
+    }
+
+    // 3. Out-of-bounds page exceeding available pages (e.g. ?page=9999 with total 15)
+    if (total > 0 && pageToQuery > totalPages) {
+      setTimeout(() => {
+        setRecoveryNotice(true);
+      }, 0);
+      const cleanParams = new URLSearchParams(searchParams.toString());
+      cleanParams.delete("page");
+      const qs = cleanParams.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname);
+    }
+  }, [
+    error,
+    isError,
+    total,
+    pageToQuery,
+    totalPages,
+    isPageInvalid,
+    isTimeInvalid,
+    rawProcedure,
+    rawTimeframe,
+    rawPage,
+    currentProcedure,
+    currentTimeframe,
+    pathname,
+    router,
+    searchParams,
+    refetch,
+  ]);
 
   // Synchronize URL search params
   const updateQueryParams = useCallback(
@@ -119,161 +201,8 @@ export function GalleryBrowser({
     [pathname, router, searchParams],
   );
 
-  const loadData = useCallback(
-    async (pageToLoad: number, proc: string, time: string) => {
-      setIsLoading(true);
-      setHasError(false);
-
-      // Validate query values client-side before fetching
-      const isPageInvalid = isNaN(pageToLoad) || pageToLoad < 1;
-      const isProcInvalid =
-        proc !== "" &&
-        !PROCEDURE_OPTIONS.some((opt) => opt.value === proc);
-      const isTimeInvalid =
-        time !== "" &&
-        !TIMEFRAME_OPTIONS.some((opt) => opt.value === time);
-
-      if (isPageInvalid || isProcInvalid || isTimeInvalid) {
-        // Trigger recovery immediately
-        setRecoveryNotice(true);
-        const safePage = 1;
-        const safeProc = isProcInvalid ? "" : proc;
-        const safeTime = isTimeInvalid ? "" : time;
-
-        const cleanParams = new URLSearchParams();
-        if (safeProc) cleanParams.set("procedure_tag", safeProc);
-        if (safeTime) cleanParams.set("timeframe_badge", safeTime);
-        const qs = cleanParams.toString();
-        router.replace(qs ? `${pathname}?${qs}` : pathname);
-
-        try {
-          const listRes = await fetchGalleryCases({
-            page: safePage,
-            page_size: DEFAULT_PAGE_SIZE,
-            procedure_tag: safeProc,
-            timeframe_badge: safeTime,
-          });
-
-          const caseIds = listRes.data.map((c) => c.id);
-          const contentData: GalleryContentData = await fetchGalleryContent(
-            locale,
-            caseIds,
-          );
-
-          setCases(listRes.data);
-          setTotal(listRes.total);
-          setCaptions(contentData.captions);
-          if (contentData.section) {
-            setSectionContent(contentData.section);
-          }
-        } catch {
-          setHasError(true);
-        } finally {
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      try {
-        const listRes = await fetchGalleryCases({
-          page: pageToLoad,
-          page_size: DEFAULT_PAGE_SIZE,
-          procedure_tag: proc,
-          timeframe_badge: time,
-        });
-
-        // Check if page number exceeds available total (e.g. ?page=9999)
-        const totalPages = Math.max(1, Math.ceil(listRes.total / DEFAULT_PAGE_SIZE));
-        if (listRes.total > 0 && pageToLoad > totalPages) {
-          // Recover to page 1
-          setRecoveryNotice(true);
-          const cleanParams = new URLSearchParams(searchParams.toString());
-          cleanParams.delete("page");
-          const qs = cleanParams.toString();
-          router.replace(qs ? `${pathname}?${qs}` : pathname);
-
-          const recoveredRes = await fetchGalleryCases({
-            page: 1,
-            page_size: DEFAULT_PAGE_SIZE,
-            procedure_tag: proc,
-            timeframe_badge: time,
-          });
-
-          const caseIds = recoveredRes.data.map((c) => c.id);
-          const contentData: GalleryContentData = await fetchGalleryContent(
-            locale,
-            caseIds,
-          );
-
-          setCases(recoveredRes.data);
-          setTotal(recoveredRes.total);
-          setCaptions(contentData.captions);
-          if (contentData.section) {
-            setSectionContent(contentData.section);
-          }
-          return;
-        }
-
-        const caseIds = listRes.data.map((c) => c.id);
-        const contentData: GalleryContentData = await fetchGalleryContent(
-          locale,
-          caseIds,
-        );
-
-        setCases(listRes.data);
-        setTotal(listRes.total);
-        setCaptions(contentData.captions);
-        if (contentData.section) {
-          setSectionContent(contentData.section);
-        }
-      } catch (err: unknown) {
-        const status = (err as { status?: number })?.status;
-        if (status === 400) {
-          // Backend validation error -> recover to defaults
-          setRecoveryNotice(true);
-          router.replace(pathname);
-          try {
-            const cleanRes = await fetchGalleryCases({
-              page: 1,
-              page_size: DEFAULT_PAGE_SIZE,
-            });
-            const caseIds = cleanRes.data.map((c) => c.id);
-            const contentData: GalleryContentData = await fetchGalleryContent(
-              locale,
-              caseIds,
-            );
-            setCases(cleanRes.data);
-            setTotal(cleanRes.total);
-            setCaptions(contentData.captions);
-            if (contentData.section) {
-              setSectionContent(contentData.section);
-            }
-          } catch {
-            setHasError(true);
-          }
-        } else {
-          setHasError(true);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [locale, pathname, router, searchParams],
-  );
-
-  useEffect(() => {
-    const key = `${rawPage ?? ""}_${rawProcedure}_${rawTimeframe}`;
-    if (lastFetchedKey.current === key && cases !== null) {
-      return;
-    }
-    lastFetchedKey.current = key;
-    loadData(currentPage, currentProcedure, currentTimeframe);
-  }, [rawPage, rawProcedure, rawTimeframe, currentPage, currentProcedure, currentTimeframe, loadData, cases]);
-
   // Handle filter changes (resets page to 1)
-  const handleProcedureChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
+  const handleProcedureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRecoveryNotice(false);
     updateQueryParams({
       procedure_tag: e.target.value,
@@ -281,9 +210,7 @@ export function GalleryBrowser({
     });
   };
 
-  const handleTimeframeChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
+  const handleTimeframeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRecoveryNotice(false);
     updateQueryParams({
       timeframe_badge: e.target.value,
@@ -300,9 +227,6 @@ export function GalleryBrowser({
     });
   };
 
-  // Pagination navigation
-  const totalPages = Math.max(1, Math.ceil(total / DEFAULT_PAGE_SIZE));
-
   const handlePageChange = (newPage: number) => {
     setRecoveryNotice(false);
     updateQueryParams({ page: newPage });
@@ -316,8 +240,9 @@ export function GalleryBrowser({
     setIsLightboxOpen(true);
   };
 
-  const hasActiveFilters =
-    Boolean(currentProcedure) || Boolean(currentTimeframe);
+  const hasActiveFilters = Boolean(currentProcedure) || Boolean(currentTimeframe);
+  const errorStatus = (error as { status?: number })?.status;
+  const hasError = isError && (errorStatus !== 400 || recoveryNotice);
 
   return (
     <div
@@ -371,12 +296,20 @@ export function GalleryBrowser({
               className="h-12 min-h-12 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="">{t("allProcedures")}</option>
-              {PROCEDURE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {t(opt.labelKey as never)}
+              {procedures.map((opt) => (
+                <option key={opt.code} value={opt.code}>
+                  {locale === "ar" ? opt.ar : opt.en}
                 </option>
               ))}
             </select>
+            {catalogError && (
+              <div role="alert">
+                <p>{t("procedureCatalogError")}</p>
+                <Button type="button" variant="outline" onClick={retryCatalog}>
+                  {t("retry")}
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Timeframe Filter */}
@@ -461,10 +394,7 @@ export function GalleryBrowser({
               type="button"
               variant="outline"
               size="default"
-              onClick={() => {
-                lastFetchedKey.current = "";
-                loadData(currentPage, currentProcedure, currentTimeframe);
-              }}
+              onClick={retry}
             >
               {t("retry")}
             </Button>
@@ -526,8 +456,8 @@ export function GalleryBrowser({
                 type="button"
                 variant="outline"
                 size="default"
-                disabled={currentPage <= 1}
-                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={pageToQuery <= 1}
+                onClick={() => handlePageChange(pageToQuery - 1)}
                 aria-label={t("previousPage")}
               >
                 <ChevronLeft
@@ -539,7 +469,7 @@ export function GalleryBrowser({
 
               <span className="px-4 text-sm font-medium text-muted-foreground">
                 {t("pageIndicator", {
-                  page: currentPage,
+                  page: pageToQuery,
                   totalPages,
                 })}
               </span>
@@ -548,8 +478,8 @@ export function GalleryBrowser({
                 type="button"
                 variant="outline"
                 size="default"
-                disabled={currentPage >= totalPages}
-                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={pageToQuery >= totalPages}
+                onClick={() => handlePageChange(pageToQuery + 1)}
                 aria-label={t("nextPage")}
               >
                 <span>{t("nextPage")}</span>

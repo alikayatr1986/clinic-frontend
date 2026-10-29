@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { NextIntlClientProvider } from "next-intl";
 import arMessages from '../../messages/ar.json';
 import enMessages from '../../messages/en.json';
 import RootLayout, { generateMetadata } from '@/app/layout';
+import { QueryProvider } from "@/lib/query-client-provider";
 vi.mock("next/font/google", () => ({
   Libre_Caslon_Display: () => ({ variable: "font-mock-libre-caslon-display" }),
   Manrope: () => ({ variable: "font-mock-manrope" }),
@@ -51,6 +53,28 @@ describe('RootLayout (localization seam)', () => {
     expect(html.props.className).toContain("font-mock-libre-caslon-display");
     expect(html.props.className).toContain("font-mock-manrope");
     expect(html.props.className).toContain("font-mock-noto-arabic");
+  });
+  it('wraps the page in the Query provider inside the intl boundary', async () => {
+    serveLocale("en");
+    type TestElement = React.ReactElement<{
+      children?: React.ReactNode;
+      "data-slot"?: string;
+    }>;
+    const html = await RootLayout(
+      layoutProps(<p data-slot="page">Page</p>),
+    );
+
+    const body = React.Children.only(html.props.children) as TestElement;
+    expect(body.type).toBe("body");
+
+    const intl = React.Children.only(body.props.children) as TestElement;
+    expect(intl.type).toBe(NextIntlClientProvider);
+
+    const provider = React.Children.only(intl.props.children) as TestElement;
+    expect(provider.type).toBe(QueryProvider);
+
+    const page = React.Children.only(provider.props.children) as TestElement;
+    expect(page.props["data-slot"]).toBe("page");
   });
   it('generateMetadata resolves the metadata namespace per locale (en byte-identical to messages/en.json)', async () => {
   serveLocale("en");

@@ -5,6 +5,7 @@ import { GallerySection } from "./GallerySection";
 import arMessages from "../../../../messages/ar.json";
 import enMessages from "../../../../messages/en.json";
 import type { GalleryPublicCase, GallerySectionContent } from "@/features/gallery/types/gallery.types";
+import { QueryProvider } from "@/lib/query-client-provider";
 
 const mockCases: GalleryPublicCase[] = [
   {
@@ -91,12 +92,14 @@ const meta = {
   parameters: { layout: "fullscreen" },
   render: (args) => (
     <div className="-m-6">
-      <NextIntlClientProvider locale="en" messages={enMessages}>
-        <GallerySection
-          initialCases={args.initialCases ?? mockCases}
-          initialContent={args.initialContent ?? mockContentEn}
-        />
-      </NextIntlClientProvider>
+      <QueryProvider>
+        <NextIntlClientProvider locale="en" messages={enMessages}>
+          <GallerySection
+            initialCases={args.initialCases ?? mockCases}
+            initialContent={args.initialContent ?? mockContentEn}
+          />
+        </NextIntlClientProvider>
+      </QueryProvider>
     </div>
   ),
 } satisfies Meta<typeof GallerySection>;
@@ -116,12 +119,14 @@ export const Arabic: Story = {
   parameters: { chromatic: { viewports: [320, 390, 768, 1024, 1440] } },
   render: () => (
     <div className="-m-6" dir="rtl" lang="ar">
-      <NextIntlClientProvider locale="ar" messages={arMessages}>
-        <GallerySection
-          initialCases={mockCases}
-          initialContent={mockContentAr}
-        />
-      </NextIntlClientProvider>
+      <QueryProvider>
+        <NextIntlClientProvider locale="ar" messages={arMessages}>
+          <GallerySection
+            initialCases={mockCases}
+            initialContent={mockContentAr}
+          />
+        </NextIntlClientProvider>
+      </QueryProvider>
     </div>
   ),
 };
@@ -129,9 +134,11 @@ export const Arabic: Story = {
 export const EmptyState: Story = {
   render: () => (
     <div className="-m-6">
-      <NextIntlClientProvider locale="en" messages={enMessages}>
-        <GallerySection initialCases={[]} initialContent={null} />
-      </NextIntlClientProvider>
+      <QueryProvider>
+        <NextIntlClientProvider locale="en" messages={enMessages}>
+          <GallerySection initialCases={[]} initialContent={null} />
+        </NextIntlClientProvider>
+      </QueryProvider>
     </div>
   ),
 };
@@ -139,13 +146,14 @@ export const EmptyState: Story = {
 export const SingleCase: Story = {
   render: () => (
     <div className="-m-6">
-      <NextIntlClientProvider locale="en" messages={enMessages}>
-        <GallerySection
-          initialCases={[mockCases[0]]}
-          initialContent={mockContentEn}
-        />
-      </NextIntlClientProvider>
+      <QueryProvider>
+        <NextIntlClientProvider locale="en" messages={enMessages}>
+          <GallerySection
+            initialCases={[mockCases[0]]}
+            initialContent={mockContentEn}
+          />
+        </NextIntlClientProvider>
+      </QueryProvider>
     </div>
   ),
 };
-
