@@ -14,17 +14,7 @@ import { GalleryComparison } from "./GalleryComparison";
 import {
   getTimeframeLabel,
 } from "../utils/gallery.utils";
-import type {
-  GalleryCaptionContent,
-  GalleryPublicCase,
-} from "../types/gallery.types";
-
-export interface GalleryLightboxProps {
-  item: GalleryPublicCase | null;
-  caption?: GalleryCaptionContent;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+import type { GalleryLightboxProps } from "../types/gallery.types";
 
 export function GalleryLightbox({
   item,

@@ -8,15 +8,12 @@ import {
   BLOG_CTA_HREF,
   BLOG_NAV_ITEMS,
 } from "@/features/blogs/constants/blogs.constants";
+import type { BlogPageProps } from "@/features/blogs/types/blogs.types";
 import { buildListMetadata } from "@/features/blogs/utils/blogs-metadata.utils";
 import { parseBlogFilters } from "@/features/blogs/utils/blogs.utils";
 import BlogLoading from "./loading";
 
-type Props = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
-
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
   const t = await getTranslations("blogs");
   // Category validity is checked by the list; any category param is noindex here.
   const raw = await searchParams;
@@ -24,7 +21,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return buildListMetadata(filters, t("pageTitle"), t("pageDescription"));
 }
 
-export default function BlogPage({ searchParams }: Props) {
+export default function BlogPage({ searchParams }: BlogPageProps) {
   return (
     <>
       <SiteHeader items={BLOG_NAV_ITEMS} ctaHref={BLOG_CTA_HREF} activePath="/blog" />

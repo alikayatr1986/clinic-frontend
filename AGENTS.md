@@ -49,13 +49,27 @@ commits.
 - Put domain implementation and its constants, types, hooks, services, schemas,
   helpers, and styles in `src/features/<feature>/`, creating only needed folders.
 - Keep components flat by default. Colocate private supporting files with a
-  complex component when useful; simple local values and types may stay inline.
+  complex component when useful. Never declare types or interfaces inside
+  components or pages; all types belong in dedicated `*.types.ts` files.
 - Keep generic UI in `src/components/ui/` and application-wide layout in
   `src/components/layout/`. Shared modules must not import feature code.
 - Promote code to global category folders only when ownership and dependencies
   justify cross-feature reuse. Prefer `@/` imports and existing naming patterns.
 - Inspect existing code first. Migrate legacy `components/site/` and global
   domain files only within a justified task; update affected imports and tests.
+
+## Types and interfaces placement rule (strictly separate types files)
+
+Never declare `interface` or `type` (including component props, page/route props,
+state interfaces, or inline parameter object types) directly inside `.tsx`
+components, pages, layouts, or error boundaries. All types and interfaces must
+be defined in dedicated `*.types.ts` files:
+- Feature components & pages: `src/features/<feature>/types/<feature>.types.ts`
+  (or colocated `<component>.types.ts` for private types).
+- Shared/primitive components & layout: `src/types/<owner>.types.ts`.
+Components and pages must strictly import their props, params, and domain models
+from their owning types files. Only primitive literal values (strings, numbers,
+booleans) may remain inline.
 
 ## Data-access architecture and server state (React Query)
 

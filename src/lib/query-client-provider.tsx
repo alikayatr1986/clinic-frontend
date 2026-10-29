@@ -1,9 +1,9 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import type { ReactNode } from "react";
 
 import { isAbortError } from "@/lib/api";
+import type { QueryProviderProps } from "@/types/query-provider.types";
 
 const MAX_QUERY_RETRIES = 2;
 const QUERY_STALE_TIME_MS = 30_000;
@@ -51,7 +51,7 @@ export function getQueryClient(): QueryClient {
   return browserQueryClient;
 }
 
-export function QueryProvider({ children }: { children: ReactNode }) {
+export function QueryProvider({ children }: QueryProviderProps) {
   return (
     <QueryClientProvider client={getQueryClient()}>
       {children}

@@ -2,8 +2,10 @@
 
 import { useTranslations } from "next-intl";
 
+import type { BlogErrorProps } from "@/features/blogs/types/blogs.types";
+
 // reset() re-renders the segment at the same URL, so the entered query is kept.
-export default function BlogError({ reset }: { error: Error; reset: () => void }) {
+export default function BlogError({ reset }: BlogErrorProps) {
   const t = useTranslations("blogs");
   return (
     <main id="main-content" className="flex-1 px-4 pt-32 pb-16">

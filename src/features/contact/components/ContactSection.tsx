@@ -15,12 +15,17 @@ import { ContactApiError } from '@/features/contact/services/contact.service';
 import { freshCaptchaToken } from '@/features/contact/services/captcha.service';
 import { useConsent } from '@/features/contact/hooks/useConsent';
 import { useSubmitContact } from '@/features/contact/hooks/useSubmitContact';
-import type { ContactConfig, ContactCopyKey, ContactErrors, ContactValues } from '@/features/contact/types/contact.types';
+import type {
+  ContactCopyKey,
+  ContactErrors,
+  ContactSectionProps,
+  ContactValues,
+} from '@/features/contact/types/contact.types';
 
 const emptyValues: ContactValues = { name: '', country: '', city: '', procedure: '', email: '', phone: '', preferred_contact: 'email', message: '' };
 const selectClass = 'min-h-12 w-full min-w-0 rounded-md border border-input bg-card px-3 py-2 text-base text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 aria-invalid:border-destructive';
 
-export function ContactSection({ config }: { config: ContactConfig }) {
+export function ContactSection({ config }: ContactSectionProps) {
   const t = useTranslations('contact');
   const locale = useLocale() === 'ar' ? 'ar' : 'en';
   const { procedures, error: catalogError, retry: retryCatalog } = useProcedures();

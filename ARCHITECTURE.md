@@ -91,6 +91,10 @@ public/                        # Images and approved static assets
 - Keep server-only credentials and integrations out of client imports. Feature
   services use shared infrastructure for the existing Go API contract; Next.js
   code must not access the database directly.
+- Keep types out of routes: route/page props (e.g. searchParams or params) and
+  error component props must be imported from the owning feature's
+  `types/<feature>.types.ts` or `src/types/`, never defined as inline `type`
+  or `interface` in `page.tsx` or `error.tsx`.
 
 ## Placement by ownership
 
@@ -148,10 +152,13 @@ features/consultation/components/ConsultationForm/
 ```
 
 Do not automatically create `index.tsx`, a folder per component, or a `hooks/`
-folder for a single small hook. Small local values and types can stay inline;
-extract them when reuse or clarity warrants it. Component-private supporting
-files may be colocated; files shared across a feature belong in that feature's
-category folders.
+folder for a single small hook. Small local primitive values (e.g. constant strings,
+numbers) may stay inline. Types and interfaces must NEVER stay inline in components
+or pages: all `interface` and `type` definitions (component props, page props,
+state types, and parameter types) must reside in dedicated `*.types.ts` files
+(`src/features/<feature>/types/<feature>.types.ts`, component-colocated `*.types.ts`,
+or `src/types/*.types.ts`). Component-private supporting files may be colocated;
+files shared across a feature belong in that feature's category folders.
 
 A hook shared by several components in one feature belongs in the feature's
 `hooks/`. A hook private to one complex component may live beside it. A hook

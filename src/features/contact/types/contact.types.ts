@@ -16,3 +16,8 @@ export interface ContactValues {
 }
 export type ContactCopyKey = Exclude<keyof typeof import('../../../../messages/en.json')['contact'], 'methods' | 'direct'>;
 export type ContactErrors = Partial<Record<keyof ContactValues | 'consent_accepted', ContactCopyKey>>;
+
+export interface ContactSectionProps {
+  config: ContactConfig;
+}
+

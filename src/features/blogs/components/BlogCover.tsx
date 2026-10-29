@@ -3,12 +3,7 @@
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
-import type { BlogCover as BlogCoverData } from "@/features/blogs/types/blogs.types";
-
-interface BlogCoverProps {
-  cover?: BlogCoverData | null;
-  className?: string;
-}
+import type { BlogCoverProps } from "@/features/blogs/types/blogs.types";
 
 /** Cropped cover with a stable-ratio neutral placeholder when missing or broken. */
 export function BlogCover({ cover, className }: BlogCoverProps) {

@@ -9,12 +9,9 @@ import {
   fetchBlogCategories,
   fetchBlogList,
 } from "@/features/blogs/services/blogs.service";
+import type { BlogListProps } from "@/features/blogs/types/blogs.types";
 import { blogListHref, parseBlogFilters } from "@/features/blogs/utils/blogs.utils";
 import { cn } from "@/lib/utils";
-
-interface BlogListProps {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";

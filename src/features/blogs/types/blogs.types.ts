@@ -76,3 +76,51 @@ export interface BlogHome {
   featured: BlogSummary | null;
   articles: BlogSummary[];
 }
+
+export interface BlogBodyProps {
+  blocks: readonly BlogBlock[];
+  externalLabel: string;
+}
+
+export interface BlogCardProps {
+  post: BlogSummary;
+  locale: string;
+  readMoreLabel: string;
+  /** Cover aspect: desktop card (4:3) or wide featured (mobile). */
+  coverClassName?: string;
+  showReadMore?: boolean;
+  className?: string;
+  headingLevel?: "h2" | "h3";
+}
+
+export interface BlogCoverProps {
+  cover?: BlogCover | null;
+  className?: string;
+}
+
+export interface BlogListProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export interface BlogRowProps {
+  post: BlogSummary;
+  locale: string;
+}
+
+export interface BlogArticleProps {
+  post: BlogDetail;
+}
+
+export interface BlogPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export interface BlogSlugPageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export interface BlogErrorProps {
+  error: Error;
+  reset: () => void;
+}
+

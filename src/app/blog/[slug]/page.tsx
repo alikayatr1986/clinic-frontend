@@ -10,27 +10,26 @@ import {
   BLOG_NAV_ITEMS,
 } from "@/features/blogs/constants/blogs.constants";
 import { fetchBlogDetail } from "@/features/blogs/services/blogs.service";
+import type { BlogSlugPageProps } from "@/features/blogs/types/blogs.types";
 import {
   buildArticleJsonLd,
   buildArticleMetadata,
   serializeJsonLd,
 } from "@/features/blogs/utils/blogs-metadata.utils";
 
-type Props = { params: Promise<{ slug: string }> };
-
 // Deduplicates the fetch between metadata and page within one request.
 const loadPost = cache(async (slug: string) =>
   fetchBlogDetail(slug, await getLocale()),
 );
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: BlogSlugPageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await loadPost(slug);
   if (!post) return {};
   return buildArticleMetadata(post);
 }
 
-export default async function BlogArticlePage({ params }: Props) {
+export default async function BlogArticlePage({ params }: BlogSlugPageProps) {
   const { slug } = await params;
   // Awaited outside Suspense so a missing article is a real 404 status;
   // an API outage throws to error.tsx (retryable) instead.

@@ -14,19 +14,11 @@ import {
 } from "../constants/gallery.constants";
 import { useGalleryCases } from "../hooks/useGalleryCases";
 import type {
-  GalleryCaptionContent,
+  GalleryBrowserProps,
   GalleryPublicCase,
-  GallerySectionContent,
+  GalleryQueryParams,
 } from "../types/gallery.types";
 import { formatGalleryEyebrow } from "../utils/gallery.utils";
-
-export interface GalleryBrowserProps {
-  initialCases?: GalleryPublicCase[];
-  initialTotal?: number;
-  initialPage?: number;
-  initialCaptions?: Record<string, GalleryCaptionContent>;
-  initialSectionContent?: GallerySectionContent | null;
-}
 
 export function GalleryBrowser({
   initialCases,
@@ -163,11 +155,7 @@ export function GalleryBrowser({
 
   // Synchronize URL search params
   const updateQueryParams = useCallback(
-    (newParams: {
-      page?: number;
-      procedure_tag?: string;
-      timeframe_badge?: string;
-    }) => {
+    (newParams: Partial<GalleryQueryParams>) => {
       const params = new URLSearchParams(searchParams.toString());
 
       if (newParams.procedure_tag !== undefined) {

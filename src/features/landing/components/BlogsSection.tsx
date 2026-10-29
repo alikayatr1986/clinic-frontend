@@ -9,7 +9,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { BlogCard } from "@/features/blogs/components/BlogCard";
 import { BlogRow } from "@/features/blogs/components/BlogRow";
 import { useBlogHome } from "@/features/blogs/hooks/useBlogHome";
-import type { BlogHome } from "@/features/blogs/types/blogs.types";
+import type { BlogsSectionProps } from "@/features/landing/types/landing.types";
 
 const PAGE_SIZE = 3;
 const MAX_ARTICLES = 12;
@@ -35,10 +35,6 @@ function useIsDesktop(): boolean {
 
 const navButtonClass =
   "inline-flex size-12 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-40";
-
-export interface BlogsSectionProps {
-  initialHome?: BlogHome;
-}
 
 export function BlogsSection({ initialHome }: BlogsSectionProps) {
   const t = useTranslations("blogs");

@@ -1,13 +1,8 @@
 import Link from "next/link";
 
 import { BlogCover } from "@/features/blogs/components/BlogCover";
-import type { BlogSummary } from "@/features/blogs/types/blogs.types";
+import type { BlogRowProps } from "@/features/blogs/types/blogs.types";
 import { blogHref, formatBlogDate } from "@/features/blogs/utils/blogs.utils";
-
-interface BlogRowProps {
-  post: BlogSummary;
-  locale: string;
-}
 
 /** Compact mobile row: start-side thumbnail, category/date, title, excerpt. */
 export function BlogRow({ post, locale }: BlogRowProps) {

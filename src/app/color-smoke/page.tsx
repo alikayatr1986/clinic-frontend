@@ -1,7 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
+import type { ColorSmokeHeroCtaProps } from "@/types/color-smoke.types";
 
-async function HeroCta({ locale }: { locale: "en" | "ar" }) {
+async function HeroCta({ locale }: ColorSmokeHeroCtaProps) {
   const t = await getTranslations({ locale, namespace: "colorSmoke" });
   const dir = locale === "ar" ? "rtl" : "ltr";
   return (

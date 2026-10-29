@@ -7,19 +7,9 @@ import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, ShieldCheck, Star, UserRound } from "lucide-react";
 import { GalleryComparison } from "@/features/gallery/components/GalleryComparison";
 import { useLandingGallery } from "@/features/gallery/hooks/useLandingGallery";
-import type {
-  GalleryCaptionContent,
-  GalleryPublicCase,
-  GallerySectionContent,
-  GalleryStatistic,
-} from "@/features/gallery/types/gallery.types";
+import type { GalleryStatistic } from "@/features/gallery/types/gallery.types";
 import { formatGalleryEyebrow } from "@/features/gallery/utils/gallery.utils";
-
-export interface GallerySectionProps {
-  initialCases?: GalleryPublicCase[];
-  initialContent?: GallerySectionContent | null;
-  initialCaptions?: Record<string, GalleryCaptionContent>;
-}
+import type { GallerySectionProps } from "@/features/landing/types/landing.types";
 
 export function GallerySection({
   initialCases,

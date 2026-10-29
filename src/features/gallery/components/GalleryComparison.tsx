@@ -1,17 +1,6 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import type {
-  GalleryCaptionContent,
-  GalleryPublicCase,
-} from "../types/gallery.types";
-
-export interface GalleryComparisonProps {
-  item: GalleryPublicCase;
-  caption?: GalleryCaptionContent;
-  priority?: boolean;
-  variant?: "featured" | "thumbnail";
-  className?: string;
-}
+import type { GalleryComparisonProps } from "../types/gallery.types";
 
 export function GalleryComparison({
   item,

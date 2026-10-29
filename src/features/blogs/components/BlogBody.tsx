@@ -1,12 +1,10 @@
 import type { ReactNode } from "react";
 
-import type { BlogBlock, BlogMark } from "@/features/blogs/types/blogs.types";
+import type {
+  BlogBodyProps,
+  BlogMark,
+} from "@/features/blogs/types/blogs.types";
 import { buildBlogAnchors, safeBlogHref } from "@/features/blogs/utils/blogs.utils";
-
-interface BlogBodyProps {
-  blocks: readonly BlogBlock[];
-  externalLabel: string;
-}
 
 function renderText(
   text: string,

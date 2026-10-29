@@ -7,7 +7,7 @@ import { BlogBody } from "@/features/blogs/components/BlogBody";
 import { BlogCard } from "@/features/blogs/components/BlogCard";
 import { BlogCover } from "@/features/blogs/components/BlogCover";
 import { BLOG_CTA_HREF } from "@/features/blogs/constants/blogs.constants";
-import type { BlogDetail } from "@/features/blogs/types/blogs.types";
+import type { BlogArticleProps } from "@/features/blogs/types/blogs.types";
 import {
   buildBlogAnchors,
   formatBlogDate,
@@ -17,7 +17,7 @@ import {
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
-export function BlogArticle({ post }: { post: BlogDetail }) {
+export function BlogArticle({ post }: BlogArticleProps) {
   const t = useTranslations("blogs");
   const locale = useLocale();
   const { toc } = buildBlogAnchors(post.body.blocks);

@@ -2,20 +2,9 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { BlogCover } from "@/features/blogs/components/BlogCover";
-import type { BlogSummary } from "@/features/blogs/types/blogs.types";
+import type { BlogCardProps } from "@/features/blogs/types/blogs.types";
 import { blogHref, formatBlogDate } from "@/features/blogs/utils/blogs.utils";
 import { cn } from "@/lib/utils";
-
-interface BlogCardProps {
-  post: BlogSummary;
-  locale: string;
-  readMoreLabel: string;
-  /** Cover aspect: desktop card (4:3) or wide featured (mobile). */
-  coverClassName?: string;
-  showReadMore?: boolean;
-  className?: string;
-  headingLevel?: "h2" | "h3";
-}
 
 export function BlogCard({
   post,

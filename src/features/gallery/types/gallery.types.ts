@@ -64,4 +64,36 @@ export interface GalleryFilterOptions {
   timeframes: GalleryFilterOption[];
 }
 
+export interface GalleryBrowserProps {
+  initialCases?: GalleryPublicCase[];
+  initialTotal?: number;
+  initialPage?: number;
+  initialCaptions?: Record<string, GalleryCaptionContent>;
+  initialSectionContent?: GallerySectionContent | null;
+}
+
+export interface GalleryCardProps {
+  item: GalleryPublicCase;
+  caption?: GalleryCaptionContent;
+  onEnlarge: (item: GalleryPublicCase) => void;
+  priority?: boolean;
+}
+
+export type GalleryComparisonVariant = "featured" | "thumbnail";
+
+export interface GalleryComparisonProps {
+  item: GalleryPublicCase;
+  caption?: GalleryCaptionContent;
+  priority?: boolean;
+  variant?: GalleryComparisonVariant;
+  className?: string;
+}
+
+export interface GalleryLightboxProps {
+  item: GalleryPublicCase | null;
+  caption?: GalleryCaptionContent;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
 

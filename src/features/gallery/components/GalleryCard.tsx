@@ -9,17 +9,7 @@ import { GalleryComparison } from "./GalleryComparison";
 import {
   getTimeframeLabel,
 } from "../utils/gallery.utils";
-import type {
-  GalleryCaptionContent,
-  GalleryPublicCase,
-} from "../types/gallery.types";
-
-export interface GalleryCardProps {
-  item: GalleryPublicCase;
-  caption?: GalleryCaptionContent;
-  onEnlarge: (item: GalleryPublicCase) => void;
-  priority?: boolean;
-}
+import type { GalleryCardProps } from "../types/gallery.types";
 
 export function GalleryCard({
   item,
