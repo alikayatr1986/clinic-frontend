@@ -1,3 +1,8 @@
+import { isSupportedCountry } from 'libphonenumber-js';
+import { getCountries } from 'libphonenumber-js';
+import englishLabels from 'react-phone-number-input/locale/en.json';
+import arabicLabels from 'react-phone-number-input/locale/ar.json';
+import type { CountryCode } from 'libphonenumber-js';
 import type { ContactConfig, ContactCountry, LocationOption } from '@/features/contact/types/contact.types';
 
 const code = /^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$/;
@@ -9,16 +14,24 @@ function option(value: unknown): value is LocationOption {
 }
 function country(value: unknown): value is ContactCountry {
   if (!option(value)) return false;
-  const cities: unknown = (value as ContactCountry).cities;
-  return Array.isArray(cities) && cities.length > 0 && cities.length <= 1000 && cities.every(option) && new Set(cities.map((city) => city.code)).size === cities.length;
+  const dialRegion: unknown = (value as ContactCountry).dialRegion;
+  return dialRegion === undefined || (typeof dialRegion === 'string' && isSupportedCountry(dialRegion as CountryCode));
 }
 function locations(raw?: string): ContactCountry[] {
   try {
-    if (!raw || raw.length > 100000) return [];
+    if (raw === undefined) {
+      const phoneRegions = getCountries();
+      const enLabels = englishLabels as unknown as Record<string, string>;
+      const arLabels = arabicLabels as unknown as Record<string, string>;
+      const extraRegions = ['AQ', 'BV', 'GS', 'HM', 'PN', 'TF', 'UM'] as const;
+      return [...phoneRegions.map((region) => ({ code: region.toLowerCase(), en: englishLabels[region] || region, ar: arabicLabels[region] || englishLabels[region] || region, dialRegion: region })),
+        ...extraRegions.map((region) => ({ code: region.toLowerCase(), en: enLabels[region], ar: arLabels[region] || enLabels[region] }))];
+    }
+    if (raw.length > 100000) return [];
     const data: unknown = JSON.parse(raw);
     if (!Array.isArray(data) || data.length > 250 || !data.every(country)) return [];
     if (new Set(data.map((country) => country.code)).size !== data.length) return [];
-    return data.map(({ code, en, ar, cities }) => ({ code, en, ar, cities: cities.map(({ code, en, ar }: LocationOption) => ({ code, en, ar })) }));
+    return data.map(({ code, en, ar, dialRegion }) => ({ code, en, ar, ...(dialRegion ? { dialRegion } : {}) }));
   } catch { return []; }
 }
 function channel(raw: string | undefined, host: string, path: RegExp): string | undefined {
@@ -43,6 +56,17 @@ export function getContactConfig(env: Record<string, string | undefined>): Conta
     phone: phone && /^\+[1-9]\d{7,14}$/.test(phone) ? phone : undefined,
     whatsapp: channel(env.CONTACT_WHATSAPP_URL, 'wa.me', /^\/[1-9]\d{7,14}\/?$/),
     telegram: channel(env.CONTACT_TELEGRAM_URL, 't.me', /^\/[A-Za-z][A-Za-z0-9_]{4,31}\/?$/),
-    captcha: { siteKey: /^[A-Za-z0-9_-]{10,200}$/.test(siteKey) ? siteKey : '', action: /^[A-Za-z0-9/_]{1,100}$/.test(action) ? action : '' },
+    captcha: { siteKey: /^[A-Za-z0-9_-]{10,200}$/.test(siteKey) ? siteKey : '', action: /^[A-Za-z0-9/_]{1,100}$/.test(action) ? action : '', devBypass: env.NODE_ENV === 'development' && env.CONTACT_CAPTCHA_DEV_BYPASS === 'true' },
   };
+}
+
+// Dialing countries are independent of the reviewed residence configuration.
+export function getDialCountries(countries: ContactCountry[]): ContactCountry[] {
+  const configuredRegions = new Set(countries.map((item) => item.dialRegion));
+  const configuredCodes = new Set(countries.map((item) => item.code));
+  return [...countries, ...getCountries().filter((region) => !configuredRegions.has(region)).map((region) => {
+    let code = `dial-${region}`;
+    while (configuredCodes.has(code)) code = `dial-${code}`;
+    return { code, en: englishLabels[region] || region, ar: arabicLabels[region] || englishLabels[region] || region, dialRegion: region };
+  })];
 }

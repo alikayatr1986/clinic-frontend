@@ -28,7 +28,6 @@ function createTestWrapper() {
 const mockValues: ContactValues = {
   name: 'Jane Doe',
   country: 'country-code',
-  city: 'city-code',
   email: 'jane@example.com',
   phone: '+1234567890',
   procedure: 'rhinoplasty',

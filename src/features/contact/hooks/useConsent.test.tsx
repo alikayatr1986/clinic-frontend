@@ -51,6 +51,7 @@ describe('useConsent hook', () => {
     });
 
     expect(result.current.isLoading).toBe(true);
+    expect(result.current.isRefreshing).toBe(true);
     expect(result.current.consent).toBeNull();
     expect(result.current.error).toBe(false);
 
@@ -60,6 +61,7 @@ describe('useConsent hook', () => {
       version: 'v1',
       text: 'Consent agreement text',
     });
+    expect(result.current.isRefreshing).toBe(false);
     expect(result.current.error).toBe(false);
     expect(fetchConsent).toHaveBeenCalledTimes(1);
     expect(fetchConsent).toHaveBeenCalledWith('en', { signal: expect.any(AbortSignal) });

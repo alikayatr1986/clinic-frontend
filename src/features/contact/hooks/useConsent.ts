@@ -35,5 +35,6 @@ export function useConsent(locale: string) {
     error: query.isError,
     retry,
     isLoading: query.isLoading,
+    isRefreshing: query.isFetching,
   };
 }

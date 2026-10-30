@@ -26,7 +26,6 @@ vi.mock('@/lib/api', () => ({
 const values = {
   name: ' Test ',
   country: 'country',
-  city: 'city',
   email: ' Person@Example.test ',
   phone: '+1 (234) 567-8901',
   procedure: 'rhinoplasty',
@@ -113,9 +112,7 @@ describe('contact transport service', () => {
         body: {
           name: 'Test',
           country: 'country',
-          city: 'city',
           email: 'person@example.test',
-          phone: '+12345678901',
           procedure: 'rhinoplasty',
           preferred_contact: 'email',
           message: '',
@@ -145,6 +142,20 @@ describe('contact transport service', () => {
         '/api/v1/leads',
         expect.objectContaining({ signal: controller.signal }),
       );
+    });
+
+    it('sends only the active normalized phone for telephone methods', async () => {
+      vi.mocked(apiRequest).mockResolvedValueOnce({ data: { id: 'opaque-lead-id' } });
+      await submitContact(
+        { ...values, preferred_contact: 'phone_call', email: '', phone: '+905321234567' },
+        { version: 'v1', text: 'Consent' },
+        'en',
+        'fresh-token',
+      );
+      const request = vi.mocked(apiRequest).mock.calls[0][1];
+      expect(request?.body).toMatchObject({ preferred_contact: 'phone_call', phone: '+905321234567' });
+      expect(request?.body).not.toHaveProperty('email');
+      expect(request?.body).not.toHaveProperty('city');
     });
 
     it('maps ApiError to ContactApiError preserving status, code, and fields without exposing server text', async () => {

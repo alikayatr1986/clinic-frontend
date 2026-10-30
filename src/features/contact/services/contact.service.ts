@@ -1,15 +1,11 @@
 import { apiRequest, ApiError, isAbortError } from '@/lib/api';
-import type { Consent, ContactValues } from '@/features/contact/types/contact.types';
+import type { Consent, ContactValues, FetchConsentOptions, SubmitContactOptions } from '@/features/contact/types/contact.types';
 
 export class ContactApiError extends Error {
   constructor(public status: number, public code: string, public fields: string[] = []) {
     super('Contact request failed');
     this.name = 'ContactApiError';
   }
-}
-
-export interface FetchConsentOptions {
-  signal?: AbortSignal;
 }
 
 export async function fetchConsent(
@@ -43,10 +39,6 @@ export async function fetchConsent(
   }
 }
 
-export interface SubmitContactOptions {
-  signal?: AbortSignal;
-}
-
 export async function submitContact(
   values: ContactValues,
   consent: Consent,
@@ -59,10 +51,13 @@ export async function submitContact(
       method: 'POST',
       headers: { 'Accept-Language': locale },
       body: {
-        ...values,
         name: values.name.trim(),
-        email: values.email.trim().toLowerCase(),
-        phone: values.phone.replace(/[\s().-]/g, ''),
+        country: values.country,
+        procedure: values.procedure,
+        preferred_contact: values.preferred_contact,
+        ...(values.preferred_contact === 'email'
+          ? { email: values.email.trim().toLowerCase() }
+          : { phone: values.phone }),
         message: values.message.trim(),
         consent_accepted: true,
         consent_version: consent.version,

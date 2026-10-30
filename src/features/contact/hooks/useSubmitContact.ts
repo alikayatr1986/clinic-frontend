@@ -3,15 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useMutation, type UseMutationResult } from '@tanstack/react-query';
 import { submitContact } from '@/features/contact/services/contact.service';
-import type { Consent, ContactValues } from '@/features/contact/types/contact.types';
-
-export interface SubmitContactArgs {
-  values: ContactValues;
-  consent: Consent;
-  locale: string;
-  token: string;
-  signal?: AbortSignal;
-}
+import type { SubmitContactArgs } from '@/features/contact/types/contact.types';
 
 export function useSubmitContact(): UseMutationResult<
   string,

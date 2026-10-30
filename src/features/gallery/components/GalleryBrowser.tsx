@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { useProcedures } from "@/features/procedures/hooks/useProcedures";
 import { GalleryCard } from "./GalleryCard";
 import { GalleryLightbox } from "./GalleryLightbox";
@@ -276,12 +277,13 @@ export function GalleryBrowser({
             >
               {t("filterProcedure")}
             </label>
-            <select
+            <Select
               id={procedureSelectId}
               aria-label={t("filterProcedure")}
               value={currentProcedure}
               onChange={handleProcedureChange}
-              className="h-12 min-h-12 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              wrapperClassName="w-auto min-w-[180px]"
+              className="text-sm"
             >
               <option value="">{t("allProcedures")}</option>
               {procedures.map((opt) => (
@@ -289,7 +291,7 @@ export function GalleryBrowser({
                   {locale === "ar" ? opt.ar : opt.en}
                 </option>
               ))}
-            </select>
+            </Select>
             {catalogError && (
               <div role="alert">
                 <p>{t("procedureCatalogError")}</p>
@@ -308,12 +310,13 @@ export function GalleryBrowser({
             >
               {t("filterTimeframe")}
             </label>
-            <select
+            <Select
               id={timeframeSelectId}
               aria-label={t("filterTimeframe")}
               value={currentTimeframe}
               onChange={handleTimeframeChange}
-              className="h-12 min-h-12 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              wrapperClassName="w-auto min-w-[180px]"
+              className="text-sm"
             >
               <option value="">{t("allTimeframes")}</option>
               {TIMEFRAME_OPTIONS.map((opt) => (
@@ -321,7 +324,7 @@ export function GalleryBrowser({
                   {t(opt.labelKey as never)}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {/* Reset Filters Action */}
