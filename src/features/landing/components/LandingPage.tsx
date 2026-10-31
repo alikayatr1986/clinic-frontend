@@ -23,7 +23,14 @@ export function LandingPage() {
     <>
       <SiteHeader items={NAV_ITEMS} ctaHref={HERO_ACTIONS.primary} />
       <main className="flex-1">
-        <HeroSection />
+        <div className="w-full relative">
+          <HeroSection />
+          {/* Gradient separator between Hero and next section */}
+          <div
+            className="absolute bottom-0 w-full h-[10vh] bg-gradient-to-b from-transparent from-0% to-[#FEFDF9] to-90% pointer-events-none"
+            aria-hidden="true"
+          />
+        </div>
         <WhyTurkeySection />
         <TreatmentServicesSection />
         <GallerySection />
