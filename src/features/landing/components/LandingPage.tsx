@@ -12,10 +12,12 @@ import { GallerySection } from "@/features/landing/components/GallerySection";
 import { BlogsSection } from "@/features/landing/components/BlogsSection";
 import { ContactSection } from "@/features/contact/components/ContactSection";
 import { getContactConfig } from "@/features/contact/constants/contact.constants";
+import { SiteFooter } from "@/features/footer/components/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export function LandingPage() {
   const tNav = useTranslations("nav");
+  const contactConfig = getContactConfig(process.env);
 
   return (
     <>
@@ -26,7 +28,7 @@ export function LandingPage() {
         <TreatmentServicesSection />
         <GallerySection />
         <BlogsSection />
-        <ContactSection config={getContactConfig(process.env)} />
+        <ContactSection config={contactConfig} />
         {SECTION_ITEMS.filter(
           ({ anchor }) =>
             anchor !== "treatments" &&
@@ -41,6 +43,7 @@ export function LandingPage() {
           />
         ))}
       </main>
+      <SiteFooter config={contactConfig} />
     </>
   );
 }

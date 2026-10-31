@@ -19,15 +19,47 @@ vi.mock('next/navigation', async (importOriginal) => {
 });
 
 describe('Home (/)', () => {
-  it('renders the site header and the main landmark', () => {
+  it('renders the site header, main, and footer landmarks in document order', () => {
     themedRender(<Home />);
 
-    expect(screen.getByRole('banner')).toBeInTheDocument();
-    expect(screen.getByRole('main')).toBeInTheDocument();
+    const banner = screen.getByRole('banner');
+    const main = screen.getByRole('main');
+    const contentinfo = screen.getByRole('contentinfo');
+
+    expect(banner).toBeInTheDocument();
+    expect(main).toBeInTheDocument();
+    expect(contentinfo).toBeInTheDocument();
+    expect(contentinfo).toHaveAttribute('data-slot', 'site-footer');
+
+    // Sequential document order: banner before main, main before contentinfo
+    expect(banner.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(main.compareDocumentPosition(contentinfo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     expect(
       screen.getAllByRole('img', { name: 'Dr. Naser Dadaszade' }).length,
     ).toBeGreaterThan(0);
+  });
+
+  it('mounts the site footer after main with explore links, about section, and contact config', () => {
+    themedRender(<Home />);
+    const main = screen.getByRole('main');
+    const footer = screen.getByRole('contentinfo');
+
+    expect(main.nextElementSibling).toBe(footer);
+    expect(footer).toHaveAttribute('data-slot', 'site-footer');
+
+    // Verify Explore navigation targets within footer
+    const galleryLinks = within(footer).getAllByRole('link', { name: enMessages.footer.exploreGallery });
+    expect(galleryLinks[0]).toHaveAttribute('href', '/gallery');
+
+    const blogLinks = within(footer).getAllByRole('link', { name: enMessages.footer.exploreBlog });
+    expect(blogLinks[0]).toHaveAttribute('href', '/blog');
+
+    const contactLinks = within(footer).getAllByRole('link', { name: enMessages.footer.exploreContact });
+    expect(contactLinks[0]).toHaveAttribute('href', '#contact');
+
+    // Verify address fallback in footer
+    expect(within(footer).getAllByText(enMessages.footer.addressFallback).length).toBeGreaterThan(0);
   });
 
   it('renders one landmark section per nav item, keyed by its anchor', () => {
@@ -109,13 +141,16 @@ describe('Home (/)', () => {
     const row = container.querySelector('[data-slot="site-header-desktop"]');
     expect(row).toHaveClass('hidden', 'lg:flex');
 
+    const primaryNav = container.querySelector('[data-slot="primary-nav"]') as HTMLElement;
+    expect(primaryNav).not.toBeNull();
+
     const current = container.querySelectorAll(
       '[data-slot="primary-nav"] a[aria-current]',
     );
     expect(current).toHaveLength(0);
 
     for (const item of NAV_ITEMS) {
-      expect(screen.getByRole('link', { name: enNavLabel(item) })).toBeInTheDocument();
+      expect(within(primaryNav).getByRole('link', { name: enNavLabel(item) })).toBeInTheDocument();
     }
 
     expect(screen.getByRole('link', { name: /book free consultation/i })).toHaveAttribute(
@@ -171,8 +206,13 @@ describe('Home (/)', () => {
     expect(rtlSections).toHaveLength(SECTION_ITEMS.length + 2);
   });
 
-  it('has zero axe violations', async () => {
-    const { container } = themedRender(<Home />);
+  it('has zero axe violations in LTR', async () => {
+    const { container } = themedRender(<Home />, { dir: 'ltr', lang: 'en', locale: 'en' });
+    await axePass(container);
+  }, 15000);
+
+  it('has zero axe violations in RTL', async () => {
+    const { container } = themedRender(<Home />, { dir: 'rtl', lang: 'ar', locale: 'ar' });
     await axePass(container);
   }, 15000);
 });
