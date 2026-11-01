@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" color="#C8102E" role="img" aria-labelledby="title desc">
+  <title>International Patient Support</title><desc>A globe surrounded by a friendly support headset, indicating worldwide concierge care.</desc>
+  <g stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="29" r="15"/>
+      <path d="M32 14c4.7 4.2 7.2 9.3 7.2 15S36.7 39.8 32 44c-4.7-4.2-7.2-9.3-7.2-15S27.3 18.2 32 14Z"/>
+      <path d="M17 29h30M20 21h24M20 37h24"/>
+      <path d="M11 33v-6C11 15.3 20.4 6 32 6s21 9.3 21 21v6"/>
+      <path d="M11 33h4v13h-4c-2.2 0-4-1.8-4-4v-5c0-2.2 1.8-4 4-4ZM53 33h-4v13h4c2.2 0 4-1.8 4-4v-5c0-2.2-1.8-4-4-4Z"/>
+      <path d="M52 46c-.6 6.2-5.3 9.2-12 9.2h-2.7"/>
+      <rect x="32.2" y="52.5" width="5.1" height="5.1" rx="2.55"/></g>
+</svg>

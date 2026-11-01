@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" color="#C8102E" role="img" aria-labelledby="title desc">
+  <title>Experienced ENT Specialist</title><desc>A medical specialist in a coat with an integrated stethoscope and precise clinical details.</desc>
+  <g stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="31.5" cy="18" r="9"/>
+      <path d="M10 56.5v-5.2c0-10.4 9-17.4 21.5-17.4S53 40.9 53 51.3v5.2"/>
+      <path d="M25 37.5 31.5 46l6.5-8.5M31.5 46v10.5"/>
+      <path d="M22.4 40.7v7.5c0 4.1 2.4 6.8 6.4 6.8"/>
+      <path d="M40.7 40.9v8.1c0 3-1.7 5-4.8 5"/>
+      <circle cx="32.7" cy="54" r="2.5"/></g>
+</svg>

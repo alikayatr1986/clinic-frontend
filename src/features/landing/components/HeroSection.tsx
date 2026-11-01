@@ -12,6 +12,7 @@ import {
   HERO_DESKTOP_MEDIA,
   HERO_MOBILE_IMAGE,
 } from "@/features/landing/constants/hero.constants";
+import Image from "next/image";
 
 export function HeroSection() {
   const t = useTranslations("hero");
@@ -101,7 +102,7 @@ export function HeroSection() {
                 className={`min-w-0 flex-[0_0_70%] snap-start text-base leading-normal lg:flex-[1_1_0] lg:text-[clamp(.75rem,.9vw,1.125rem)] ${index > 0 ? "lg:border-s lg:border-[var(--border)] lg:ps-4" : ""}`}
               >
                 <Card variant="trust">
-                  <Icon aria-hidden="true" />
+                  <Image src={Icon} alt="" aria-hidden="true" className="h-8 w-8" />
                   <span>{t(key)}</span>
                 </Card>
               </li>

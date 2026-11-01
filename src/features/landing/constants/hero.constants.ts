@@ -1,4 +1,6 @@
-import { ShieldPlus, UserRound, UsersRound } from "lucide-react";
+import AccreditedHospitalsIcon from "@/features/landing/assets/icons/hero/accredited-hospitals-icon.svg?url";
+import InternationalPatientSupportIcon from "@/features/landing/assets/icons/hero/international-patient-support-icon.svg?url";
+import EntSpecialistIcon from "@/features/landing/assets/icons/hero/ent-specialist-icon.svg?url";
 import { getImageProps } from "next/image";
 import desktopHeroImage from "../assets/images/hero-section-desktop-image.png";
 import mobileHeroImage from "../assets/images/hero-section-mobile-image.png";
@@ -30,7 +32,7 @@ export const HERO_MOBILE_IMAGE = getImageProps({
 export const HERO_ACTIONS = { primary: "#contact", secondary: "#treatments" } as const;
 
 export const HERO_TRUST_ITEMS = [
-  { key: "trustHospitals", icon: ShieldPlus },
-  { key: "trustSpecialist", icon: UserRound },
-  { key: "trustSupport", icon: UsersRound },
+  { key: "trustHospitals", icon: AccreditedHospitalsIcon },
+  { key: "trustSpecialist", icon: EntSpecialistIcon },
+  { key: "trustSupport", icon: InternationalPatientSupportIcon },
 ] as const;
