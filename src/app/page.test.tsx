@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { screen, within } from '@testing-library/react';
 
 import Home from '@/app/page';
-import { NAV_ITEMS, SECTION_ITEMS } from '@/features/landing/constants/nav.constants';
+import { NAV_ITEMS } from '@/features/landing/constants/nav.constants';
 import { axePass, enNavLabel, themedRender } from '@/test/utils';
 import arMessages from '../../messages/ar.json';
 import enMessages from '../../messages/en.json';
@@ -65,9 +65,7 @@ describe('Home (/)', () => {
   it('renders one landmark section per nav item, keyed by its anchor', () => {
     themedRender(<Home />);
 
-    expect(SECTION_ITEMS).toHaveLength(NAV_ITEMS.length);
-
-    for (const item of SECTION_ITEMS) {
+    for (const item of NAV_ITEMS) {
       const region = screen.getByRole('region', {
         name:
                   item.anchor === 'treatments'
@@ -217,7 +215,7 @@ describe('Home (/)', () => {
     const ltrSections = ltr.container.querySelectorAll('main section[id]');
     const rtlSections = rtl.container.querySelectorAll('main section[id]');
     expect(rtlSections).toHaveLength(ltrSections.length);
-    expect(rtlSections).toHaveLength(SECTION_ITEMS.length + 2);
+    expect(rtlSections).toHaveLength(6);
   });
 
   it('has zero axe violations in LTR', async () => {

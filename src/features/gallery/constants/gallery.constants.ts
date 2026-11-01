@@ -5,8 +5,7 @@ export const DEFAULT_PAGE_SIZE = 12;
 
 export const GALLERY_NAV_ITEMS: readonly NavItem[] = [
   { labelKey: "treatments", href: "/#treatments", anchor: "treatments" },
-  { labelKey: "about", href: "/#about-us", anchor: "about-us" },
-  { labelKey: "surgeon", href: "/#meet-the-surgeon", anchor: "meet-the-surgeon" },
+  { labelKey: "surgeon", href: "/#contact", anchor: "contact" },
   { labelKey: "blog", href: "/#blog", anchor: "blog" },
   { labelKey: "faq", href: "/#faq", anchor: "faq" },
   { labelKey: "contact", href: "/#contact", anchor: "contact" },

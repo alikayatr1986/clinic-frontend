@@ -1,9 +1,4 @@
-import { useTranslations } from "next-intl";
-
-import {
-  NAV_ITEMS,
-  SECTION_ITEMS,
-} from "@/features/landing/constants/nav.constants";
+import { NAV_ITEMS } from "@/features/landing/constants/nav.constants";
 import { HERO_ACTIONS } from "@/features/landing/constants/hero.constants";
 import { HeroSection } from "@/features/landing/components/HeroSection";
 import { TreatmentServicesSection } from "@/features/landing/components/TreatmentServicesSection";
@@ -17,7 +12,6 @@ import { SiteFooter } from "@/features/footer/components/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export function LandingPage() {
-  const tNav = useTranslations("nav");
   const contactConfig = getContactConfig(process.env);
 
   return (
@@ -28,7 +22,7 @@ export function LandingPage() {
           <HeroSection />
           {/* Gradient separator between Hero and next section */}
           <div
-            className="absolute bottom-0 w-full h-[10vh] bg-gradient-to-b from-transparent from-0% to-[#FEFDF9] to-90% pointer-events-none"
+            className="absolute bottom-0 w-full h-[10vh] bg-linear-to-b from-transparent from-0% to-[#FEFDF9] to-90% pointer-events-none"
             aria-hidden="true"
           />
         </div>
@@ -38,20 +32,6 @@ export function LandingPage() {
         <BlogsSection />
         <ContactSection config={contactConfig} />
         <FaqSection />
-        {SECTION_ITEMS.filter(
-          ({ anchor }) =>
-            anchor !== "treatments" &&
-            anchor !== "blog" &&
-            anchor !== "contact" &&
-            anchor !== "faq",
-        ).map(({ anchor, labelKey }) => (
-          <section
-            key={anchor}
-            id={anchor}
-            aria-label={tNav(labelKey)}
-            className="min-h-40 scroll-mt-16 lg:scroll-mt-20"
-          />
-        ))}
       </main>
       <SiteFooter config={contactConfig} />
     </>

@@ -33,8 +33,7 @@ export const EXPLORE_LINKS: readonly FooterLinkItem[] = [
 ];
 
 export const ABOUT_ITEMS: readonly FooterLinkItem[] = [
-  { labelKey: "aboutUs", href: "/#about-us" },
-  { labelKey: "aboutSurgeon", href: "/#meet-the-surgeon" },
+  { labelKey: "aboutSurgeon", href: "/#contact" },
   { labelKey: "aboutFaq", href: "/#faq" },
 ];
 

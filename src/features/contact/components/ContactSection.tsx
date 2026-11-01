@@ -73,7 +73,7 @@ export function ContactSection({ config }: ContactSectionProps) {
             {t("introduction")}
           </p>
         </div>
-        <ul className="grid min-w-0 gap-5 sm:grid-cols-3 lg:col-start-1 lg:row-start-2">
+        <ul className="grid min-w-0 grid-cols-3 gap-3 sm:gap-5 lg:col-start-1 lg:row-start-2">
           {(["trustChoice", "trustConsent", "trustContact"] as const).map(
             (key) => (
               <li key={key} className="text-center text-sm leading-relaxed">
@@ -85,7 +85,7 @@ export function ContactSection({ config }: ContactSectionProps) {
                   className="mx-auto mb-3 size-8"
                 />
                 <h3 className="font-semibold">{t(`${key}Title`)}</h3>
-                <p className="mt-2 text-muted-foreground">{t(key)}</p>
+                <p className="mt-2 hidden text-muted-foreground sm:block">{t(key)}</p>
               </li>
             ),
           )}

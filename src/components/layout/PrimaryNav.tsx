@@ -20,7 +20,7 @@ export function PrimaryNav({ items, activePath = "/", className }: PrimaryNavPro
           const isAnchor = item.href.startsWith("#");
 
           return (
-            <li key={item.href}>
+            <li key={item.labelKey}>
               <a
                 href={item.href}
                 aria-current={

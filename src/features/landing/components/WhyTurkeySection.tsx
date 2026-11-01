@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import Image, { getImageProps } from "next/image";
 import { ArrowRight, Plane } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -244,11 +242,6 @@ export function WhyTurkeySection() {
             {t("trustSupport")}
           </li>
         </ul>
-        <div className="justify-self-start lg:col-start-1 lg:row-start-6">
-          <Button asChild>
-            <Link href="#about-us">{t("cta")}</Link>
-          </Button>
-        </div>
       </div>
     </section>
   );

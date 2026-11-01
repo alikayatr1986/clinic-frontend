@@ -79,7 +79,7 @@ export function MobileNav({
               const active = isActive(item, activePath);
 
               return (
-                <li key={item.href} className="flex">
+                <li key={item.labelKey} className="flex">
                   <SheetClose asChild>
                     <a
                       href={item.href}

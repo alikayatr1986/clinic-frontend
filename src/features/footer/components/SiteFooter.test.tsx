@@ -165,7 +165,7 @@ describe("SiteFooter", () => {
     const { container } = themedRender(<SiteFooter config={FULL_CONFIG} />);
     for (const selector of ['[data-slot="footer-about"]', '[data-slot="footer-panel-about"]']) {
       const about = container.querySelector(selector) as HTMLElement;
-      for (const [label, href] of [["About Us", "/#about-us"], ["Meet the Surgeon", "/#meet-the-surgeon"], ["FAQ", "/#faq"]]) {
+      for (const [label, href] of [["Meet the Surgeon", "/#contact"], ["FAQ", "/#faq"]]) {
         expect(within(about).getByRole("link", { name: label, hidden: true })).toHaveAttribute("href", href);
       }
       expect(within(about).queryByText("Coming Soon")).toBeNull();
@@ -448,7 +448,7 @@ describe("SiteFooter", () => {
     const { container } = themedRender(<SiteFooter config={FULL_CONFIG} />);
 
     const links = screen.getAllByRole("link");
-    expect(links).toHaveLength(22);
+    expect(links).toHaveLength(20);
     for (const link of links) {
       expect(link).toHaveClass(
         "focus-visible:ring-2",
