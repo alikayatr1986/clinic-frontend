@@ -4,6 +4,17 @@ import isoIcon from "../assets/icons/why-turkey/ISO-icon.png";
 import jciIcon from "../assets/icons/why-turkey/JCI-icon.png";
 import ministryOfHealthIcon from "../assets/icons/why-turkey/ministery-of-health-icon.png";
 import hospitalSampleImage from "../assets/images/why-turkey-hospital-sample-image.png";
+import rhinoplastyIcon from "../assets/icons/why-turkey/rhinoplasty-excellence-icon.svg?url";
+import healthcareIcon from "../assets/icons/why-turkey/accredited-healthcare-icon.svg?url";
+import valueIcon from "../assets/icons/why-turkey/exceptional-value-icon.svg?url";
+import recoveryIcon from "../assets/icons/why-turkey/luxury-recovery-icon.svg?url";
+
+export const WHY_TURKEY_BENEFITS = [
+  { key: "benefitCapital", icon: rhinoplastyIcon },
+  { key: "benefitHealthcare", icon: healthcareIcon },
+  { key: "benefitValue", icon: valueIcon },
+  { key: "benefitRecovery", icon: recoveryIcon },
+] as const;
 
 export const WHY_TURKEY_CERTIFICATE_MARKS = [
   {

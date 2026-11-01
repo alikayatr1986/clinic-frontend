@@ -45,7 +45,7 @@ export interface SiteFooterConstants {
   };
   skyline: FooterImageAsset;
   exploreLinks: readonly FooterLinkItem[];
-  aboutItems: readonly FooterComingSoonItem[];
+  aboutItems: readonly FooterLinkItem[];
   legalItems: readonly FooterComingSoonItem[];
 }
 

@@ -192,14 +192,8 @@ export function SiteFooter({ config }: SiteFooterProps) {
 
             <ul className="space-y-1">
               {FOOTER_CONSTANTS.aboutItems.map((item) => (
-                <li
-                  key={item.labelKey}
-                  className="flex min-h-12 flex-wrap items-center justify-between gap-x-3 gap-y-1.5 py-2.5 text-base text-midnight-100"
-                >
-                  <span>{t(item.labelKey)}</span>
-                  <span className="shrink-0 rounded-md border border-white/5 bg-white/10 px-2.5 py-1 text-xs font-medium text-linen">
-                    {t("comingSoon")}
-                  </span>
+                <li key={item.labelKey}>
+                  <Link href={item.href} className={LINK_ROW}>{t(item.labelKey)}</Link>
                 </li>
               ))}
             </ul>
@@ -407,14 +401,8 @@ export function SiteFooter({ config }: SiteFooterProps) {
               <div data-slot="footer-panel-about" className="py-4">
                 <ul className="space-y-1">
                   {FOOTER_CONSTANTS.aboutItems.map((item) => (
-                    <li
-                      key={item.labelKey}
-                      className="flex min-h-12 flex-wrap items-center justify-between gap-x-3 gap-y-1.5 py-2.5 text-base text-midnight-100"
-                    >
-                      <span>{t(item.labelKey)}</span>
-                      <span className="shrink-0 rounded-md border border-white/5 bg-white/10 px-2.5 py-1 text-xs font-medium text-linen">
-                        {t("comingSoon")}
-                      </span>
+                    <li key={item.labelKey}>
+                      <Link href={item.href} className={LINK_ROW}>{t(item.labelKey)}</Link>
                     </li>
                   ))}
                 </ul>

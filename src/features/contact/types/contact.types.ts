@@ -55,3 +55,10 @@ export interface ContactPhoneInputProps {
 }
 
 
+
+export interface ContactFormProps {
+  config: ContactConfig;
+  locale: "en" | "ar";
+  form: ReturnType<typeof import("@/features/contact/hooks/useContactForm").useContactForm>;
+}
+export interface ContactInformationProps { config: ContactConfig; locale: "en" | "ar" }

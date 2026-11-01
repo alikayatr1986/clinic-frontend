@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Your choice">
+<title>Your choice</title>
+<g fill="none" stroke="#C81036" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="12" y="6" width="29" height="51" rx="6"/>
+    <path d="M22 50h9"/>
+    <path d="M20 14h13" opacity=".45"/>
+    <path d="M40 19h10a7 7 0 0 1 7 7v8a7 7 0 0 1-7 7h-4l-7 6v-6h-1a7 7 0 0 1-7-7v-8a7 7 0 0 1 7-7h2z" fill="#FFF9FA"/>
+    <path d="m38 30 4.5 4.5L51 26"/>
+  </g>
+</svg>

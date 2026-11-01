@@ -240,7 +240,7 @@
     "logoAlt": "Dr. Naser Dadaszade",
     "tagline": "ENT & Facial Plastic Surgery in Istanbul. Personalized surgical care with a focus on natural appearance, breathing function, safety, and patient comfort.",
     "exploreTitle": "Explore",
-    "exploreGallery": "Before & After Gallery",
+    "exploreGallery": "Gallery",
     "exploreBlog": "Blog",
     "exploreContact": "Contact",
     "aboutTitle": "About",
@@ -330,5 +330,20 @@
     "trustConsent": "Read the current consent text before sending your details.",
     "trustContactTitle": "Your details",
     "trustContact": "Provide only the email address or phone number for your selected method."
+  },
+  "faqSection": {
+    "eyebrow": "08. FAQ",
+    "heading": "Answers for a Confident Journey",
+    "introduction": "Explore common questions about your treatment journey.",
+    "consultationHeading": "Still have questions?",
+    "consultationSupport": "Contact us for personalized guidance.",
+    "provisional": "Provisional information — answers are awaiting clinic approval.",
+    "answer": "This answer is a placeholder and will be updated with clinic-approved information.",
+    "question1": "What is the difference between rhinoplasty and septorhinoplasty?",
+    "question2": "How long should I stay in Istanbul for the surgery?",
+    "question3": "What is the typical recovery time?",
+    "question4": "Are the surgeries performed in accredited hospitals?",
+    "question5": "How much does rhinoplasty cost in Turkey?",
+    "question6": "Do you provide follow-up care after I return home?"
   }
 }

@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowRight, ShieldCheck, Star, UserRound } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { GALLERY_STAT_ICONS } from "@/features/landing/constants/gallery.constants";
 import { GalleryComparison } from "@/features/gallery/components/GalleryComparison";
 import { useLandingGallery } from "@/features/gallery/hooks/useLandingGallery";
 import type { GalleryStatistic } from "@/features/gallery/types/gallery.types";
@@ -42,9 +44,6 @@ export function GallerySection({
   const heading = content?.heading || t("heading");
   const introduction = content?.introduction || t("introduction");
   const statistics: GalleryStatistic[] = content?.statistics || [];
-
-  // Icon mapping for approved trust statistics
-  const statIcons = [UserRound, Star, ShieldCheck];
 
   return (
     <section
@@ -147,11 +146,11 @@ export function GallerySection({
                     className="mt-8 grid grid-cols-3 gap-3 border-y border-border/70 py-6 lg:hidden"
                   >
                     {statistics.map((stat, idx) => {
-                      const Icon = statIcons[idx % statIcons.length];
+                      const icon = GALLERY_STAT_ICONS[idx % GALLERY_STAT_ICONS.length];
                       return (
                         <div key={stat.key || idx} className="flex flex-col items-center text-center">
                           <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-2">
-                            <Icon className="size-5" aria-hidden="true" />
+                            <Image src={icon} alt="" width={28} height={28} className="size-7" />
                           </div>
                           <p
                             dir="ltr"
@@ -175,11 +174,11 @@ export function GallerySection({
                     className="mt-8 hidden lg:grid grid-cols-3 gap-6 border-y border-border/70 py-6"
                   >
                     {statistics.map((stat, idx) => {
-                      const Icon = statIcons[idx % statIcons.length];
+                      const icon = GALLERY_STAT_ICONS[idx % GALLERY_STAT_ICONS.length];
                       return (
                         <div key={stat.key || idx} className="flex items-center gap-3.5">
                           <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                            <Icon className="size-5" aria-hidden="true" />
+                            <Image src={icon} alt="" width={28} height={28} className="size-7" />
                           </div>
                           <div className="min-w-0">
                             <p

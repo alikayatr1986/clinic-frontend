@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title desc">
+  <title>Happy patients</title>
+  <desc>Two smiling patient portraits with a small heart symbol</desc>
+  <g stroke="#C90D36" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 10.5c-1.4-1.9-4.1-2-5.6-.3-1.6 1.8-1 4.2 1.1 6.1L32 20l4.5-3.7c2.1-1.9 2.7-4.3 1.1-6.1-1.5-1.7-4.2-1.6-5.6.3Z" fill="#C90D36" stroke="none"/>
+    <circle cx="20" cy="27.1" r="7.6"/>
+    <circle cx="44" cy="27.1" r="7.6"/>
+    <path d="M17.1 29c1.4 1.9 4.4 2.1 5.8 0M41.1 29c1.4 1.9 4.4 2.1 5.8 0" stroke-width="2.2"/>
+    <path d="M7.7 51.9v-3.6c0-6.4 5.3-11.6 11.7-11.6h1.2c6.4 0 11.7 5.2 11.7 11.6v3.6"/>
+    <path d="M31.7 48.3c0-6.4 5.3-11.6 11.7-11.6h1.2c6.4 0 11.7 5.2 11.7 11.6v3.6"/>
+
+  </g>
+</svg>

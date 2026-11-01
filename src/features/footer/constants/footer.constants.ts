@@ -32,10 +32,10 @@ export const EXPLORE_LINKS: readonly FooterLinkItem[] = [
   { labelKey: "exploreContact", href: "#contact" },
 ];
 
-export const ABOUT_ITEMS: readonly FooterComingSoonItem[] = [
-  { labelKey: "aboutUs" },
-  { labelKey: "aboutSurgeon" },
-  { labelKey: "aboutFaq" },
+export const ABOUT_ITEMS: readonly FooterLinkItem[] = [
+  { labelKey: "aboutUs", href: "/#about-us" },
+  { labelKey: "aboutSurgeon", href: "/#meet-the-surgeon" },
+  { labelKey: "aboutFaq", href: "/#faq" },
 ];
 
 export const LEGAL_ITEMS: readonly FooterComingSoonItem[] = [

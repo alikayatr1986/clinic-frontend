@@ -1,3 +1,15 @@
+import emailIcon from "@/features/contact/assets/email-icon.svg?url";
+import phoneCallIcon from "@/features/contact/assets/phone-call-icon.svg?url";
+import whatsappIcon from "@/features/contact/assets/whatsapp-icon.svg?url";
+import telegramIcon from "@/features/contact/assets/telegram-icon.svg?url";
+import choiceIcon from "@/features/contact/assets/choice-icon.svg?url";
+import consentIcon from "@/features/contact/assets/consent-icons.svg?url";
+import detailsIcon from "@/features/contact/assets/details-icons.svg?url";
+
+export const contactMethodIcons = { email: emailIcon, phone_call: phoneCallIcon, whatsapp: whatsappIcon, telegram: telegramIcon } as const;
+
+export const contactTrustIcons = { trustChoice: choiceIcon, trustConsent: consentIcon, trustContact: detailsIcon } as const;
+
 import { isSupportedCountry } from 'libphonenumber-js';
 import { getCountries } from 'libphonenumber-js';
 import englishLabels from 'react-phone-number-input/locale/en.json';

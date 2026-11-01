@@ -10,6 +10,7 @@ import { TreatmentServicesSection } from "@/features/landing/components/Treatmen
 import { WhyTurkeySection } from "@/features/landing/components/WhyTurkeySection";
 import { GallerySection } from "@/features/landing/components/GallerySection";
 import { BlogsSection } from "@/features/landing/components/BlogsSection";
+import { FaqSection } from "@/features/landing/components/FaqSection";
 import { ContactSection } from "@/features/contact/components/ContactSection";
 import { getContactConfig } from "@/features/contact/constants/contact.constants";
 import { SiteFooter } from "@/features/footer/components/SiteFooter";
@@ -36,11 +37,13 @@ export function LandingPage() {
         <GallerySection />
         <BlogsSection />
         <ContactSection config={contactConfig} />
+        <FaqSection />
         {SECTION_ITEMS.filter(
           ({ anchor }) =>
             anchor !== "treatments" &&
             anchor !== "blog" &&
-            anchor !== "contact",
+            anchor !== "contact" &&
+            anchor !== "faq",
         ).map(({ anchor, labelKey }) => (
           <section
             key={anchor}

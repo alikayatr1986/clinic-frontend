@@ -56,8 +56,7 @@ describe("TreatmentServicesSection", () => {
       expect(within(services[index]).getByRole("heading", { level: 3 })).toHaveTextContent(copy.services[key].title);
       expect(within(services[index]).getByText(copy.services[key].description)).toBeInTheDocument();
       const icon = services[index].querySelector("img")!;
-      const imageSrc = typeof image.src === "string" ? image.src : image.src.src;
-      expect(icon.getAttribute("src")).toContain(encodeURIComponent(imageSrc));
+      expect(decodeURIComponent(icon.getAttribute("src")!)).toContain(decodeURIComponent(image.src));
       expect(icon).toHaveAttribute("alt", "");
       expect(icon).toHaveAttribute("aria-hidden", "true");
       expect(icon).not.toHaveClass("rtl:-scale-x-100");

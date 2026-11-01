@@ -173,6 +173,7 @@ describe("GallerySection", () => {
     const statsContainer = screen.getByTestId("gallery-statistics");
     expect(within(statsContainer).getByText("500+")).toBeInTheDocument();
     expect(within(statsContainer).getByText("Happy Patients")).toBeInTheDocument();
+    expect(statsContainer.querySelectorAll('img[alt=""]')).toHaveLength(3);
     const mobileStats = screen.getByTestId("gallery-statistics-mobile");
     const introduction = within(section).getByText(mockContentEn.introduction);
     expect(introduction.compareDocumentPosition(mobileStats)).toBe(

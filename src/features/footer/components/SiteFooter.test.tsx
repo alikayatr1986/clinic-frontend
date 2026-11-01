@@ -135,7 +135,7 @@ describe("SiteFooter", () => {
     ) as HTMLElement;
     expect(
       within(desktopExplore).getByRole("link", {
-        name: "Before & After Gallery",
+        name: "Gallery",
       }),
     ).toHaveAttribute("href", "/gallery");
     expect(
@@ -150,7 +150,7 @@ describe("SiteFooter", () => {
     ) as HTMLElement;
     expect(
       within(mobileExplore).getByRole("link", {
-        name: "Before & After Gallery",
+        name: "Gallery",
       }),
     ).toHaveAttribute("href", "/gallery");
     expect(
@@ -161,28 +161,15 @@ describe("SiteFooter", () => {
     ).toHaveAttribute("href", "#contact");
   });
 
-  it("keeps About items and legal labels non-interactive with Coming Soon badges", () => {
+  it("links About items to landing sections and keeps legal labels non-interactive", () => {
     const { container } = themedRender(<SiteFooter config={FULL_CONFIG} />);
-
-    const about = container.querySelector(
-      '[data-slot="footer-about"]',
-    ) as HTMLElement;
-    expect(about.querySelectorAll("a")).toHaveLength(0);
-    for (const label of ["About Us", "Meet the Surgeon", "FAQ"]) {
-      expect(within(about).getByText(label)).toBeInTheDocument();
-      expect(within(about).queryByRole("link", { name: label })).toBeNull();
+    for (const selector of ['[data-slot="footer-about"]', '[data-slot="footer-panel-about"]']) {
+      const about = container.querySelector(selector) as HTMLElement;
+      for (const [label, href] of [["About Us", "/#about-us"], ["Meet the Surgeon", "/#meet-the-surgeon"], ["FAQ", "/#faq"]]) {
+        expect(within(about).getByRole("link", { name: label, hidden: true })).toHaveAttribute("href", href);
+      }
+      expect(within(about).queryByText("Coming Soon")).toBeNull();
     }
-    expect(within(about).getAllByText("Coming Soon")).toHaveLength(3);
-
-    const mobileAbout = container.querySelector(
-      '[data-slot="footer-panel-about"]',
-    ) as HTMLElement;
-    expect(mobileAbout.querySelectorAll("a")).toHaveLength(0);
-    for (const label of ["About Us", "Meet the Surgeon", "FAQ"]) {
-      expect(within(mobileAbout).getByText(label)).toBeInTheDocument();
-      expect(within(mobileAbout).queryByRole("link", { name: label })).toBeNull();
-    }
-    expect(within(mobileAbout).getAllByText("Coming Soon")).toHaveLength(3);
 
     const legal = screen.getByRole("list", { name: "Legal" });
     expect(within(legal).getAllByRole("listitem")).toHaveLength(3);
@@ -461,7 +448,7 @@ describe("SiteFooter", () => {
     const { container } = themedRender(<SiteFooter config={FULL_CONFIG} />);
 
     const links = screen.getAllByRole("link");
-    expect(links).toHaveLength(16);
+    expect(links).toHaveLength(22);
     for (const link of links) {
       expect(link).toHaveClass(
         "focus-visible:ring-2",
@@ -478,7 +465,7 @@ describe("SiteFooter", () => {
       );
     }
 
-    for (const badge of screen.getAllByText("Coming Soon")) {
+    for (const badge of screen.queryAllByText("Coming Soon")) {
       expect(badge.closest("a")).toBeNull();
       expect(badge).not.toHaveAttribute("tabindex");
     }

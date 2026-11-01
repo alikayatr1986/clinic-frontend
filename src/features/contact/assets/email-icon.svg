@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="28 31 72 72" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Email contact icon</title>
+  <desc id="desc">Navy envelope with a red flap on a transparent background.</desc>
+  <rect x="30" y="44" width="68" height="44" rx="8" stroke="#0E1B3A" stroke-width="4.5"/>
+  <path d="M32 48L59.5 68.2C62.2 70.2 65.8 70.2 68.5 68.2L96 48" stroke="#D20A32" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

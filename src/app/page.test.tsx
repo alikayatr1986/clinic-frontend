@@ -76,7 +76,9 @@ describe('Home (/)', () => {
                       ? enMessages.blogs.heading
                       : item.anchor === 'contact'
                         ? enMessages.contact.heading
-                        : enNavLabel(item),
+                        : item.anchor === 'faq'
+                          ? enMessages.faqSection.heading
+                          : enNavLabel(item),
       });
       expect(region).toHaveAttribute('id', item.anchor);
       expect(region).toHaveClass('scroll-mt-16', 'lg:scroll-mt-20');
@@ -97,6 +99,18 @@ describe('Home (/)', () => {
     expect(container.querySelectorAll('#treatments')).toHaveLength(1);
     expect(treatments.previousElementSibling).toHaveAttribute('id', 'why-turkey');
     expect(within(treatments).getByRole('heading', { level: 2 })).toHaveTextContent(enMessages.treatmentServices.heading);
+  });
+
+  it.each([
+    ['en', enMessages],
+    ['ar', arMessages],
+  ] as const)('places FAQ after contact and links to it in %s', (locale, messages) => {
+    const { container } = themedRender(<Home />, { locale });
+    const faq = screen.getByRole('region', { name: messages.faqSection.heading });
+    expect(container.querySelectorAll('#faq')).toHaveLength(1);
+    expect(faq.previousElementSibling).toHaveAttribute('id', 'contact');
+    expect(within(screen.getByRole('banner')).getByRole('link', { name: messages.nav.faq })).toHaveAttribute('href', '#faq');
+    expect(within(faq).getByRole('link', { name: messages.header.cta })).toHaveAttribute('href', '#contact');
   });
 
   it('points every anchored nav item at its own section id', () => {
@@ -153,7 +167,7 @@ describe('Home (/)', () => {
       expect(within(primaryNav).getByRole('link', { name: enNavLabel(item) })).toBeInTheDocument();
     }
 
-    expect(screen.getByRole('link', { name: /book free consultation/i })).toHaveAttribute(
+    expect(screen.getAllByRole('link', { name: /book free consultation/i })[0]).toHaveAttribute(
       'href',
       '#contact',
     );

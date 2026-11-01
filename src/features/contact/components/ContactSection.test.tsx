@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axePass, themedRender } from '@/test/utils';
 import { ContactSection } from './ContactSection';
-import { getContactConfig } from '@/features/contact/constants/contact.constants';
+import { contactMethodIcons, contactTrustIcons, getContactConfig } from '@/features/contact/constants/contact.constants';
 import { ContactApiError, fetchConsent, submitContact } from '@/features/contact/services/contact.service';
 import { freshCaptchaToken } from '@/features/contact/services/captcha.service';
 import type { ContactConfig } from '@/features/contact/types/contact.types';
@@ -52,6 +52,24 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe('ContactSection', () => {
+  it('uses the supplied icon for each trust item', () => {
+    themedRender(<ContactSection config={config} />);
+    for (const [title, src] of [['Your choice', contactTrustIcons.trustChoice], ['Your consent', contactTrustIcons.trustConsent], ['Your details', contactTrustIcons.trustContact]]) {
+      const image = screen.getByRole('heading', { name: title }).parentElement?.querySelector('img');
+      expect(image).toHaveAttribute('src', src);
+      expect(image).toHaveAttribute('alt', '');
+    }
+  });
+
+  it('shows the supplied icon for each contact method', () => {
+    themedRender(<ContactSection config={config} />);
+    for (const [label, src] of [['Email', contactMethodIcons.email], ['Phone call', contactMethodIcons.phone_call], ['WhatsApp', contactMethodIcons.whatsapp], ['Telegram', contactMethodIcons.telegram]]) {
+      const image = screen.getByRole('radio', { name: label }).closest('label')?.querySelector('img');
+      expect(image).toHaveAttribute('src', src);
+      expect(image).toHaveAttribute('alt', '');
+    }
+  });
+
   it('defaults to email with no city or inactive phone control and passes EN/AR accessibility', async () => {
     const view = themedRender(<ContactSection config={config} />);
     await ready();

@@ -126,13 +126,13 @@ export function BlogsSection({ initialHome }: BlogsSectionProps) {
             <div
               data-testid="blogs-loading"
               role="status"
-              className="grid animate-pulse gap-6 lg:grid-cols-3"
+              className="grid animate-pulse gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6"
             >
               <span className="sr-only">{t("loading")}</span>
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className={`aspect-[4/5] rounded-2xl bg-muted ${i > 0 ? "hidden lg:block" : ""}`}
+                  className={`aspect-[4/5] rounded-2xl bg-muted ${i === 1 ? "hidden md:block" : i === 2 ? "hidden lg:block" : ""}`}
                 />
               ))}
             </div>
@@ -198,37 +198,28 @@ export function BlogsSection({ initialHome }: BlogsSectionProps) {
               )}
             </div>
           ) : (
-            <div className="mx-auto max-w-2xl lg:max-w-none">
-              <BlogCard
-                post={featured}
-                locale={locale}
-                readMoreLabel={t("readMore")}
-                coverClassName="aspect-[2.9/1]"
-                showReadMore={false}
-              />
-              {latest.length > 0 && (
-                <div className="mt-10">
-                  <div className="flex items-center justify-between gap-4">
-                    <h3
-                      className={`text-xl font-normal ${
-                        isArabic
-                          ? "[font-family:var(--font-noto-arabic),sans-serif]"
-                          : "font-hero-display"
-                      }`}
-                    >
-                      {t("latest")}
-                    </h3>
-                    <Button asChild variant="link">
-                      <Link href="/blog">{t("viewAll")}</Link>
-                    </Button>
+            <div className="mx-auto max-w-2xl">
+              <div className="md:hidden">
+                <BlogCard post={featured} locale={locale} readMoreLabel={t("readMore")} coverClassName="aspect-[2.9/1]" showReadMore={false} />
+                {latest.length > 0 && (
+                  <div className="mt-10">
+                    <div className="flex items-center justify-between gap-4">
+                      <h3 className={`text-xl font-normal ${isArabic ? "[font-family:var(--font-noto-arabic),sans-serif]" : "font-hero-display"}`}>
+                        {t("latest")}
+                      </h3>
+                      <Button asChild variant="link"><Link href="/blog">{t("viewAll")}</Link></Button>
+                    </div>
+                    <div className="mt-4 grid gap-4">
+                      {latest.map((post) => <BlogRow key={post.id} post={post} locale={locale} />)}
+                    </div>
                   </div>
-                  <div className="mt-4 grid gap-4">
-                    {latest.map((post) => (
-                      <BlogRow key={post.id} post={post} locale={locale} />
-                    ))}
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
+              <div className="hidden grid-cols-2 items-stretch gap-4 md:grid">
+                {[featured, ...latest.slice(0, 1)].map((post) => (
+                  <BlogCard key={post.id} post={post} locale={locale} readMoreLabel={t("readMore")} />
+                ))}
+              </div>
             </div>
           )}
         </div>

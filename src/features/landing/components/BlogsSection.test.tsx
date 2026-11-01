@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 
 import { BlogsSection } from "./BlogsSection";
 import { axePass, themedRender } from "@/test/utils";
@@ -91,20 +91,20 @@ describe("BlogsSection", () => {
     expect(screen.queryAllByTestId("blogs-indicator")).toHaveLength(0);
   });
 
-  it("mobile: featured plus latest rows without duplicates or carousel", async () => {
+  it("mobile: featured plus latest rows and two cards at medium widths", async () => {
     setDesktop(false);
     const { container } = themedRender(<BlogsSection initialHome={home(6)} />);
-    const titles = screen.getAllByRole("link", { name: /^Post / }).map((l) => l.textContent);
+    const titles = within(container.querySelector(".md\\:hidden") as HTMLElement).getAllByRole("link", { name: /^Post / }).map((l) => l.textContent);
     expect(titles).toEqual(["Post 1", "Post 2", "Post 3", "Post 4"]);
-    expect(screen.getByText(enMessages.blogs.latest)).toBeInTheDocument();
+    expect(container.querySelector(".md\\:grid")).toHaveClass("grid-cols-2");
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
     await axePass(container);
   });
 
-  it("mobile: a single post has no Latest Articles heading", () => {
+  it("mobile: renders a single available post", () => {
     setDesktop(false);
-    themedRender(<BlogsSection initialHome={home(1)} />);
-    expect(screen.queryByText(enMessages.blogs.latest)).not.toBeInTheDocument();
+    const { container } = themedRender(<BlogsSection initialHome={home(1)} />);
+    expect(within(container.querySelector(".md\\:hidden") as HTMLElement).getAllByRole("link", { name: /^Post / })).toHaveLength(1);
   });
 
   it("empty library keeps #blog with coming-soon copy", () => {

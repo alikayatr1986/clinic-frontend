@@ -164,7 +164,7 @@ function check(result, locale, label) {
     assert.equal(item.borderStart, index > 0 && width >= 1024 ? 1 : 0, `${label}: desktop separators`);
   });
   assert.equal(result.services.length, 4, `${label}: exactly four services`);
-  const assets = ['rhInoplastv-icon.png', 'ent-treatment-icon.png', 'facial-rejuvenation-icon.png', 'functiona-reconstructive-surgery-icon.png'];
+  const assets = ['rhInoplastv-icon', 'ent-treatments-icon', 'facial-rejuvenation-icon', 'functional-reconstructive-icon'];
   result.services.forEach((service, index) => {
     assert.ok(service.loaded, `${label}: service icon decoded`);
     assert.ok(decodeURIComponent(service.source).includes(assets[index]), `${label}: supplied service icon`);

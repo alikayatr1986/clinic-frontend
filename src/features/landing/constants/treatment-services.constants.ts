@@ -1,9 +1,9 @@
 import { Globe, ShieldCheck, UserRound } from "lucide-react";
 import doctorIcon from "../assets/icons/treatment-services/doctor-icon.png";
-import entTreatmentIcon from "../assets/icons/treatment-services/ent-treatment-icon.png";
-import facialRejuvenationIcon from "../assets/icons/treatment-services/facial-rejuvenation-icon.png";
-import reconstructiveSurgeryIcon from "../assets/icons/treatment-services/functiona-reconstructive-surgery-icon.png";
-import rhinoplastyIcon from "../assets/icons/treatment-services/rhInoplastv-icon.png";
+import entTreatmentIcon from "../assets/icons/treatment-services/ent-treatments-icon.svg?url";
+import facialRejuvenationIcon from "../assets/icons/treatment-services/facial-rejuvenation-icon.svg?url";
+import reconstructiveSurgeryIcon from "../assets/icons/treatment-services/functional-reconstructive-icon.svg?url";
+import rhinoplastyIcon from "../assets/icons/treatment-services/rhInoplastv-icon.svg?url";
 import desktopArtwork from "../assets/images/treatment-services-desktop-image.png";
 import mobileArtwork from "../assets/images/treatment-services-mobile-image.png";
 
@@ -19,10 +19,10 @@ export const TREATMENT_SERVICES_DOCTOR_MARK = {
 } as const;
 
 export const TREATMENT_SERVICES = [
-  { key: "rhinoplasty", image: { src: rhinoplastyIcon, width: 78, height: 76 } },
-  { key: "ent", image: { src: entTreatmentIcon, width: 75, height: 75 } },
-  { key: "rejuvenation", image: { src: facialRejuvenationIcon, width: 843, height: 844 } },
-  { key: "reconstructive", image: { src: reconstructiveSurgeryIcon, width: 75, height: 75 } },
+  { key: "rhinoplasty", image: { src: rhinoplastyIcon, width: 96, height: 96 } },
+  { key: "ent", image: { src: entTreatmentIcon, width: 96, height: 96 } },
+  { key: "rejuvenation", image: { src: facialRejuvenationIcon, width: 96, height: 96 } },
+  { key: "reconstructive", image: { src: reconstructiveSurgeryIcon, width: 96, height: 96 } },
 ] as const;
 
 export const TREATMENT_SERVICES_ACTIONS = {

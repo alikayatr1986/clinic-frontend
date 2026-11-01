@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title desc">
+  <title>Years of experience</title>
+  <desc>Protective shield with clock for proven medical experience</desc>
+  <g stroke="#C90D36" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 7.3c6.1 4.5 13.4 6.3 20.3 7.6v14.2c0 11.4-6.1 19.2-20.3 27.1C17.8 48.3 11.7 40.5 11.7 29.1V14.9C18.6 13.6 25.9 11.8 32 7.3Z"/>
+    <circle cx="32" cy="30.9" r="12.5"/>
+    <path d="M32 23.2v8l5.6 3.8"/>
+    <path d="M32 16v2.4M32 43.4v2.4M17.1 30.9h2.4M44.5 30.9h2.4" stroke-width="2"/>
+
+  </g>
+</svg>
