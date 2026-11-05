@@ -13,6 +13,9 @@ export const GALLERY_NAV_ITEMS: readonly NavItem[] = [
 
 export const GALLERY_CTA_HREF = "/#contact";
 
+/**
+ * @deprecated Use `useGalleryOptions` hook to load dynamic database timeframes instead.
+ */
 export const TIMEFRAME_OPTIONS: readonly GalleryFilterOption[] = [
   {
     value: "synthetic-time",

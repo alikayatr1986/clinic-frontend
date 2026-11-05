@@ -3,12 +3,14 @@ import { apiRequest, ApiError } from "@/lib/api";
 import {
   fetchGalleryCases,
   fetchGalleryContent,
+  fetchGalleryOptions,
   fetchLandingGalleryCases,
 } from "./gallery.service";
 import type {
   GalleryCaptionContent,
   GalleryContentResponse,
   GalleryListResponse,
+  GalleryOptionsResponse,
   GalleryPublicCase,
   GallerySectionContent,
 } from "../types/gallery.types";
@@ -271,6 +273,51 @@ describe("gallery.service", () => {
 
       await expect(
         fetchGalleryContent("en", ["case-1"], { signal: controller.signal }),
+      ).rejects.toThrow(ApiError);
+    });
+  });
+
+  describe("fetchGalleryOptions", () => {
+    it("requests options from /api/v1/gallery/options", async () => {
+      const mockOptions: GalleryOptionsResponse = {
+        data: {
+          procedures: [{ code: "rhino", en: "Rhinoplasty", ar: "تجميل الأنف" }],
+          timeframes: [{ code: "0-3-months", en: "0-3 Months", ar: "0-3 أشهر", status: "active" }],
+        },
+      };
+      vi.mocked(apiRequest).mockResolvedValueOnce(mockOptions);
+
+      const res = await fetchGalleryOptions();
+
+      expect(apiRequest).toHaveBeenCalledWith("/api/v1/gallery/options", {
+        signal: undefined,
+        headers: undefined,
+        cache: undefined,
+      });
+      expect(res).toEqual(mockOptions);
+    });
+
+    it("handles missing data gracefully", async () => {
+      vi.mocked(apiRequest).mockResolvedValueOnce({} as GalleryOptionsResponse);
+
+      const res = await fetchGalleryOptions();
+
+      expect(res).toEqual({
+        data: {
+          procedures: [],
+          timeframes: [],
+        },
+      });
+    });
+
+    it("forwards signal and propagates ApiError on network or 5xx failure", async () => {
+      const controller = new AbortController();
+      vi.mocked(apiRequest).mockRejectedValueOnce(
+        new ApiError(503, "DEPENDENCY_UNAVAILABLE"),
+      );
+
+      await expect(
+        fetchGalleryOptions({ signal: controller.signal }),
       ).rejects.toThrow(ApiError);
     });
   });

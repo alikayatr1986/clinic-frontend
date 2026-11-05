@@ -6,6 +6,7 @@ import { useProcedures } from "@/features/procedures/hooks/useProcedures";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GalleryComparison } from "./GalleryComparison";
+import { useGalleryOptions } from "../hooks/useGalleryOptions";
 import {
   getTimeframeLabel,
 } from "../utils/gallery.utils";
@@ -20,14 +21,17 @@ export function GalleryCard({
   const t = useTranslations("gallery");
   const locale = useLocale();
   const { procedures } = useProcedures();
+  const { timeframes } = useGalleryOptions();
 
   function getLabel(k: string) {
     return t(k as never);
   }
 
   const procedure = procedures.find((p) => p.code === item.procedure_tag);
-  const procedureLabel = procedure ? (locale === "ar" ? procedure.ar : procedure.en) : item.procedure_tag;
-  const timeframeLabel = getTimeframeLabel(item.timeframe_badge, getLabel);
+  const procedureLabel = procedure
+    ? `${locale === "ar" ? procedure.ar : procedure.en}${procedure.retired || procedure.status === "retired" ? (locale === "ar" ? " (متقاعد)" : " (Retired)") : ""}`
+    : item.procedure_tag;
+  const timeframeLabel = getTimeframeLabel(item.timeframe_badge, getLabel, timeframes, locale);
 
   return (
     <article

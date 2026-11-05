@@ -14,6 +14,19 @@ vi.mock("@/features/procedures/hooks/useProcedures", () => ({
   ], error: false, retry: vi.fn() }),
 }));
 
+let mockDynamicTimeframes: { code: string; en: string; ar: string; status?: string; retired?: boolean }[] = [];
+vi.mock("../hooks/useGalleryOptions", () => ({
+  useGalleryOptions: () => ({
+    timeframes: mockDynamicTimeframes,
+    procedures: [],
+    isLoading: false,
+    isError: false,
+    error: null,
+    retry: vi.fn(),
+    refetch: vi.fn(),
+  }),
+}));
+
 const mockCase: GalleryPublicCase = {
   id: "case-lightbox-uuid",
   url: "/api/v1/gallery/case-lightbox-uuid/media/display",
@@ -55,6 +68,76 @@ describe("GalleryLightbox", () => {
 
     const img = screen.getByRole("img", { name: "Enlarged comparison view" });
     expect(img).toBeInTheDocument();
+  });
+
+  it("renders localized dynamic timeframe badge when available", () => {
+    mockDynamicTimeframes = [
+      { code: "3-months-dynamic", en: "3 Months Post-Op", ar: "3 أشهر بعد الجراحة", status: "active" },
+    ];
+    const caseWithDynamicTf: GalleryPublicCase = {
+      ...mockCase,
+      timeframe_badge: "3-months-dynamic",
+    };
+
+    const { unmount } = themedRender(
+      <GalleryLightbox
+        item={caseWithDynamicTf}
+        caption={mockCaption}
+        open={true}
+        onOpenChange={vi.fn()}
+      />,
+      { locale: "en", dir: "ltr" },
+    );
+
+    expect(screen.getByText("3 Months Post-Op")).toBeInTheDocument();
+    unmount();
+
+    themedRender(
+      <GalleryLightbox
+        item={caseWithDynamicTf}
+        caption={mockCaption}
+        open={true}
+        onOpenChange={vi.fn()}
+      />,
+      { locale: "ar", dir: "rtl" },
+    );
+
+    expect(screen.getByText("3 أشهر بعد الجراحة")).toBeInTheDocument();
+  });
+
+  it("renders localized label with (Retired) indicator for historical case referencing retired timeframe", () => {
+    mockDynamicTimeframes = [
+      { code: "retired-tf", en: "Old 6 Months", ar: "6 أشهر قديمة", status: "retired", retired: true },
+    ];
+    const caseWithRetiredTf: GalleryPublicCase = {
+      ...mockCase,
+      timeframe_badge: "retired-tf",
+    };
+
+    const { unmount } = themedRender(
+      <GalleryLightbox
+        item={caseWithRetiredTf}
+        caption={mockCaption}
+        open={true}
+        onOpenChange={vi.fn()}
+      />,
+      { locale: "en", dir: "ltr" },
+    );
+
+    expect(screen.getByText("Old 6 Months (Retired)")).toBeInTheDocument();
+    unmount();
+
+    themedRender(
+      <GalleryLightbox
+        item={caseWithRetiredTf}
+        caption={mockCaption}
+        open={true}
+        onOpenChange={vi.fn()}
+      />,
+      { locale: "ar", dir: "rtl" },
+    );
+
+    expect(screen.getByText("6 أشهر قديمة (متقاعد)")).toBeInTheDocument();
   });
 
   it("calls onOpenChange(false) when Escape is pressed", async () => {

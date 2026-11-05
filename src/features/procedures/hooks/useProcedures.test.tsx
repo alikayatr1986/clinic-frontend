@@ -1,3 +1,4 @@
+import type { ProcedureOption } from "../types/procedures.types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -30,7 +31,7 @@ function createTestWrapper() {
 }
 
 describe("useProcedures hook", () => {
-  const mockProcedures: proceduresService.ProcedureOption[] = [
+  const mockProcedures: ProcedureOption[] = [
     { code: "rhinoplasty", en: "Rhinoplasty", ar: "تجميل الأنف" },
     { code: "revision_rhinoplasty", en: "Revision rhinoplasty", ar: "إعادة تجميل الأنف" },
   ];
@@ -176,7 +177,7 @@ describe("useProcedures hook", () => {
   });
 
   it("preserves exact backend codes and both en and ar labels without aliases", async () => {
-    const rawBackendData: proceduresService.ProcedureOption[] = [
+    const rawBackendData: ProcedureOption[] = [
       { code: "rhinoplasty", en: "Rhinoplasty", ar: "تجميل الأنف" },
       { code: "revision_rhinoplasty", en: "Revision rhinoplasty", ar: "إعادة تجميل الأنف" },
     ];

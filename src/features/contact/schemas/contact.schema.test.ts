@@ -11,6 +11,10 @@ const procedures = [{ code: 'rhinoplasty', en: 'Rhinoplasty', ar: 'تجميل ا
 const valid: ContactValues = { name: 'Test', country: 'tr', procedure: 'rhinoplasty', email: 'test@example.test', phone: '', preferred_contact: 'email', message: '' };
 
 describe('contact validation', () => {
+  it('rejects retired procedures while accepting legacy active options', () => {
+    expect(validateContact(valid, true, countries, [{ ...procedures[0], status: 'retired' }])).toMatchObject({ procedure: 'requiredProcedure' });
+    expect(validateContact(valid, true, countries, procedures)).toEqual({});
+  });
   it('accepts the country-only default email journey', () => {
     expect(validateContact(valid, true, countries, procedures)).toEqual({});
   });

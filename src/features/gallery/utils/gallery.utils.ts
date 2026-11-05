@@ -1,6 +1,7 @@
 import {
   TIMEFRAME_OPTIONS,
 } from "../constants/gallery.constants";
+import type { GalleryOption } from "../types/gallery.types";
 
 type GetLabel = (key: string) => string;
 
@@ -18,7 +19,23 @@ function getFilterLabel(
 export function getTimeframeLabel(
   value: string | undefined,
   getLabel: GetLabel,
+  dynamicTimeframes?: readonly GalleryOption[],
+  locale?: string,
 ): string {
+  if (!value) return "";
+
+  if (dynamicTimeframes && dynamicTimeframes.length > 0) {
+    const found = dynamicTimeframes.find((candidate) => candidate.code === value);
+    if (found) {
+      const isRetired = found.retired || found.status === "retired";
+      const base = locale === "ar" ? found.ar : found.en;
+      if (isRetired) {
+        return locale === "ar" ? `${base} (متقاعد)` : `${base} (Retired)`;
+      }
+      return base;
+    }
+  }
+
   return getFilterLabel(value, TIMEFRAME_OPTIONS, getLabel);
 }
 

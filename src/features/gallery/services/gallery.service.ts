@@ -4,6 +4,7 @@ import type {
   GalleryCaptionContent,
   GalleryContentResponse,
   GalleryListResponse,
+  GalleryOptionsResponse,
   GalleryPublicCase,
   GalleryQueryParams,
   GallerySectionContent,
@@ -97,4 +98,24 @@ export async function fetchGalleryContent(
   }
 
   return { section, captions };
+}
+
+export async function fetchGalleryOptions(
+  options: FetchGalleryOptions = {},
+): Promise<GalleryOptionsResponse> {
+  const json = await apiRequest<GalleryOptionsResponse>(
+    "/api/v1/gallery/options",
+    {
+      signal: options.signal,
+      headers: options.headers,
+      cache: options.cache,
+    },
+  );
+
+  return {
+    data: {
+      procedures: json?.data?.procedures ?? [],
+      timeframes: json?.data?.timeframes ?? [],
+    },
+  };
 }

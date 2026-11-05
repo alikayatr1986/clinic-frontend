@@ -2,10 +2,8 @@
 
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
-import {
-  fetchProcedures,
-  type ProcedureOption,
-} from "../services/procedures.service";
+import { fetchProcedures } from "../services/procedures.service";
+import type { ProcedureOption } from "../types/procedures.types";
 
 export type { ProcedureOption };
 
@@ -17,7 +15,7 @@ export function proceduresQueryOptions() {
   return queryOptions({
     queryKey: proceduresKeys.all,
     queryFn: ({ signal }) => fetchProcedures({ signal }),
-    staleTime: Infinity,
+    staleTime: 60_000,
     retry: false,
     retryOnMount: false,
     refetchOnWindowFocus: false,

@@ -11,6 +11,7 @@ import {
 import { useProcedures } from "@/features/procedures/hooks/useProcedures";
 import { Badge } from "@/components/ui/badge";
 import { GalleryComparison } from "./GalleryComparison";
+import { useGalleryOptions } from "../hooks/useGalleryOptions";
 import {
   getTimeframeLabel,
 } from "../utils/gallery.utils";
@@ -25,6 +26,7 @@ export function GalleryLightbox({
   const t = useTranslations("gallery");
   const locale = useLocale();
   const { procedures } = useProcedures();
+  const { timeframes } = useGalleryOptions();
 
   if (!item) {
     return null;
@@ -35,8 +37,10 @@ export function GalleryLightbox({
   }
 
   const procedure = procedures.find((p) => p.code === item.procedure_tag);
-  const procedureLabel = procedure ? (locale === "ar" ? procedure.ar : procedure.en) : item.procedure_tag;
-  const timeframeLabel = getTimeframeLabel(item.timeframe_badge, getLabel);
+  const procedureLabel = procedure
+    ? `${locale === "ar" ? procedure.ar : procedure.en}${procedure.retired || procedure.status === "retired" ? (locale === "ar" ? " (متقاعد)" : " (Retired)") : ""}`
+    : item.procedure_tag;
+  const timeframeLabel = getTimeframeLabel(item.timeframe_badge, getLabel, timeframes, locale);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -1,14 +1,6 @@
 import { apiRequest } from "@/lib/api";
 
-export interface ProcedureOption {
-  code: string;
-  en: string;
-  ar: string;
-}
-
-export interface FetchProceduresOptions {
-  signal?: AbortSignal;
-}
+import type { ProcedureOption, FetchProceduresOptions } from "../types/procedures.types";
 
 /**
  * Fetch the procedure catalog from the backend API.

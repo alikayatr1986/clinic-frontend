@@ -47,6 +47,33 @@ export interface GalleryContentResponse {
   data: GalleryContentItem[];
 }
 
+export interface GalleryOption {
+  code: string;
+  en: string;
+  ar: string;
+  status?: "draft" | "active" | "retired" | string;
+  retired?: boolean;
+}
+
+export interface GalleryOptionsData {
+  procedures: GalleryOption[];
+  timeframes: GalleryOption[];
+}
+
+export interface GalleryOptionsResponse {
+  data: GalleryOptionsData;
+}
+
+export interface UseGalleryOptionsResult {
+  procedures: GalleryOption[];
+  timeframes: GalleryOption[];
+  isLoading: boolean;
+  isError: boolean;
+  error: unknown;
+  retry: () => Promise<unknown>;
+  refetch: () => Promise<unknown>;
+}
+
 export interface GalleryQueryParams {
   page?: number;
   page_size?: number;

@@ -14,6 +14,7 @@ import {
   TIMEFRAME_OPTIONS,
 } from "../constants/gallery.constants";
 import { useGalleryCases } from "../hooks/useGalleryCases";
+import { useGalleryOptions } from "../hooks/useGalleryOptions";
 import type {
   GalleryBrowserProps,
   GalleryPublicCase,
@@ -31,6 +32,7 @@ export function GalleryBrowser({
   const t = useTranslations("gallery");
   const locale = useLocale();
   const { procedures, error: catalogError, retry: retryCatalog } = useProcedures();
+  const { timeframes, isLoading: isOptionsLoading } = useGalleryOptions();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -48,8 +50,11 @@ export function GalleryBrowser({
   const parsedPage = rawPage ? parseInt(rawPage, 10) : initialPage;
   const isPageInvalid = isNaN(parsedPage) || parsedPage < 1;
   const isTimeInvalid =
+    !isOptionsLoading &&
     rawTimeframe !== "" &&
-    !TIMEFRAME_OPTIONS.some((opt) => opt.value === rawTimeframe);
+    (timeframes.length > 0
+      ? !timeframes.some((opt) => opt.code === rawTimeframe)
+      : !TIMEFRAME_OPTIONS.some((opt) => opt.value === rawTimeframe));
 
   const pageToQuery = isPageInvalid ? 1 : parsedPage;
   const currentProcedure = rawProcedure;
@@ -143,6 +148,7 @@ export function GalleryBrowser({
     totalPages,
     isPageInvalid,
     isTimeInvalid,
+    isOptionsLoading,
     rawProcedure,
     rawTimeframe,
     rawPage,
@@ -288,7 +294,7 @@ export function GalleryBrowser({
               <option value="">{t("allProcedures")}</option>
               {procedures.map((opt) => (
                 <option key={opt.code} value={opt.code}>
-                  {locale === "ar" ? opt.ar : opt.en}
+                  {locale === "ar" ? opt.ar : opt.en}{(opt.retired || opt.status === "retired") && (locale === "ar" ? " (متقاعد)" : " (Retired)")}
                 </option>
               ))}
             </Select>
@@ -319,11 +325,21 @@ export function GalleryBrowser({
               className="text-sm"
             >
               <option value="">{t("allTimeframes")}</option>
-              {TIMEFRAME_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {t(opt.labelKey as never)}
-                </option>
-              ))}
+              {timeframes.length > 0
+                ? timeframes.map((opt) => {
+                    const isRetired = opt.retired || opt.status === "retired";
+                    const base = locale === "ar" ? opt.ar : opt.en;
+                    return (
+                      <option key={opt.code} value={opt.code}>
+                        {isRetired ? `${base} (${locale === "ar" ? "متقاعد" : "Retired"})` : base}
+                      </option>
+                    );
+                  })
+                : TIMEFRAME_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {t(opt.labelKey as never)}
+                    </option>
+                  ))}
             </Select>
           </div>
 

@@ -14,6 +14,19 @@ vi.mock("@/features/procedures/hooks/useProcedures", () => ({
   ], error: false, retry: vi.fn() }),
 }));
 
+let mockDynamicTimeframes: { code: string; en: string; ar: string; status?: string; retired?: boolean }[] = [];
+vi.mock("../hooks/useGalleryOptions", () => ({
+  useGalleryOptions: () => ({
+    timeframes: mockDynamicTimeframes,
+    procedures: [],
+    isLoading: false,
+    isError: false,
+    error: null,
+    retry: vi.fn(),
+    refetch: vi.fn(),
+  }),
+}));
+
 const mockCase: GalleryPublicCase = {
   id: "case-card-uuid",
   url: "/api/v1/gallery/case-card-uuid/media/display",
@@ -53,6 +66,72 @@ describe("GalleryCard", () => {
       name: enMessages.gallery.enlargeCase.replace("{id}", mockCase.id),
     });
     expect(enlargeBtn).toBeInTheDocument();
+  });
+
+  it("renders localized dynamic timeframe badge when available", () => {
+    mockDynamicTimeframes = [
+      { code: "0-3-months", en: "0-3 Months Post-Op", ar: "0-3 أشهر بعد الجراحة", status: "active" },
+    ];
+    const caseWithDynamicTf: GalleryPublicCase = {
+      ...mockCase,
+      timeframe_badge: "0-3-months",
+    };
+
+    const { unmount } = themedRender(
+      <GalleryCard
+        item={caseWithDynamicTf}
+        caption={mockCaption}
+        onEnlarge={vi.fn()}
+      />,
+      { locale: "en", dir: "ltr" },
+    );
+
+    expect(screen.getByText("0-3 Months Post-Op")).toBeInTheDocument();
+    unmount();
+
+    themedRender(
+      <GalleryCard
+        item={caseWithDynamicTf}
+        caption={mockCaption}
+        onEnlarge={vi.fn()}
+      />,
+      { locale: "ar", dir: "rtl" },
+    );
+
+    expect(screen.getByText("0-3 أشهر بعد الجراحة")).toBeInTheDocument();
+  });
+
+  it("renders localized label with (Retired) indicator for historical case referencing retired timeframe", () => {
+    mockDynamicTimeframes = [
+      { code: "retired-time", en: "Old 3 Months", ar: "3 أشهر قديمة", status: "retired", retired: true },
+    ];
+    const caseWithRetiredTf: GalleryPublicCase = {
+      ...mockCase,
+      timeframe_badge: "retired-time",
+    };
+
+    const { unmount } = themedRender(
+      <GalleryCard
+        item={caseWithRetiredTf}
+        caption={mockCaption}
+        onEnlarge={vi.fn()}
+      />,
+      { locale: "en", dir: "ltr" },
+    );
+
+    expect(screen.getByText("Old 3 Months (Retired)")).toBeInTheDocument();
+    unmount();
+
+    themedRender(
+      <GalleryCard
+        item={caseWithRetiredTf}
+        caption={mockCaption}
+        onEnlarge={vi.fn()}
+      />,
+      { locale: "ar", dir: "rtl" },
+    );
+
+    expect(screen.getByText("3 أشهر قديمة (متقاعد)")).toBeInTheDocument();
   });
 
   it("calls onEnlarge when enlarge button is clicked", async () => {

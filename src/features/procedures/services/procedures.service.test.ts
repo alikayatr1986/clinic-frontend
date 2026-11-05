@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, ApiError } from "@/lib/api";
-import { fetchProcedures, type ProcedureOption } from "./procedures.service";
+import { fetchProcedures } from "./procedures.service";
+import type { ProcedureOption } from "../types/procedures.types";
 
 vi.mock("@/lib/api", () => ({
   apiRequest: vi.fn(),

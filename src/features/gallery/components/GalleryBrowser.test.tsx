@@ -37,6 +37,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("../services/gallery.service", () => ({
   fetchGalleryCases: vi.fn(),
   fetchGalleryContent: vi.fn(),
+  fetchGalleryOptions: vi.fn(),
 }));
 
 const mockCases: GalleryPublicCase[] = Array.from({ length: 15 }, (_, i) => ({
@@ -79,6 +80,17 @@ describe("GalleryBrowser", () => {
           alt_text: "Case 1 alt text",
           caption: "Case 1 caption",
         },
+      },
+    });
+
+    vi.mocked(galleryService.fetchGalleryOptions).mockResolvedValue({
+      data: {
+        procedures: [],
+        timeframes: [
+          { code: "0-3-months", en: "0-3 Months", ar: "0-3 أشهر", status: "active" },
+          { code: "1-month", en: "1 Month Post-Op", ar: "شهر بعد العملية", status: "active" },
+          { code: "6-months", en: "6 Months Post-Op", ar: "6 أشهر بعد العملية", status: "active" },
+        ],
       },
     });
   });
@@ -133,6 +145,46 @@ describe("GalleryBrowser", () => {
     await user.selectOptions(procedureSelect, "rhinoplasty");
 
     expect(mockPush).toHaveBeenCalledWith("/gallery?procedure_tag=rhinoplasty");
+  });
+
+  it("populates dynamic timeframes and updates URL on timeframe filter change", async () => {
+    const user = userEvent.setup();
+    themedRender(<GalleryBrowser />);
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId("gallery-card")).toHaveLength(12);
+    });
+
+    const timeframeSelect = screen.getByRole("combobox", {
+      name: enMessages.gallery.filterTimeframe,
+    });
+    await waitFor(() => {
+      expect(within(timeframeSelect).getByText("1 Month Post-Op")).toBeInTheDocument();
+    });
+    expect(within(timeframeSelect).getByText("6 Months Post-Op")).toBeInTheDocument();
+
+    await user.selectOptions(timeframeSelect, "1-month");
+
+    expect(mockPush).toHaveBeenCalledWith("/gallery?timeframe_badge=1-month");
+  });
+
+  it("preserves valid dynamic timeframe query parameter on initial mount without calling router.replace", async () => {
+    mockSearchParams = new URLSearchParams("timeframe_badge=0-3-months");
+
+    themedRender(<GalleryBrowser />);
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId("gallery-card")).toHaveLength(12);
+    });
+
+    expect(mockReplace).not.toHaveBeenCalled();
+    expect(mockSearchParams.get("timeframe_badge")).toBe("0-3-months");
+    expect(galleryService.fetchGalleryCases).toHaveBeenCalledWith(
+      expect.objectContaining({
+        timeframe_badge: "0-3-months",
+      }),
+      expect.anything(),
+    );
   });
 
   it("shows and operates the reset filters button", async () => {

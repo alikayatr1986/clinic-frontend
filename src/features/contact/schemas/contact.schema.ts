@@ -1,4 +1,4 @@
-import type { ProcedureOption } from '@/features/procedures/services/procedures.service';
+import type { ProcedureOption } from '@/features/procedures/types/procedures.types';
 import type { ContactCountry, ContactErrors, ContactValues } from '@/features/contact/types/contact.types';
 import { normalizeContactPhone } from '@/features/contact/utils/contact-phone.utils';
 
@@ -6,7 +6,7 @@ export function validateContact(values: ContactValues, accepted: boolean, countr
   const errors: ContactErrors = {};
   if (!values.name.trim() || [...values.name.trim()].length > 200) errors.name = 'requiredName';
   if (!countries.some((item) => item.code === values.country)) errors.country = 'requiredCountry';
-  if (!procedures.some((item) => item.code === values.procedure)) errors.procedure = 'requiredProcedure';
+  if (!procedures.some((item) => item.code === values.procedure && item.status !== "retired" && !item.retired)) errors.procedure = 'requiredProcedure';
   if (values.preferred_contact === 'email') {
     if (values.email.trim().length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) errors.email = 'invalidEmail';
   } else {

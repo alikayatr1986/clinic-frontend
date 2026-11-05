@@ -18,6 +18,7 @@ const contactMethods: ContactMethod[] = ["email", "phone_call", "whatsapp", "tel
 export function ContactForm({ config, locale, form }: ContactFormProps) {
   const t = useTranslations("contact");
   const { procedures, catalogError, consent, consentError, consentRefreshing, submitMutation, values, accepted, errors, setErrors, status, captchaPending, captchaState, setCaptchaState, setCaptchaAttempt, summary, captchaConfigured, captchaBypass, captchaReady, locationsAvailable, telephoneDraft, dialCountries, dialCountry, busy, success, setAccepted, change, changeMethod, changeEmail, changePhone, changeDialCountry, retryDependencies, submit } = form;
+  const activeProcedures = procedures.filter((item) => item.status !== "retired" && !item.retired);
   function field(
     key: keyof ContactValues,
     control: ReactNode,
@@ -96,7 +97,7 @@ export function ContactForm({ config, locale, form }: ContactFormProps) {
                 </Button>
               </div>
             ) : (
-              (!consent || !procedures.length) && (
+              (!consent || !activeProcedures.length) && (
                 <p role="status" className="mb-5 text-sm">
                   {t("loading")}
                 </p>
@@ -252,12 +253,12 @@ export function ContactForm({ config, locale, form }: ContactFormProps) {
                 "procedure",
                 <Select
                     {...attributes("procedure")}
-                    disabled={!procedures.length || catalogError}
+                    disabled={!activeProcedures.length || catalogError}
                     value={values.procedure}
                     onChange={(event) => change("procedure", event.target.value)}
                   >
                     <option value="">{t("selectProcedure")}</option>
-                    {procedures.map((item) => (
+                    {activeProcedures.map((item) => (
                       <option key={item.code} value={item.code}>
                         {item[locale]}
                       </option>
@@ -345,7 +346,7 @@ export function ContactForm({ config, locale, form }: ContactFormProps) {
                     !consent ||
                     consentError ||
                     catalogError ||
-                    !procedures.length ||
+                    !activeProcedures.length ||
                     !locationsAvailable ||
                     !captchaReady ||
                     success
