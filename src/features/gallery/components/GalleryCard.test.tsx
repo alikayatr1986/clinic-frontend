@@ -150,7 +150,7 @@ describe("GalleryCard", () => {
       name: enMessages.gallery.enlargeCase.replace("{id}", mockCase.id),
     });
     await user.click(enlargeBtn);
-    expect(onEnlarge).toHaveBeenCalledWith(mockCase);
+    expect(onEnlarge).toHaveBeenCalledWith(mockCase, expect.any(HTMLButtonElement));
   });
 
   it("anchors Before/After labels to physical sides in Arabic RTL", () => {

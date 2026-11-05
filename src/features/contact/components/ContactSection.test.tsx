@@ -212,6 +212,20 @@ describe('ContactSection', () => {
     expect(screen.getByLabelText(/Phone number/)).toHaveValue('0532 111 2233');
   });
 
+  it('keeps email and consent through method switches and clears them after success', async () => {
+    themedRender(<ContactSection config={config} />);
+    await fillBase();
+    fireEvent.change(screen.getByLabelText(/Email address/), { target: { value: 'person@example.test' } });
+    await userEvent.click(screen.getByRole('radio', { name: 'Phone call' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Email' }));
+    expect(screen.getByLabelText(/Email address/)).toHaveValue('person@example.test');
+    expect(screen.getByRole('checkbox')).toBeChecked();
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+    await screen.findByText('Message sent successfully.');
+    expect(screen.getByLabelText(/Email address/)).toHaveValue('');
+    expect(screen.getByRole('checkbox')).not.toBeChecked();
+  });
+
   it('blocks telephone submission when residence has no reviewed dial metadata', async () => {
     themedRender(<ContactSection config={config} />);
     await fillBase();

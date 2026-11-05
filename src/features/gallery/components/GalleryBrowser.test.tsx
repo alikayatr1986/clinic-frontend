@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
-import { screen, waitFor, within } from "@testing-library/react";
+import { act, screen, waitFor, within } from "@testing-library/react";
+import { QueryClient } from "@tanstack/react-query";
+import { galleryCasesQueryOptions } from "../hooks/useGalleryCases";
 import { GalleryBrowser } from "./GalleryBrowser";
 import { axePass, themedRender } from "@/test/utils";
 import { useProcedures } from "@/features/procedures/hooks/useProcedures";
@@ -415,6 +417,33 @@ describe("GalleryBrowser", () => {
     expect(
       screen.getByRole("heading", { name: enMessages.gallery.dialogTitle }),
     ).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(enlargeBtn).toHaveFocus());
+  });
+
+  it("updates an open case from query data and closes when it disappears", async () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const options = galleryCasesQueryOptions("en", { page: 1, page_size: 12, procedure_tag: "", timeframe_badge: "" });
+    themedRender(<GalleryBrowser />, { queryClient });
+    const firstCard = (await screen.findAllByTestId("gallery-card"))[0];
+    await userEvent.click(within(firstCard).getByRole("button", { name: enMessages.gallery.enlargeCase.replace("{id}", "case-1") }));
+    expect(screen.getByRole("dialog")).toHaveTextContent("Rhinoplasty");
+    act(() => {
+      queryClient.setQueryData(options.queryKey, (data) => data && ({
+        ...data,
+        cases: [{ ...mockCases[0], procedure_tag: "revision_rhinoplasty" }, ...mockCases.slice(1, 12)],
+      }));
+    });
+    await waitFor(() => expect(screen.getByRole("dialog")).toHaveTextContent("Revision rhinoplasty"));
+    act(() => {
+      queryClient.setQueryData(options.queryKey, (data) => data && ({ ...data, cases: mockCases.slice(1, 12) }));
+    });
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("gallery-browser")).toHaveFocus());
+    act(() => {
+      queryClient.setQueryData(options.queryKey, (data) => data && ({ ...data, cases: mockCases.slice(0, 12) }));
+    });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("passes axe accessibility checks", async () => {

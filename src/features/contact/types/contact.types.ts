@@ -56,6 +56,8 @@ export interface ContactPhoneInputProps {
 
 
 
+export interface ContactFormBoundaryProps { config: ContactConfig; locale: "en" | "ar" }
+
 export interface ContactFormProps {
   config: ContactConfig;
   locale: "en" | "ar";

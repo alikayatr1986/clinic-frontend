@@ -68,7 +68,7 @@ export function GalleryCard({
             type="button"
             variant="outline"
             size="default"
-            onClick={() => onEnlarge(item)}
+            onClick={(event) => onEnlarge(item, event.currentTarget)}
             aria-label={t("enlargeCase", { id: item.id })}
           >
             <Maximize2 aria-hidden="true" className="size-4 shrink-0" />

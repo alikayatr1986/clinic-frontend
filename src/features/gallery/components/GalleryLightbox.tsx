@@ -22,6 +22,7 @@ export function GalleryLightbox({
   caption,
   open,
   onOpenChange,
+  onCloseAutoFocus,
 }: GalleryLightboxProps) {
   const t = useTranslations("gallery");
   const locale = useLocale();
@@ -44,7 +45,7 @@ export function GalleryLightbox({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent onCloseAutoFocus={onCloseAutoFocus}>
         <DialogHeader>
           <DialogTitle>{t("dialogTitle")}</DialogTitle>
           <DialogDescription>

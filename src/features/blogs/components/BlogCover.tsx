@@ -7,11 +7,14 @@ import type { BlogCoverProps } from "@/features/blogs/types/blogs.types";
 
 /** Cropped cover with a stable-ratio neutral placeholder when missing or broken. */
 export function BlogCover({ cover, className }: BlogCoverProps) {
-  const [broken, setBroken] = useState(false);
+  const [imageState, setImageState] = useState({ url: cover?.url, broken: false });
+  if (imageState.url !== cover?.url) {
+    setImageState({ url: cover?.url, broken: false });
+  }
 
   return (
     <div className={cn("relative overflow-hidden bg-muted", className)}>
-      {cover && !broken ? (
+      {cover && !imageState.broken ? (
         // Gated derivative URLs must bypass the image optimizer cache.
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -20,7 +23,7 @@ export function BlogCover({ cover, className }: BlogCoverProps) {
           width={cover.width}
           height={cover.height}
           loading="lazy"
-          onError={() => setBroken(true)}
+          onError={() => setImageState({ url: cover.url, broken: true })}
           style={{
             objectPosition: `${cover.focal_point.x * 100}% ${cover.focal_point.y * 100}%`,
           }}

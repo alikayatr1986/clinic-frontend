@@ -38,6 +38,7 @@ export function GalleryBrowser({
   const searchParams = useSearchParams();
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const lightboxTriggerRef = useRef<HTMLButtonElement | null>(null);
   const procedureSelectId = useId();
   const timeframeSelectId = useId();
   const hasRecovered400 = useRef<boolean>(false);
@@ -90,8 +91,14 @@ export function GalleryBrowser({
   const [recoveryNotice, setRecoveryNotice] = useState<boolean>(false);
 
   // Lightbox modal state
-  const [lightboxCase, setLightboxCase] = useState<GalleryPublicCase | null>(null);
+  const [lightboxCaseId, setLightboxCaseId] = useState<string | null>(null);
+  const lightboxCase = cases?.find((item) => item.id === lightboxCaseId) ?? null;
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
+
+  if (lightboxCaseId && !lightboxCase) {
+    setIsLightboxOpen(false);
+    setLightboxCaseId(null);
+  }
 
   const totalPages = Math.max(1, Math.ceil(total / DEFAULT_PAGE_SIZE));
 
@@ -230,8 +237,9 @@ export function GalleryBrowser({
     }
   };
 
-  const handleEnlarge = (item: GalleryPublicCase) => {
-    setLightboxCase(item);
+  const handleEnlarge = (item: GalleryPublicCase, trigger: HTMLButtonElement) => {
+    lightboxTriggerRef.current = trigger;
+    setLightboxCaseId(item.id);
     setIsLightboxOpen(true);
   };
 
@@ -242,6 +250,7 @@ export function GalleryBrowser({
   return (
     <div
       ref={containerRef}
+      tabIndex={-1}
       data-testid="gallery-browser"
       className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8"
     >
@@ -506,6 +515,11 @@ export function GalleryBrowser({
         caption={lightboxCase ? captions[lightboxCase.id] : undefined}
         open={isLightboxOpen}
         onOpenChange={setIsLightboxOpen}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          const trigger = lightboxTriggerRef.current;
+          (trigger?.isConnected ? trigger : containerRef.current)?.focus();
+        }}
       />
     </div>
   );

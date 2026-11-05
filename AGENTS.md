@@ -96,6 +96,17 @@ Local React state (`useState`/`useReducer`) is strictly reserved for ephemeral U
 - Local pagination display and viewport/scroll-derived state
 - Client-side focus management and accessible announcements
 
+Keep transient UI state and its handlers in the smallest stable component that
+needs them. When multiple components need to coordinate, keep a single source
+of truth in their closest common owner. Extract a section when it has a clear
+responsibility or isolating frequently updated state reduces unnecessary work;
+do not split components solely to reduce render counts. A custom hook alone does
+not isolate renders from its calling component.
+
+Define components outside other components and preserve intentional state and
+draft lifetimes when moving or conditionally rendering them. Use the React
+Profiler to investigate a slow interaction before adding memoization.
+
 ### 4. Query-key ownership and key factories
 Query keys must be stable, serializable arrays owned by the feature and exposed via a query key factory (e.g. `galleryKeys`, `blogKeys`, `contactKeys`, `proceduresKeys`).
 - Query keys must include all request dimensions that affect the response: `locale`, `page`, `page_size`, filters, and entity identifiers.

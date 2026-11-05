@@ -102,7 +102,7 @@ export interface GalleryBrowserProps {
 export interface GalleryCardProps {
   item: GalleryPublicCase;
   caption?: GalleryCaptionContent;
-  onEnlarge: (item: GalleryPublicCase) => void;
+  onEnlarge: (item: GalleryPublicCase, trigger: HTMLButtonElement) => void;
   priority?: boolean;
 }
 
@@ -121,6 +121,7 @@ export interface GalleryLightboxProps {
   caption?: GalleryCaptionContent;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCloseAutoFocus?: (event: Event) => void;
 }
 
 

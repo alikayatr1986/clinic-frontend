@@ -1,25 +1,15 @@
 "use client";
 
-import Script from "next/script";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { contactTrustIcons } from "@/features/contact/constants/contact.constants";
-import { useContactForm } from "@/features/contact/hooks/useContactForm";
 import type { ContactSectionProps } from "@/features/contact/types/contact.types";
-import { ContactForm } from "./ContactForm";
+import { ContactFormBoundary } from "./ContactFormBoundary";
 import { ContactInformation } from "./ContactInformation";
 
 export function ContactSection({ config }: ContactSectionProps) {
   const t = useTranslations("contact");
   const locale = useLocale() === "ar" ? "ar" : "en";
-  const form = useContactForm(config, locale);
-  const {
-    successToast,
-    captchaConfigured,
-    captchaBypass,
-    captchaAttempt,
-    setCaptchaState,
-  } = form;
 
   return (
     <section
@@ -37,27 +27,6 @@ export function ContactSection({ config }: ContactSectionProps) {
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-72 -start-72 -z-10 size-[34rem] rounded-full border-[5rem] border-secondary/40"
       />
-      <div
-        role="status"
-        aria-live="polite"
-        className={
-          successToast
-            ? "fixed bottom-4 end-4 z-50 max-w-[calc(100vw-2rem)] rounded-lg border border-border bg-card px-5 py-4 text-sm text-foreground shadow-lg motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2"
-            : "sr-only"
-        }
-      >
-        {successToast ? t("success") : ""}
-      </div>
-      {captchaConfigured && !captchaBypass && (
-        <Script
-          key={captchaAttempt}
-          id={`contact-recaptcha-${captchaAttempt}`}
-          src={`https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(config.captcha.siteKey)}${captchaAttempt ? `&contact_retry=${captchaAttempt}` : ""}`}
-          strategy="afterInteractive"
-          onReady={() => setCaptchaState("ready")}
-          onError={() => setCaptchaState("error")}
-        />
-      )}
       <div className="mx-auto grid max-w-7xl min-w-0 items-start gap-8 px-4 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:gap-x-12 lg:px-8">
         <div className="min-w-0 lg:col-start-1 lg:row-start-1">
           <p className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[.2em] text-muted-foreground before:h-px before:w-12 before:shrink-0 before:bg-primary before:content-['']">
@@ -90,7 +59,7 @@ export function ContactSection({ config }: ContactSectionProps) {
             ),
           )}
         </ul>
-        <ContactForm config={config} locale={locale} form={form} />
+        <ContactFormBoundary config={config} locale={locale} />
         <ContactInformation config={config} locale={locale} />
       </div>
     </section>
