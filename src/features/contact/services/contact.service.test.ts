@@ -126,6 +126,15 @@ describe('contact transport service', () => {
       });
     });
 
+    it('serializes proof and flow only together', async () => {
+      vi.mocked(apiRequest).mockResolvedValue({ data: { id: 'id' } });
+      await submitContact(values, { version: 'v1', text: 'Consent' }, 'en', 'token', { proof: 'proof', flow: 'flow' });
+      expect(vi.mocked(apiRequest).mock.calls[0][1]?.body).toMatchObject({ verification_proof: 'proof', verification_flow: 'flow' });
+      await submitContact(values, { version: 'v1', text: 'Consent' }, 'en', 'token', { proof: 'proof' });
+      expect(vi.mocked(apiRequest).mock.calls[1][1]?.body).not.toHaveProperty('verification_proof');
+      expect(vi.mocked(apiRequest).mock.calls[1][1]?.body).not.toHaveProperty('verification_flow');
+    });
+
     it('forwards caller signal to apiRequest', async () => {
       vi.mocked(apiRequest).mockResolvedValueOnce({ data: { id: 'opaque-lead-id' } });
       const controller = new AbortController();

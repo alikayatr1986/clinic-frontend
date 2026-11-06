@@ -2,10 +2,11 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { getDialCountries } from "@/features/contact/constants/contact.constants";
 import { useProcedures } from "@/features/procedures/hooks/useProcedures";
 import { validateContact } from "@/features/contact/schemas/contact.schema";
-import { isAbortError } from "@/lib/api";
+import { ApiError, isAbortError } from "@/lib/api";
 import { ContactApiError } from "@/features/contact/services/contact.service";
 import { freshCaptchaToken } from "@/features/contact/services/captcha.service";
 import { useConsent } from "@/features/contact/hooks/useConsent";
+import { useVerification } from "@/features/contact/hooks/useVerification";
 import { useSubmitContact } from "@/features/contact/hooks/useSubmitContact";
 import { normalizeContactPhone } from "@/features/contact/utils/contact-phone.utils";
 import type { ContactConfig, ContactCopyKey, ContactDrafts, ContactErrors, ContactMethod, ContactValues } from "@/features/contact/types/contact.types";
@@ -39,6 +40,12 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
     isRefreshing: consentRefreshing,
   } = useConsent(locale);
   const submitMutation = useSubmitContact();
+  const verification = useVerification();
+  const [verificationState, setVerificationState] = useState({ challenge: "", flow: "", proof: "", code: "", destination: "", method: "", failed: false, fallback: false });
+  const verificationGeneration = useRef(0);
+  const verifying = useRef(false);
+  const [verificationPending, setVerificationPending] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState<ContactCopyKey | "">("");
 
   const [values, setValues] = useState<ContactValues>(emptyValues);
   const [drafts, setDrafts] = useState<ContactDrafts>(emptyDrafts);
@@ -72,7 +79,7 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
     (item) => item.code === telephoneDraft?.dialCountry,
   );
 
-  const busy = captchaPending || submitMutation.isPending || consentRefreshing;
+  const busy = captchaPending || submitMutation.isPending || consentRefreshing || verificationPending;
   const success = submitMutation.isSuccess;
 
   function setAccepted(value: boolean) {
@@ -98,6 +105,7 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
     setValues((previous) => ({ ...previous, [key]: value }));
     setErrors((previous) => ({ ...previous, [key]: undefined }));
     if (key === "country") {
+      clearVerification();
       const selected = String(value);
       setDrafts((previous) => ({
         ...previous,
@@ -116,7 +124,14 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
     }
   }
 
+  function clearVerification() {
+    verificationGeneration.current++;
+    setVerificationState({ challenge: "", flow: "", proof: "", code: "", destination: "", method: "", failed: false, fallback: false });
+    setVerificationMessage("");
+  }
+
   function changeMethod(method: ContactMethod) {
+    clearVerification();
     setValues((previous) => ({
       ...previous,
       preferred_contact: method,
@@ -133,11 +148,13 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
   }
 
   function changeEmail(value: string) {
+    clearVerification();
     setDrafts((previous) => ({ ...previous, email: value }));
     change("email", value);
   }
 
   function changePhone(value: string) {
+    clearVerification();
     if (!telephoneMethod) return;
     setDrafts((previous) => ({
       ...previous,
@@ -147,6 +164,7 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
   }
 
   function changeDialCountry(value: string) {
+    clearVerification();
     if (!telephoneMethod) return;
     setDrafts((previous) => ({
       ...previous,
@@ -157,6 +175,38 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
       dial_country: undefined,
       phone: undefined,
     }));
+  }
+
+  async function verifyContact(operation: "issue" | "resend" | "check" | "fallback" | "undelivered") {
+    if (verifying.current) return;
+    const destination = telephoneMethod && dialCountry?.dialRegion
+      ? normalizeContactPhone(values.phone, dialCountry.dialRegion) : values.email.trim().toLowerCase();
+    if (!destination || !captchaReady) { setVerificationMessage("verificationInvalid"); return; }
+    verifying.current = true;
+    setVerificationPending(true);
+    const generation = verificationGeneration.current;
+    setVerificationMessage("verificationLoading");
+    try {
+      const token = captchaBypass
+        ? `local-${Array.from(crypto.getRandomValues(new Uint32Array(4)), (part) => part.toString(16).padStart(8, "0")).join("")}`
+        : await freshCaptchaToken(config.captcha.siteKey, config.captcha.action);
+      const result = await verification.mutation.mutateAsync({ operation, input: {
+        method: values.preferred_contact, destination, recaptcha_token: token,
+        ...(operation !== "issue" ? { challenge: verificationState.challenge, flow: verificationState.flow } : {}),
+        ...(operation === "check" ? { code: verificationState.code } : {}),
+        ...(operation === "fallback" ? { sms_consent: true } : {}),
+      }});
+      if (generation !== verificationGeneration.current) return;
+      setVerificationState((previous) => ({ ...previous, challenge: result.challenge ?? previous.challenge, flow: result.flow ?? previous.flow, proof: result.proof ?? "", destination, method: values.preferred_contact, failed: operation === "undelivered", fallback: operation === "fallback" || previous.fallback }));
+      setVerificationMessage(operation === "check" ? "verificationSuccess" : operation === "undelivered" ? "verificationUndeliveredRecorded" : "verificationSent");
+    } catch (error) {
+      if (generation === verificationGeneration.current) {
+        setVerificationMessage(error instanceof ApiError && error.status === 429 ? "verificationThrottled" : "verificationFailed");
+      }
+    } finally {
+      verifying.current = false;
+      setVerificationPending(false);
+    }
   }
 
   function announce(message: ContactCopyKey) {
@@ -184,7 +234,7 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (submitting.current) return;
+    if (submitting.current || verifying.current) return;
     submitMutation.reset();
     setSuccessToast(0);
     const invalid = validateContact(
@@ -209,6 +259,10 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
       !locationsAvailable
     ) {
       announce("dependenciesUnavailable");
+      return;
+    }
+    if (!verification.policy.data || (verification.policy.data[values.preferred_contact] && (!verificationState.proof || verificationState.method !== values.preferred_contact))) {
+      announce("verificationRequired");
       return;
     }
     if (!captchaReady) {
@@ -249,9 +303,12 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
         consent,
         locale,
         token,
+        proof: verificationState.proof,
+        flow: verificationState.flow,
       });
       setValues(emptyValues);
       setDrafts(emptyDrafts);
+      clearVerification();
       setAccepted(false);
       setErrors({});
       setStatus("");
@@ -266,6 +323,9 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
         void retryConsent();
         setErrors({ consent_accepted: "requiredConsent" });
         announce("consentChanged");
+      } else if (error instanceof ContactApiError && error.code === "CHALLENGE_REQUIRED" && verificationState.proof) {
+        clearVerification();
+        announce("verificationExpired");
       } else if (error instanceof ContactApiError && error.status === 403) {
         announce("challenge");
       } else if (error instanceof ContactApiError && error.status === 429) {
@@ -294,5 +354,5 @@ export function useContactForm(config: ContactConfig, locale: "en" | "ar") {
     }
   }
 
-  return { procedures, catalogError, consent, consentError, consentRefreshing, submitMutation, values, accepted, errors, setErrors, status, successToast, captchaPending, captchaState, setCaptchaState, captchaAttempt, setCaptchaAttempt, summary, captchaConfigured, captchaBypass, captchaReady, locationsAvailable, telephoneDraft, dialCountries, dialCountry, busy, success, setAccepted, change, changeMethod, changeEmail, changePhone, changeDialCountry, retryDependencies, submit };
+  return { verification, clearVerification, verificationState, setVerificationState, verificationMessage, verifyContact, procedures, catalogError, consent, consentError, consentRefreshing, submitMutation, values, accepted, errors, setErrors, status, successToast, captchaPending, captchaState, setCaptchaState, captchaAttempt, setCaptchaAttempt, summary, captchaConfigured, captchaBypass, captchaReady, locationsAvailable, telephoneDraft, dialCountries, dialCountry, busy, success, setAccepted, change, changeMethod, changeEmail, changePhone, changeDialCountry, retryDependencies, submit };
 }

@@ -5,10 +5,12 @@ import { axePass, themedRender } from '@/test/utils';
 import { ContactSection } from './ContactSection';
 import { contactMethodIcons, contactTrustIcons, getContactConfig } from '@/features/contact/constants/contact.constants';
 import { ContactApiError, fetchConsent, submitContact } from '@/features/contact/services/contact.service';
+import { fetchVerificationPolicy, operateVerification } from '@/features/contact/services/verification.service';
 import { freshCaptchaToken } from '@/features/contact/services/captcha.service';
 import type { ContactConfig } from '@/features/contact/types/contact.types';
 
 vi.mock('@/features/contact/services/contact.service', async (original) => ({ ...await original<typeof import('@/features/contact/services/contact.service')>(), fetchConsent: vi.fn(), submitContact: vi.fn() }));
+vi.mock('@/features/contact/services/verification.service', () => ({ fetchVerificationPolicy: vi.fn(), operateVerification: vi.fn() }));
 vi.mock('@/features/contact/services/captcha.service', () => ({ freshCaptchaToken: vi.fn() }));
 vi.mock('@/features/procedures/hooks/useProcedures', () => ({ useProcedures: () => ({ procedures: [{ code: 'rhinoplasty', en: 'Rhinoplasty', ar: 'تجميل الأنف' }], error: false, retry: vi.fn() }) }));
 const script = vi.hoisted(() => ({ outcome: 'ready' as 'ready' | 'error' | 'stall' }));
@@ -45,6 +47,7 @@ async function fillBase() {
 beforeEach(() => {
   vi.clearAllMocks();
   script.outcome = 'ready';
+  vi.mocked(fetchVerificationPolicy).mockResolvedValue({ email: false, phone_call: false, whatsapp: false, telegram: false });
   vi.mocked(fetchConsent).mockResolvedValue({ version: 'v1', text: 'Current consent' });
   vi.mocked(submitContact).mockResolvedValue('opaque-id');
   vi.mocked(freshCaptchaToken).mockResolvedValue('fresh-token');
@@ -52,6 +55,110 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe('ContactSection', () => {
+  it('never offers fallback when policy disables it', async () => {
+    vi.mocked(fetchVerificationPolicy).mockResolvedValue({ email: false, phone_call: false, whatsapp: true, telegram: false, whatsapp_sms_fallback: false });
+    vi.mocked(operateVerification).mockResolvedValueOnce({ challenge: 'challenge', flow: 'flow' }).mockRejectedValueOnce(new Error('unavailable'));
+    themedRender(<ContactSection config={config} />);
+    await fillBase();
+    fireEvent.click(screen.getByRole('radio', { name: 'WhatsApp' }));
+    fireEvent.change(screen.getByLabelText('Phone number'), { target: { value: '5321234567' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Send code' }));
+    fireEvent.change(await screen.findByLabelText('Verification code'), { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check code' }));
+    await screen.findByText('Verification failed or is temporarily unavailable. Please try again later.');
+    expect(screen.queryByRole('button', { name: 'I did not receive a WhatsApp code' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Send a code by SMS instead' })).not.toBeInTheDocument();
+  });
+
+  it('requires a recorded report and a separate explicit SMS action', async () => {
+    vi.mocked(fetchVerificationPolicy).mockResolvedValue({ email: false, phone_call: false, whatsapp: true, telegram: false, whatsapp_sms_fallback: true });
+    vi.mocked(operateVerification).mockResolvedValueOnce({ challenge: 'challenge', flow: 'flow' }).mockRejectedValueOnce(new Error('unavailable')).mockResolvedValueOnce({ challenge: 'challenge', flow: 'flow' }).mockResolvedValueOnce({ challenge: 'challenge', flow: 'new-flow' });
+    themedRender(<ContactSection config={config} />);
+    await fillBase();
+    fireEvent.click(screen.getByRole('radio', { name: 'WhatsApp' }));
+    fireEvent.change(screen.getByLabelText('Phone number'), { target: { value: '5321234567' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Send code' }));
+    fireEvent.change(await screen.findByLabelText('Verification code'), { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check code' }));
+    await screen.findByText('Verification failed or is temporarily unavailable. Please try again later.');
+    expect(screen.queryByRole('button', { name: 'Send a code by SMS instead' })).not.toBeInTheDocument();
+    expect(screen.getByText(/Wait for the resend cooldown/)).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'I did not receive a WhatsApp code' }));
+    const consent = await screen.findByRole('button', { name: 'Send a code by SMS instead' });
+    expect(vi.mocked(operateVerification).mock.calls.map(([op]) => op)).toEqual(['issue', 'check', 'undelivered']);
+    fireEvent.click(consent);
+    await waitFor(() => expect(operateVerification).toHaveBeenCalledWith('fallback', expect.objectContaining({ method: 'whatsapp', challenge: 'challenge', flow: 'flow', sms_consent: true }), expect.anything()));
+    await screen.findByText('The code was requested by SMS.');
+  });
+
+  it('submits the checked SMS proof with the lead', async () => {
+    vi.mocked(fetchVerificationPolicy).mockResolvedValue({ email: false, phone_call: true, whatsapp: false, telegram: false });
+    vi.mocked(operateVerification).mockResolvedValueOnce({ challenge: 'challenge', flow: 'flow' }).mockResolvedValueOnce({ proof: 'proof' });
+    themedRender(<ContactSection config={config} />);
+    await fillBase();
+    fireEvent.click(screen.getByRole('radio', { name: 'Phone call' }));
+    fireEvent.change(screen.getByLabelText('Phone number'), { target: { value: '5321234567' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Send code' }));
+    fireEvent.change(await screen.findByLabelText('Verification code'), { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check code' }));
+    await screen.findByText('Contact verified.');
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+    await waitFor(() => expect(submitContact).toHaveBeenCalledWith(expect.anything(), expect.anything(), 'en', 'fresh-token', expect.objectContaining({ proof: 'proof', flow: 'flow' })));
+  });
+
+  it('restarts after a rejected lead proof without losing the draft', async () => {
+    vi.mocked(fetchVerificationPolicy).mockResolvedValue({ email: false, phone_call: true, whatsapp: false, telegram: false });
+    vi.mocked(operateVerification).mockResolvedValueOnce({ challenge: 'challenge', flow: 'flow' }).mockResolvedValueOnce({ proof: 'proof' });
+    vi.mocked(submitContact).mockRejectedValueOnce(new ContactApiError(403, 'CHALLENGE_REQUIRED'));
+    themedRender(<ContactSection config={config} />);
+    await fillBase();
+    fireEvent.click(screen.getByRole('radio', { name: 'Phone call' }));
+    fireEvent.change(screen.getByLabelText('Phone number'), { target: { value: '5321234567' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Send code' }));
+    fireEvent.change(await screen.findByLabelText('Verification code'), { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check code' }));
+    await screen.findByText('Contact verified.');
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+    await screen.findByText('Verification expired or was rejected. Please verify again.');
+    expect(screen.getByLabelText(/Full name/)).toHaveValue('Test person');
+    expect(screen.getByRole('button', { name: 'Send code' })).toBeEnabled();
+  });
+
+  it('offers a restart for an expired challenge and disables submission while sending', async () => {
+    vi.mocked(fetchVerificationPolicy).mockResolvedValue({ email: false, phone_call: true, whatsapp: false, telegram: false });
+    let finish!: (value: { challenge: string; flow: string }) => void;
+    vi.mocked(operateVerification).mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+    themedRender(<ContactSection config={config} />);
+    await fillBase();
+    fireEvent.click(screen.getByRole('radio', { name: 'Phone call' }));
+    fireEvent.change(screen.getByLabelText('Phone number'), { target: { value: '5321234567' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Send code' }));
+    await waitFor(() => expect(operateVerification).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled();
+    await act(async () => finish({ challenge: 'challenge', flow: 'flow' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Start verification again' }));
+    expect(screen.getByRole('button', { name: 'Send code' })).toBeEnabled();
+    expect(screen.getByLabelText(/Full name/)).toHaveValue('Test person');
+  });
+
+  it('requires SMS proof and clears it when the number changes', async () => {
+    vi.mocked(fetchVerificationPolicy).mockResolvedValue({ email: false, phone_call: true, whatsapp: false, telegram: false });
+    vi.mocked(operateVerification).mockResolvedValueOnce({ challenge: 'challenge', flow: 'flow' }).mockResolvedValueOnce({ proof: 'proof' });
+    themedRender(<ContactSection config={config} />);
+    await fillBase();
+    fireEvent.click(screen.getByRole('radio', { name: 'Phone call' }));
+    fireEvent.change(screen.getByLabelText('Phone number'), { target: { value: '5321234567' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Send code' }));
+    fireEvent.change(await screen.findByLabelText('Verification code'), { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check code' }));
+    await screen.findByText('Contact verified.');
+    fireEvent.change(screen.getByLabelText('Phone number'), { target: { value: '5321234568' } });
+    expect(screen.queryByText('Contact verified.')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+    expect(await screen.findByText('Complete contact verification before submitting.')).toBeVisible();
+    expect(submitContact).not.toHaveBeenCalled();
+  });
+
   it('uses the supplied icon for each trust item', () => {
     themedRender(<ContactSection config={config} />);
     for (const [title, src] of [['Your choice', contactTrustIcons.trustChoice], ['Your consent', contactTrustIcons.trustConsent], ['Your details', contactTrustIcons.trustContact]]) {

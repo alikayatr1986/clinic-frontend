@@ -7,6 +7,7 @@ import type { Consent } from '@/features/contact/types/contact.types';
 
 export const contactKeys = {
   all: ['contact'] as const,
+  verificationPolicy: () => [...contactKeys.all, 'verification-policy'] as const,
   consent: (locale: string) => [...contactKeys.all, 'consent', locale] as const,
 };
 

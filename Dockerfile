@@ -1,0 +1,28 @@
+FROM node:24-alpine AS build
+WORKDIR /app
+RUN corepack enable
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY . .
+ARG API_BASE_URL
+ARG SITE_URL
+ARG CONTACT_ADDRESS_EN
+ARG CONTACT_ADDRESS_AR
+ARG CONTACT_PUBLIC_EMAIL
+ARG CONTACT_PUBLIC_PHONE
+ARG CONTACT_WHATSAPP_URL
+ARG CONTACT_TELEGRAM_URL
+ARG CONTACT_LOCATIONS_JSON
+ARG CONTACT_CAPTCHA_SITE_KEY
+ARG CONTACT_CAPTCHA_ACTION
+RUN if [ -z "$CONTACT_LOCATIONS_JSON" ]; then unset CONTACT_LOCATIONS_JSON; fi; pnpm build
+
+FROM node:24-alpine AS production
+WORKDIR /app
+ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
+COPY --from=build --chown=node:node /app /app
+USER node
+EXPOSE 3000
+CMD ["./node_modules/.bin/next", "start"]

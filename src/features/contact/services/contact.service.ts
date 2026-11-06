@@ -63,6 +63,7 @@ export async function submitContact(
         consent_version: consent.version,
         lang: locale,
         recaptcha_token: token,
+        ...(options.proof && options.flow ? { verification_proof: options.proof, verification_flow: options.flow } : {}),
       },
       signal: options.signal,
       timeoutMs: 20000,

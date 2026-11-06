@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     const apiOrigin = (process.env.API_BASE_URL || "http://127.0.0.1:8080").replace(/\/$/, "");
     return [
       { source: "/api/v1/consent", destination: `${apiOrigin}/api/v1/consent` },
+      { source: "/api/v1/verification/:path*", destination: `${apiOrigin}/api/v1/verification/:path*` },
       { source: "/api/v1/leads", destination: `${apiOrigin}/api/v1/leads` },
       { source: "/api/v1/procedures", destination: `${apiOrigin}/api/v1/procedures` },
       {

@@ -19,7 +19,7 @@ export function useSubmitContact(): UseMutationResult<
   }, []);
 
   return useMutation({
-    mutationFn: ({ values, consent, locale, token, signal }: SubmitContactArgs) => {
+    mutationFn: ({ values, consent, locale, token, signal, proof, flow }: SubmitContactArgs) => {
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
@@ -36,7 +36,7 @@ export function useSubmitContact(): UseMutationResult<
       }
 
       return submitContact(values, consent, locale, token, {
-        signal: controller.signal,
+        signal: controller.signal, proof, flow,
       });
     },
     retry: false,

@@ -49,8 +49,14 @@ commits.
 - Put domain implementation and its constants, types, hooks, services, schemas,
   helpers, and styles in `src/features/<feature>/`, creating only needed folders.
 - Keep components flat by default. Colocate private supporting files with a
-  complex component when useful. Never declare types or interfaces inside
-  components or pages; all types belong in dedicated `*.types.ts` files.
+  complex component when useful. When a component is decomposed into subcomponents
+  related only to each other (e.g. form cards, sections, field groups, modals),
+  group them in a dedicated subfolder under `components/<group>/`. Do not dump
+  non-shared subcomponents flat into the root `components/` folder.
+- Separate category folders: custom hooks strictly belong in `hooks/`, Zod schemas
+  in `schemas/`, helpers in `utils/`, types in `types/`, and API calls in `services/`.
+  Never leave hooks, schemas, or utils loose in `components/`. Never declare types
+  or interfaces inside components or pages; all types belong in dedicated `*.types.ts` files.
 - Keep generic UI in `src/components/ui/` and application-wide layout in
   `src/components/layout/`. Shared modules must not import feature code.
 - Promote code to global category folders only when ownership and dependencies
