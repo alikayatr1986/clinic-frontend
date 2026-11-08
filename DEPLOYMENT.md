@@ -15,7 +15,7 @@ cp .env.example .env.production
 Edit `.env.production`:
 
 - Set `API_BASE_URL` to the backend origin, for example `http://192.0.2.10:8080`, with no `/api/v1` path. `127.0.0.1` inside the container means the frontend container itself, not the server. If the backend runs in another container, use an address reachable from this container; a Compose service name works only when both services share a Docker network. Ensure firewall rules allow this connection.
-- Add `SITE_URL=https://your-domain.example` for canonical URLs, metadata, robots and sitemap links.
+- Add `SITE_URL=https://medcation.care` for canonical URLs, metadata, robots and sitemap links.
 - Set the reviewed `CONTACT_*` values as needed. Both address languages are required to display an address. For contact form submissions, configure the public `CONTACT_CAPTCHA_SITE_KEY` and `CONTACT_CAPTCHA_ACTION`; the action must match the backend's `RECAPTCHA_LEAD_ACTION`. Backend reCAPTCHA secrets belong only on the backend. See `.env.example` for validation and optional country configuration. Do not enable the development bypass in production.
 
 The app can render some values during the build. The Compose file passes these settings to both the image build and the running container. **After changing any of them, rebuild and recreate the container** using the command below. Build arguments are not secret storage: use only the public contact details, public CAPTCHA site key and non-secret origins described above.

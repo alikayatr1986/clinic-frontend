@@ -17,7 +17,8 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
   const t = await getTranslations("blogs");
   // Category validity is checked by the list; any category param is noindex here.
   const raw = await searchParams;
-  const filters = parseBlogFilters(raw, [String(raw.category ?? "")]);
+  const category = Array.isArray(raw.category) ? raw.category[0] : raw.category;
+  const filters = parseBlogFilters(raw, [category ?? ""]);
   return buildListMetadata(filters, t("pageTitle"), t("pageDescription"));
 }
 

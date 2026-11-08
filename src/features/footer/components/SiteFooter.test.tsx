@@ -346,12 +346,16 @@ describe("SiteFooter", () => {
     expect(skyline).toHaveAttribute("aria-hidden", "true");
     expect(skyline).toHaveClass(
       "pointer-events-none",
-      "opacity-50",
-      "lg:opacity-35",
+      "opacity-35",
+      "bottom-[calc(100%-1.5rem)]",
+      "w-screen",
+      "lg:opacity-10",
     );
 
     const skylineImg = skyline?.querySelector("img");
+    expect(skyline?.parentElement).toHaveAttribute("data-slot", "footer-bottom");
     expect(skylineImg).not.toBeNull();
+    expect(skylineImg).toHaveClass("h-auto", "w-full");
     expect(skylineImg).toHaveAttribute("aria-hidden", "true");
     expect(skylineImg).toHaveAttribute("alt", "");
     expect(skylineImg).toHaveAttribute("sizes", "100vw");

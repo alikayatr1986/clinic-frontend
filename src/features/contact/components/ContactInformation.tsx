@@ -1,4 +1,6 @@
 import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { contactMethodIcons } from "@/features/contact/constants/contact.constants";
 import { Mail, MapPin, Phone } from "lucide-react";
 import type { ContactInformationProps } from "@/features/contact/types/contact.types";
 
@@ -41,8 +43,9 @@ export function ContactInformation({ config, locale }: ContactInformationProps) 
                       href={config[method]}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex min-h-16 min-w-0 items-center justify-center rounded-lg border border-border p-4 text-center font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      className="flex min-h-16 min-w-0 items-center justify-center gap-3 rounded-lg border border-border p-4 text-center font-medium transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     >
+                      <Image src={contactMethodIcons[method]} alt="" width={24} height={24} aria-hidden="true" />
                       {t(`direct.${method}`)}
                       <span className="sr-only"> {t("newWindow")}</span>
                     </a>

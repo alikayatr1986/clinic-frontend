@@ -4,7 +4,7 @@ services:
       context: .
       args:
         API_BASE_URL: ${API_BASE_URL:?Set API_BASE_URL in .env.production}
-        SITE_URL: ${SITE_URL:?Set SITE_URL in .env.production}
+        SITE_URL: ${SITE_URL:-https://medcation.care}
         CONTACT_ADDRESS_EN: ${CONTACT_ADDRESS_EN:-}
         CONTACT_ADDRESS_AR: ${CONTACT_ADDRESS_AR:-}
         CONTACT_PUBLIC_EMAIL: ${CONTACT_PUBLIC_EMAIL:-}
@@ -15,6 +15,8 @@ services:
         CONTACT_CAPTCHA_SITE_KEY: ${CONTACT_CAPTCHA_SITE_KEY:-}
         CONTACT_CAPTCHA_ACTION: ${CONTACT_CAPTCHA_ACTION:-}
     env_file: .env.production
+    environment:
+      SITE_URL: ${SITE_URL:-https://medcation.care}
     ports:
       - "127.0.0.1:3000:3000"
     restart: unless-stopped

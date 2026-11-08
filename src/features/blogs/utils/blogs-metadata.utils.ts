@@ -113,6 +113,8 @@ export function buildListMetadata(
     title,
     description,
     ...(canonical && { alternates: { canonical } }),
+    openGraph: { type: "website", title, description, ...(canonical && { url: canonical }) },
+    twitter: { card: "summary", title, description },
     ...((filtered || paged) && { robots: { index: false, follow: true } }),
   };
 }

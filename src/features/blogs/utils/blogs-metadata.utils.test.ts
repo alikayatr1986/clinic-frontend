@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   absoluteUrl,
   buildArticleJsonLd,
+  buildArticleMetadata,
   buildListMetadata,
   serializeJsonLd,
 } from "./blogs-metadata.utils";
@@ -26,6 +27,7 @@ describe("blog metadata", () => {
     vi.stubEnv("SITE_URL", "not a url");
     expect(absoluteUrl("/blog")).toBeNull();
     expect(buildArticleJsonLd(post, "Home", "Articles")).toBeNull();
+    expect(buildListMetadata({ q: "", category: "", page: 1 }, "t", "d").alternates).toBeUndefined();
   });
 
   it("escapes script terminators in JSON-LD", () => {
@@ -37,9 +39,16 @@ describe("blog metadata", () => {
     expect(JSON.parse(s)[0].mainEntityOfPage["@id"]).toBe("https://example.com/blog/a%20b");
   });
 
+  it("preserves article-specific metadata and cover", () => {
+    vi.stubEnv("SITE_URL", "https://example.com");
+    const article = { ...post, seo_title: "SEO title", seo_description: "SEO description", cover: { url: "/cover.jpg", width: 1200, height: 630, alt: "Cover" } } as BlogDetail;
+    expect(buildArticleMetadata(article)).toMatchObject({ title: "SEO title", description: "SEO description", alternates: { canonical: "https://example.com/blog/a%20b" }, openGraph: { type: "article", publishedTime: post.first_published_at, modifiedTime: post.last_published_at, images: [{ url: "https://example.com/cover.jpg" }] }, twitter: { card: "summary_large_image", images: ["https://example.com/cover.jpg"] } });
+  });
+
   it("indexes only the unfiltered first list page", () => {
     vi.stubEnv("SITE_URL", "https://example.com");
     const base = { q: "", category: "", page: 1 };
+    expect(buildListMetadata(base, "t", "d")).toMatchObject({ openGraph: { title: "t", description: "d", url: "https://example.com/blog" }, twitter: { card: "summary", title: "t", description: "d" } });
     expect(buildListMetadata(base, "t", "d").robots).toBeUndefined();
     expect(buildListMetadata({ ...base, q: "x" }, "t", "d")).toMatchObject({
       robots: { index: false, follow: true },

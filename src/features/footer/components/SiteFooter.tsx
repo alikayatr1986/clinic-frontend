@@ -113,20 +113,6 @@ export function SiteFooter({ config }: SiteFooterProps) {
         className="pointer-events-none absolute -bottom-24 -start-24 size-[380px] rounded-full blur-3xl bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--color-crimson-600)_35%,transparent)_0%,transparent_70%)]"
       />
 
-      <div
-        data-slot="footer-skyline"
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-end overflow-hidden opacity-50 [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_35%)] [mask-image:linear-gradient(to_bottom,transparent_0%,black_35%)] lg:opacity-35"
-      >
-        <Image
-          {...FOOTER_CONSTANTS.skyline}
-          alt=""
-          aria-hidden="true"
-          sizes="100vw"
-          className="h-[220px] w-full object-cover object-bottom lg:w-auto lg:max-w-none lg:object-contain lg:object-right-bottom rtl:lg:object-left-bottom"
-        />
-      </div>
-
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 xl:px-8">
         {/* Desktop Four-Column Composition (>=1024px) */}
         <div
@@ -554,8 +540,22 @@ export function SiteFooter({ config }: SiteFooterProps) {
         {/* Bottom Legal Bar */}
         <div
           data-slot="footer-bottom"
-          className="flex flex-col items-center gap-4 border-t border-white/10 py-7 text-center lg:flex-row lg:justify-between lg:gap-6 lg:text-start"
+          className="relative flex flex-col items-center gap-4 border-t border-white/10 py-7 text-center lg:flex-row lg:justify-between lg:gap-6 lg:text-start"
         >
+          <div
+            data-slot="footer-skyline"
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-[calc(100%-1.5rem)] left-1/2 flex w-screen -translate-x-1/2 justify-center overflow-hidden opacity-35 [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_35%)] [mask-image:linear-gradient(to_bottom,transparent_0%,black_35%)] lg:bottom-[calc(100%-6rem)] lg:opacity-10"
+          >
+            <Image
+              {...FOOTER_CONSTANTS.skyline}
+              alt=""
+              aria-hidden="true"
+              sizes="100vw"
+              className="h-auto w-full"
+            />
+          </div>
+
           <p className="text-sm text-linen/80 lg:text-[15px]">
             {t("copyright", { year })}
           </p>

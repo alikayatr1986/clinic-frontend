@@ -102,6 +102,7 @@ describe("GalleryPage (/gallery)", () => {
   });
 
   it("generates page metadata with localized title and description", async () => {
+    vi.stubEnv("SITE_URL", "https://medcation.care");
     serveLocale("en");
     const metaEn = await generateMetadata();
     expect(metaEn.title).toBe(enMessages.gallery.pageTitle);
@@ -111,6 +112,14 @@ describe("GalleryPage (/gallery)", () => {
     const metaAr = await generateMetadata();
     expect(metaAr.title).toBe(arMessages.gallery.pageTitle);
     expect(metaAr.description).toBe(arMessages.gallery.pageDescription);
+    for (const [meta, messages] of [[metaEn, enMessages], [metaAr, arMessages]] as const) {
+      const title = messages.gallery.pageTitle;
+      const description = messages.gallery.pageDescription;
+      expect(meta).toMatchObject({ alternates: { canonical: "https://medcation.care/gallery" }, openGraph: { title, description, url: "https://medcation.care/gallery" }, twitter: { card: "summary", title, description } });
+    }
+    vi.stubEnv("SITE_URL", "invalid");
+    expect((await generateMetadata()).alternates).toBeUndefined();
+    vi.unstubAllEnvs();
   });
 
   it("passes axe accessibility checks", async () => {

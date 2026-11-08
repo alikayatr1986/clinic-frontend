@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import arMessages from '../../messages/ar.json';
 import enMessages from '../../messages/en.json';
 import RootLayout, { generateMetadata } from '@/app/layout';
+import { generateMetadata as generateHomeMetadata } from "@/app/page";
 import { QueryProvider } from "@/lib/query-client-provider";
 vi.mock("next/font/google", () => ({
   Libre_Caslon_Display: () => ({ variable: "font-mock-libre-caslon-display" }),
@@ -76,16 +77,15 @@ describe('RootLayout (localization seam)', () => {
     const page = React.Children.only(provider.props.children) as TestElement;
     expect(page.props["data-slot"]).toBe("page");
   });
-  it('generateMetadata resolves the metadata namespace per locale (en byte-identical to messages/en.json)', async () => {
-  serveLocale("en");
-  expect(await generateMetadata()).toEqual({
-  title: enMessages.metadata.title,
-  description: enMessages.metadata.description,
-  });
-  serveLocale("ar");
-  expect(await generateMetadata()).toEqual({
-  title: arMessages.metadata.title,
-  description: arMessages.metadata.description,
-  });
+  it.each(["en", "ar"] as const)("generates localized sharing metadata for %s", async (locale) => {
+    vi.stubEnv("SITE_URL", "https://medcation.care");
+    serveLocale(locale);
+    const { title, description } = (locale === "en" ? enMessages : arMessages).metadata;
+    expect(await generateMetadata()).toMatchObject({ title, description, openGraph: { title, description }, twitter: { card: "summary", title, description } });
+    expect((await generateMetadata()).alternates).toBeUndefined();
+    expect(await generateHomeMetadata()).toMatchObject({ alternates: { canonical: "https://medcation.care/" }, openGraph: { title, description, url: "https://medcation.care/" } });
+    vi.stubEnv("SITE_URL", "invalid");
+    expect((await generateHomeMetadata()).alternates).toBeUndefined();
+    vi.unstubAllEnvs();
   });
 });

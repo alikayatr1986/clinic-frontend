@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { absoluteUrl } from "@/features/blogs/utils/blogs-metadata.utils";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { GalleryBrowser } from "@/features/gallery/components/GalleryBrowser";
 import {
@@ -10,9 +11,15 @@ import {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("gallery");
+  const title = t("pageTitle");
+  const description = t("pageDescription");
+  const canonical = absoluteUrl("/gallery");
   return {
-    title: t("pageTitle"),
-    description: t("pageDescription"),
+    title,
+    description,
+    ...(canonical && { alternates: { canonical } }),
+    openGraph: { type: "website", title, description, ...(canonical && { url: canonical }) },
+    twitter: { card: "summary", title, description },
   };
 }
 
