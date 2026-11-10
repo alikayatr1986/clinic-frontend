@@ -38,7 +38,7 @@ export function GalleryComparison({
         {/* We use physical CSS left / right so labels do NOT mirror in RTL */}
         <span
           data-testid="overlay-before"
-          className={`absolute bottom-3 z-10 select-none rounded bg-black/65 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-xs shadow-xs ${
+          className={`absolute bottom-3 z-10 select-none rounded bg-black/65 px-2.5 py-1 text-xs font-semibold text-white shadow-xs ${
             isBeforeLeft ? "left-3" : "right-3"
           }`}
         >
@@ -46,7 +46,7 @@ export function GalleryComparison({
         </span>
         <span
           data-testid="overlay-after"
-          className={`absolute bottom-3 z-10 select-none rounded bg-black/65 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-xs shadow-xs ${
+          className={`absolute bottom-3 z-10 select-none rounded bg-black/65 px-2.5 py-1 text-xs font-semibold text-white shadow-xs ${
             isBeforeLeft ? "right-3" : "left-3"
           }`}
         >
