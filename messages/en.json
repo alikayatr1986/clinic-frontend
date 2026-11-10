@@ -361,12 +361,17 @@
     "consultationHeading": "Still have questions?",
     "consultationSupport": "Contact us for personalized guidance.",
     "provisional": "Provisional information — answers are awaiting clinic approval.",
-    "answer": "This answer is a placeholder and will be updated with clinic-approved information.",
-    "question1": "What is the difference between rhinoplasty and septorhinoplasty?",
-    "question2": "How long should I stay in Istanbul for the surgery?",
-    "question3": "What is the typical recovery time?",
-    "question4": "Are the surgeries performed in accredited hospitals?",
-    "question5": "How much does rhinoplasty cost in Turkey?",
-    "question6": "Do you provide follow-up care after I return home?"
+    "question1": "At what age can someone undergo rhinoplasty?",
+    "question2": "Is rhinoplasty only cosmetic, or can it also improve health?",
+    "question3": "Can every patient have the same nose shape after rhinoplasty?",
+    "question4": "Is rhinoplasty different for patients with thick nasal skin?",
+    "question5": "Can someone undergo rhinoplasty after having nasal fillers?",
+    "question6": "How long does rhinoplasty surgery take?",
+    "answer1": "Rhinoplasty should be performed after nasal bone and cartilage development is sufficiently complete. For girls, this generally occurs around age 16–17; the doctor prefers to operate after age 17. The key consideration is whether facial and nasal growth has reached an appropriate stage.",
+    "answer2": "Rhinoplasty can address functional problems as well as appearance, and may also improve psychological well-being. For example, surgery can correct structural abnormalities such as nasal deviation that interfere with breathing, while also improving the appearance of the nose.",
+    "answer3": "No. Each nose should be designed to suit the patient's individual facial proportions, including the chin, lips, forehead, and the angles between them. Copying someone else's nose may not produce a natural, harmonious result.",
+    "answer4": "Yes. Thick skin requires special techniques and a strong bone and cartilage framework to support it. The nose should not be reduced excessively, because thick skin may not contract sufficiently around a very small framework.",
+    "answer5": "Yes, but previous fillers need careful assessment and management before or during surgery. Depending on their composition, some can be dissolved with an appropriate enzyme; remaining material may need to be managed during surgery. Filler can obscure the underlying structure, and if it dissolves later, the appearance of the nose may change.",
+    "answer6": "The duration depends on the complexity of the procedure, the nose's structure, and whether surgery is primary or a revision. In the doctor's practice, primary rhinoplasty typically takes about two hours. Revision surgery can take two to six hours, depending on the corrections required and the condition of the nasal structures."
   }
 }

@@ -37,10 +37,10 @@ export function FaqSection() {
         </div>
         <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 rounded-3xl border border-[#e3e7e9] bg-white px-5 py-2 shadow-[0_12px_30px_#18243a12] dark:border-[#34445c] dark:bg-[#172442] sm:px-8">
           <Accordion type="single" collapsible defaultValue="question1" dir={isArabic ? "rtl" : "ltr"}>
-            {(["question1", "question2", "question3", "question4", "question5", "question6"] as const).map((key) => (
-              <AccordionItem key={key} value={key}>
-                <AccordionTrigger><span className={`text-lg leading-snug lg:text-xl ${isArabic ? "[font-family:var(--font-noto-arabic),sans-serif]" : "font-hero-display font-normal"}`}>{t(key)}</span></AccordionTrigger>
-                <AccordionContent><span className="text-base leading-7">{t("answer")}</span></AccordionContent>
+            {([1, 2, 3, 4, 5, 6] as const).map((number) => (
+              <AccordionItem key={number} value={`question${number}`}>
+                <AccordionTrigger><span className={`text-lg leading-snug lg:text-xl ${isArabic ? "[font-family:var(--font-noto-arabic),sans-serif]" : "font-hero-display font-normal"}`}>{t(`question${number}`)}</span></AccordionTrigger>
+                <AccordionContent><span className="text-base leading-7">{t(`answer${number}`)}</span></AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>

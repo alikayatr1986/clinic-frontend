@@ -22,12 +22,12 @@ describe("FaqSection", () => {
     }
     expect(screen.getByRole("link", { name: locale === "ar" ? arMessages.header.cta : enMessages.header.cta })).toHaveAttribute("href", "#contact");
     expect(first).toHaveAttribute("aria-expanded", "true");
-    expect(document.getElementById(first.getAttribute("aria-controls")!)).toHaveTextContent(messages.answer);
+    expect(document.getElementById(first.getAttribute("aria-controls")!)).toHaveTextContent(messages.answer1);
     expect(screen.getByRole("region", { name: messages.heading })).toHaveAttribute("dir", locale === "ar" ? "rtl" : "ltr");
     await userEvent.click(second);
     expect(first).toHaveAttribute("aria-expanded", "false");
     expect(second).toHaveAttribute("aria-expanded", "true");
-    expect(document.getElementById(second.getAttribute("aria-controls")!)).toHaveTextContent(messages.answer);
+    expect(document.getElementById(second.getAttribute("aria-controls")!)).toHaveTextContent(messages.answer2);
     second.focus();
     await userEvent.keyboard("{Enter}");
     expect(second).toHaveAttribute("aria-expanded", "false");
