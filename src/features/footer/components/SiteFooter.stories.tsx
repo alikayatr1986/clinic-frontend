@@ -13,6 +13,7 @@ const config: SiteFooterConfig = {
     en: "Nişantaşı, Istanbul, Türkiye",
     ar: "نيشانتاشي، إسطنبول، تركيا",
   },
+  instagram: "https://www.instagram.com/naser.dadaszade.md/",
   whatsapp: "https://wa.me/905551234567",
   telegram: "https://t.me/exampleclinic",
 };

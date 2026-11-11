@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import {
-  ArrowUpRight,
   ChevronDown,
   Images,
   Mail,
@@ -11,6 +10,7 @@ import {
   User,
 } from "lucide-react";
 
+import { SocialLinks } from "@/features/footer/components/social-links/SocialLinks";
 import { FOOTER_CONSTANTS } from "@/features/footer/constants/footer.constants";
 import type {
   SiteFooterConfig,
@@ -30,13 +30,6 @@ const LINK_ROW = cn(
   "flex min-h-12 items-center justify-between gap-3 rounded-sm py-2.5",
   "text-base text-linen/90 underline-offset-4",
   "hover:text-crimson-100 hover:underline",
-  FOCUS_RING,
-);
-
-const CHANNEL_BUTTON = cn(
-  "inline-flex min-h-12 flex-1 items-center gap-3 rounded-lg border border-white/15 bg-white/5 px-4",
-  "text-base font-medium text-linen transition-colors motion-reduce:transition-none",
-  "hover:border-white/25 hover:bg-white/10",
   FOCUS_RING,
 );
 
@@ -60,6 +53,7 @@ function footerConfig({
   phone,
   email,
   address,
+  instagram,
   whatsapp,
   telegram,
 }: SiteFooterConfig = {}): SiteFooterConfig {
@@ -76,6 +70,7 @@ function footerConfig({
             ar: arAddress ?? enAddress!,
           }
         : undefined,
+    instagram: clean(instagram),
     whatsapp: clean(whatsapp),
     telegram: clean(telegram),
   };
@@ -86,9 +81,8 @@ export function SiteFooter({ config }: SiteFooterProps) {
   const locale = useLocale();
   const language = locale === "ar" ? "ar" : "en";
   const year = new Date().getFullYear();
-  const { phone, email, address, whatsapp, telegram } = footerConfig(config);
+  const { phone, email, address, instagram, whatsapp, telegram } = footerConfig(config);
   const addressText = address?.[language];
-  const hasChannels = Boolean(whatsapp || telegram);
   const headingClass = cn(
     "text-3xl font-normal text-linen",
     language === "ar"
@@ -246,53 +240,7 @@ export function SiteFooter({ config }: SiteFooterProps) {
               </li>
             </ul>
 
-            {hasChannels && (
-              <div className="mt-6 flex flex-wrap gap-3">
-                {whatsapp && (
-                  <a
-                    href={whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={CHANNEL_BUTTON}
-                  >
-                    <Image
-                      {...FOOTER_CONSTANTS.channelIcons.whatsapp}
-                      alt=""
-                      aria-hidden="true"
-                      className="size-5 shrink-0"
-                    />
-                    <span className="min-w-0 flex-1">{t("whatsapp")}</span>
-                    <ArrowUpRight
-                      aria-hidden="true"
-                      className="size-4 shrink-0 rtl:-scale-x-100"
-                    />
-                    <span className="sr-only"> {t("opensInNewTab")}</span>
-                  </a>
-                )}
-
-                {telegram && (
-                  <a
-                    href={telegram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={CHANNEL_BUTTON}
-                  >
-                    <Image
-                      {...FOOTER_CONSTANTS.channelIcons.telegram}
-                      alt=""
-                      aria-hidden="true"
-                      className="size-5 shrink-0"
-                    />
-                    <span className="min-w-0 flex-1">{t("telegram")}</span>
-                    <ArrowUpRight
-                      aria-hidden="true"
-                      className="size-4 shrink-0 rtl:-scale-x-100"
-                    />
-                    <span className="sr-only"> {t("opensInNewTab")}</span>
-                  </a>
-                )}
-              </div>
-            )}
+            <SocialLinks instagram={instagram} whatsapp={whatsapp} telegram={telegram} layout="desktop" />
           </nav>
         </div>
 
@@ -485,53 +433,7 @@ export function SiteFooter({ config }: SiteFooterProps) {
                   </li>
                 </ul>
 
-                {hasChannels && (
-                  <div className="mt-6 grid max-w-[528px] grid-cols-1 gap-3 min-[360px]:grid-cols-2">
-                    {whatsapp && (
-                      <a
-                        href={whatsapp}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={CHANNEL_BUTTON}
-                      >
-                        <Image
-                          {...FOOTER_CONSTANTS.channelIcons.whatsapp}
-                          alt=""
-                          aria-hidden="true"
-                          className="size-5 shrink-0"
-                        />
-                        <span className="min-w-0 flex-1">{t("whatsapp")}</span>
-                        <ArrowUpRight
-                          aria-hidden="true"
-                          className="size-4 shrink-0 rtl:-scale-x-100"
-                        />
-                        <span className="sr-only"> {t("opensInNewTab")}</span>
-                      </a>
-                    )}
-
-                    {telegram && (
-                      <a
-                        href={telegram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={CHANNEL_BUTTON}
-                      >
-                        <Image
-                          {...FOOTER_CONSTANTS.channelIcons.telegram}
-                          alt=""
-                          aria-hidden="true"
-                          className="size-5 shrink-0"
-                        />
-                        <span className="min-w-0 flex-1">{t("telegram")}</span>
-                        <ArrowUpRight
-                          aria-hidden="true"
-                          className="size-4 shrink-0 rtl:-scale-x-100"
-                        />
-                        <span className="sr-only"> {t("opensInNewTab")}</span>
-                      </a>
-                    )}
-                  </div>
-                )}
+                <SocialLinks instagram={instagram} whatsapp={whatsapp} telegram={telegram} layout="mobile" />
               </div>
             </details>
           </div>

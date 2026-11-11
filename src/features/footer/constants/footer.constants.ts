@@ -1,3 +1,4 @@
+import instagramIcon from "../assets/icons/instagram-icon.png";
 import footerLogo from "../assets/icons/footer-logo-white.png";
 import telegramIcon from "../assets/icons/telegram-icon.png";
 import whatsappIcon from "../assets/icons/whatsapp-icon.png";
@@ -16,6 +17,7 @@ export const FOOTER_LOGO_IMAGE = {
 } as const;
 
 export const CHANNEL_ICONS = {
+  instagram: { src: instagramIcon, width: 1536, height: 1024 },
   whatsapp: { src: whatsappIcon, width: 512, height: 512 },
   telegram: { src: telegramIcon, width: 512, height: 512 },
 } as const;

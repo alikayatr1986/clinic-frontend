@@ -13,6 +13,12 @@ describe('public contact config allowlist', () => {
   it.each(['javascript:alert(1)', 'https://evil.test/12345678901', 'https://wa.me@evil.test/12345678901', 'https://user:pass@wa.me/12345678901', 'https://wa.me/12345678901?text=private'])('rejects unsafe channel %s', (raw) => {
     expect(getContactConfig({ CONTACT_WHATSAPP_URL: raw }).whatsapp).toBeUndefined();
   });
+  it('validates the Instagram profile URL', () => {
+    expect(getContactConfig({ CONTACT_INSTAGRAM_URL: 'https://www.instagram.com/naser.dadaszade.md/' }).instagram).toBe('https://www.instagram.com/naser.dadaszade.md/');
+    for (const raw of ['javascript:alert(1)', 'https://evil.test/profile', 'https://www.instagram.com/profile?private=1', 'https://www.instagram.com/']) {
+      expect(getContactConfig({ CONTACT_INSTAGRAM_URL: raw }).instagram).toBeUndefined();
+    }
+  });
   it('hides invalid details and fails CAPTCHA configuration closed', () => {
     expect(getContactConfig({ CONTACT_PUBLIC_EMAIL: 'x@example.test\nBcc: bad', CONTACT_PUBLIC_PHONE: '123', CONTACT_CAPTCHA_SITE_KEY: '<bad>', CONTACT_CAPTCHA_ACTION: 'lead?x' })).toMatchObject({ email: undefined, phone: undefined, captcha: { siteKey: '', action: '' } });
   });

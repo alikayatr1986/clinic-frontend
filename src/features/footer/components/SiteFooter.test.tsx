@@ -44,6 +44,7 @@ const FULL_CONFIG: SiteFooterConfig = {
     en: "Nişantaşı, Istanbul, Türkiye",
     ar: "نيشانتاشي، إسطنبول، تركيا",
   },
+  instagram: "https://www.instagram.com/naser.dadaszade.md/",
   whatsapp: "https://wa.me/905551234567",
   telegram: "https://t.me/exampleclinic",
 };
@@ -221,6 +222,11 @@ describe("SiteFooter", () => {
     expect(
       mobileContact.querySelector('a[href="mailto:clinic@example.test"]'),
     ).not.toBeNull();
+    for (const contact of [desktopContact, mobileContact]) {
+      expect(within(contact).getByRole("link", { name: /instagram/i })).toHaveAttribute(
+        "href", "https://www.instagram.com/naser.dadaszade.md/",
+      );
+    }
     const mobileWhatsapp = within(mobileContact).getByRole("link", {
       name: /whatsapp/i,
     });
@@ -240,6 +246,19 @@ describe("SiteFooter", () => {
     expect(within(mobileTelegram).getByText("opens in a new tab")).toHaveClass(
       "sr-only",
     );
+  });
+
+  it("links to configured Instagram in both contact layouts", () => {
+    const { container } = themedRender(<SiteFooter config={{ instagram: "https://www.instagram.com/naser.dadaszade.md/" }} />);
+    for (const slot of ["footer-contact", "footer-panel-contact"]) {
+      const section = container.querySelector(`[data-slot="${slot}"]`) as HTMLElement;
+      const link = within(section).getByRole("link", { name: /instagram/i });
+      expect(link).toHaveAttribute("href", "https://www.instagram.com/naser.dadaszade.md/");
+      expect(link.querySelector("img")).toHaveAttribute("src", expect.stringContaining("instagram-icon"));
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+      expect(within(link).getByText("opens in a new tab")).toHaveClass("sr-only");
+    }
   });
 
   it("renders exactly three mobile disclosure rows in order with contact open by default", () => {
@@ -368,6 +387,7 @@ describe("SiteFooter", () => {
 
     expect(container.querySelector('a[href^="tel:"]')).toBeNull();
     expect(container.querySelector('a[href^="mailto:"]')).toBeNull();
+    expect(screen.queryByRole("link", { name: /instagram/i })).toBeNull();
     expect(screen.queryByRole("link", { name: /whatsapp/i })).toBeNull();
     expect(screen.queryByRole("link", { name: /telegram/i })).toBeNull();
     expect(screen.queryByText(/XXX/)).toBeNull();
@@ -406,6 +426,7 @@ describe("SiteFooter", () => {
 
     expect(container.querySelector('a[href^="tel:"]')).toBeNull();
     expect(container.querySelector('a[href^="mailto:"]')).toBeNull();
+    expect(screen.queryByRole("link", { name: /instagram/i })).toBeNull();
     expect(screen.queryByRole("link", { name: /whatsapp/i })).toBeNull();
     expect(screen.queryByRole("link", { name: /telegram/i })).toBeNull();
 
@@ -452,7 +473,7 @@ describe("SiteFooter", () => {
     const { container } = themedRender(<SiteFooter config={FULL_CONFIG} />);
 
     const links = screen.getAllByRole("link");
-    expect(links).toHaveLength(20);
+    expect(links).toHaveLength(22);
     for (const link of links) {
       expect(link).toHaveClass(
         "focus-visible:ring-2",

@@ -8,6 +8,7 @@ export interface ContactConfig {
   address?: { en: string; ar: string };
   email?: string;
   phone?: string;
+  instagram?: string;
   whatsapp?: string;
   telegram?: string;
   captcha: { siteKey: string; action: string; devBypass?: boolean };

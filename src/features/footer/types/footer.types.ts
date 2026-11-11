@@ -9,6 +9,7 @@ export interface SiteFooterConfig {
   phone?: string;
   email?: string;
   address?: LocalizedText;
+  instagram?: string;
   whatsapp?: string;
   telegram?: string;
 }
@@ -40,6 +41,7 @@ export interface FooterImageAsset {
 export interface SiteFooterConstants {
   logo: FooterImageAsset;
   channelIcons: {
+    instagram: FooterImageAsset;
     whatsapp: FooterImageAsset;
     telegram: FooterImageAsset;
   };
@@ -53,4 +55,16 @@ export interface SiteFooterFrameProps {
   config: SiteFooterConfig;
   theme: "light" | "dark";
   dir: "ltr" | "rtl";
+}
+
+export interface SocialLinksProps {
+  instagram?: string;
+  whatsapp?: string;
+  telegram?: string;
+  layout: "desktop" | "mobile";
+}
+
+export interface SocialLinkProps {
+  href: string;
+  channel: "instagram" | "whatsapp" | "telegram";
 }

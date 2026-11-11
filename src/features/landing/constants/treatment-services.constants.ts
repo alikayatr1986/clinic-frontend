@@ -1,5 +1,5 @@
 import { Globe, ShieldCheck, UserRound } from "lucide-react";
-import doctorIcon from "../assets/icons/treatment-services/doctor-icon.png";
+import doctorIcon from "../assets/icons/treatment-services/doctor-icon.svg?url";
 import entTreatmentIcon from "../assets/icons/treatment-services/ent-treatments-icon.svg?url";
 import facialRejuvenationIcon from "../assets/icons/treatment-services/facial-rejuvenation-icon.svg?url";
 import reconstructiveSurgeryIcon from "../assets/icons/treatment-services/functional-reconstructive-icon.svg?url";

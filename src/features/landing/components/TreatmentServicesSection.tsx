@@ -1,6 +1,6 @@
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -73,13 +73,20 @@ export function TreatmentServicesSection() {
           </picture>
           <article
             aria-labelledby="treatment-services-profile-name"
-            className="relative z-10 mx-4 -mt-12 mb-12 grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)] items-start gap-3 rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-lg [overflow-wrap:anywhere] min-[481px]:mx-6 min-[481px]:grid-cols-[3.875rem_minmax(0,1fr)] min-[481px]:gap-5 min-[481px]:p-6 lg:m-0 lg:w-full lg:max-w-md"
+            className="relative z-10 mx-4 -mt-12 mb-12 grid min-w-0 grid-cols-[3rem_minmax(0,1fr)] items-start gap-3 rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-lg [overflow-wrap:anywhere] min-[481px]:mx-6 min-[481px]:grid-cols-[5rem_minmax(0,1fr)] min-[481px]:gap-5 min-[481px]:p-6 lg:m-0 lg:w-full lg:max-w-md"
           >
+            <a
+              href={process.env.DOCTOR_PROFILE_URL || "https://naserdadaszade.com/en/home/"}
+              aria-label={t("profileName")}
+              className="absolute inset-0 rounded-2xl text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <ChevronRight aria-hidden="true" className="absolute top-3 right-3 size-6" />
+            </a>
             <Image
               {...TREATMENT_SERVICES_DOCTOR_MARK}
               alt=""
               aria-hidden="true"
-              className="h-auto w-full"
+              className="aspect-square w-full rounded-full bg-midnight-900 p-2 min-[481px]:p-3"
             />
             <div className="min-w-0 border-s border-border ps-3 min-[481px]:ps-5">
               <p

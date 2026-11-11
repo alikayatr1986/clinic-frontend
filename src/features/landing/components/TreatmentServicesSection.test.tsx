@@ -43,13 +43,13 @@ describe("TreatmentServicesSection", () => {
     expect(within(profile).getByText(copy.profileEyebrow)).toBeInTheDocument();
     expect(within(profile).getByText(copy.profileSpecialty)).toBeInTheDocument();
     const mark = profile.querySelector("img")!;
-    const doctorMarkSrc = typeof TREATMENT_SERVICES_DOCTOR_MARK.src === "string"
-      ? TREATMENT_SERVICES_DOCTOR_MARK.src
-      : TREATMENT_SERVICES_DOCTOR_MARK.src.src;
-    expect(mark.getAttribute("src")).toContain(encodeURIComponent(doctorMarkSrc));
+    expect(decodeURIComponent(mark.getAttribute("src")!)).toContain(TREATMENT_SERVICES_DOCTOR_MARK.src);
+    expect(mark).toHaveClass("rounded-full", "bg-midnight-900");
     expect(mark).toHaveAttribute("alt", "");
     expect(mark).toHaveAttribute("aria-hidden", "true");
-    expect(within(profile).queryByRole("link")).not.toBeInTheDocument();
+    const profileLink = within(profile).getByRole("link", { name: copy.profileName });
+    expect(profileLink).toHaveAttribute("href", process.env.DOCTOR_PROFILE_URL || "https://naserdadaszade.com/en/home/");
+    expect(profileLink.querySelector(".lucide-chevron-right")).toBeInTheDocument();
     const services = within(screen.getByRole("list", { name: copy.servicesLabel })).getAllByRole("listitem");
     expect(services).toHaveLength(4);
     TREATMENT_SERVICES.forEach(({ key, image }, index) => {
@@ -62,7 +62,7 @@ describe("TreatmentServicesSection", () => {
       expect(icon).not.toHaveClass("rtl:-scale-x-100");
     });
     expect(profile.compareDocumentPosition(services[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    const links = within(section).getAllByRole("link");
+    const links = within(section).getAllByRole("link").filter(link => link !== profileLink);
     expect(links).toHaveLength(2);
     expect(links[0]).toHaveAccessibleName(copy.primaryAction);
     expect(links[1]).toHaveAccessibleName(copy.secondaryAction);
@@ -118,6 +118,8 @@ describe("TreatmentServicesSection", () => {
     expect(links[0]).toHaveFocus();
     await user.tab();
     expect(links[1]).toHaveFocus();
+    await user.tab();
+    expect(links[2]).toHaveFocus();
   });
 
   it.each(["en", "ar"] as const)("has zero axe violations in %s", async (locale) => {
